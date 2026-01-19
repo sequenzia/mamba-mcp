@@ -108,9 +108,14 @@ class CapabilityTree(Tree[dict]):
 class ResultPanel(ScrollableContainer):
     """Panel for displaying results."""
 
+    BINDINGS = [
+        Binding("y", "copy_all", "Copy"),
+    ]
+
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self._log = RichLog(highlight=True, markup=True)
+        self._plain_content: list[str] = []
 
     def compose(self) -> ComposeResult:
         yield self._log
@@ -118,27 +123,50 @@ class ResultPanel(ScrollableContainer):
     def clear(self) -> None:
         """Clear the result panel."""
         self._log.clear()
+        self._plain_content.clear()
 
     def write_json(self, data: Any, title: str = "") -> None:
         """Write JSON data to the panel."""
         if title:
             self._log.write(f"[bold blue]{title}[/]\n")
+            self._plain_content.append(f"--- {title} ---")
 
         if hasattr(data, "model_dump"):
             data = data.model_dump()
 
         json_str = json.dumps(data, indent=2, default=str)
-        syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
+        syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False, word_wrap=True)
         self._log.write(syntax)
         self._log.write("")
+        self._plain_content.append(json_str)
+        self._plain_content.append("")
 
     def write_error(self, error: str) -> None:
         """Write an error message."""
         self._log.write(f"[bold red]Error:[/] {error}\n")
+        self._plain_content.append(f"Error: {error}")
+        self._plain_content.append("")
 
     def write_info(self, message: str) -> None:
         """Write an info message."""
         self._log.write(f"[bold green]Info:[/] {message}\n")
+        self._plain_content.append(f"Info: {message}")
+        self._plain_content.append("")
+
+    def action_copy_all(self) -> None:
+        """Copy all content to clipboard."""
+        text = "\n".join(self._plain_content).strip()
+        if not text:
+            self.app.notify("Nothing to copy", severity="warning")
+            return
+        try:
+            import pyperclip  # type: ignore[import-untyped]
+
+            pyperclip.copy(text)
+            self.app.notify("Copied to clipboard")
+        except Exception:
+            self.app.copy_to_clipboard(text)
+            self.app.notify("Copied (OSC 52)")
 
 
 class ToolCallDialog(Container):
@@ -329,7 +357,7 @@ class MCPTestApp(App[None]):
         Binding("r", "refresh", "Refresh"),
         Binding("l", "show_logs", "Logs"),
         Binding("p", "ping", "Ping"),
-        Binding("c", "clear", "Clear"),
+        Binding("x", "clear", "Clear"),
         Binding("t", "call_tool", "Call Tool"),
         Binding("enter", "call_tool", "Call Tool", show=False),
         Binding("escape", "close_dialog", "Close", show=False),
