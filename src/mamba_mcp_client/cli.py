@@ -1,224 +1,271 @@
 """CLI entry point for mamba-mcp-client with .env file support."""
 
-import argparse
 import asyncio
 import json
+import shlex
 import sys
+from enum import Enum
 from pathlib import Path
+from typing import Annotated, Optional
 
+import typer
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
 from mamba_mcp_client import __version__
 from mamba_mcp_client.client import MCPTestClient
-from mamba_mcp_client.config import ClientConfig, TransportType
+from mamba_mcp_client.config import ClientConfig
 from mamba_mcp_client.tui import MCPTestApp
 
 console = Console()
+app = typer.Typer(
+    name="mamba-mcp",
+    help="MCP Client for testing and debugging MCP Servers",
+    no_args_is_help=True,
+)
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser(
-        prog="mamba-mcp",
-        description="MCP Client for testing and debugging MCP Servers",
-    )
-
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"mamba-mcp-client {__version__}",
-    )
-
-    parser.add_argument(
-        "--env",
-        "-e",
-        type=Path,
-        help="Path to .env file to load environment variables from",
-    )
-
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # TUI command
-    tui_parser = subparsers.add_parser("tui", help="Launch the interactive TUI")
-    add_connection_args(tui_parser)
-
-    # Connect command (for quick inspection)
-    connect_parser = subparsers.add_parser("connect", help="Connect and inspect server")
-    add_connection_args(connect_parser)
-
-    # List tools command
-    tools_parser = subparsers.add_parser("tools", help="List available tools")
-    add_connection_args(tools_parser)
-
-    # List resources command
-    resources_parser = subparsers.add_parser("resources", help="List available resources")
-    add_connection_args(resources_parser)
-
-    # List prompts command
-    prompts_parser = subparsers.add_parser("prompts", help="List available prompts")
-    add_connection_args(prompts_parser)
-
-    # Call tool command
-    call_parser = subparsers.add_parser("call", help="Call a tool")
-    add_connection_args(call_parser)
-    call_parser.add_argument("tool_name", help="Name of the tool to call")
-    call_parser.add_argument(
-        "--args",
-        "-a",
-        type=str,
-        default="{}",
-        help="Tool arguments as JSON string",
-    )
-
-    # Read resource command
-    read_parser = subparsers.add_parser("read", help="Read a resource")
-    add_connection_args(read_parser)
-    read_parser.add_argument("uri", help="Resource URI to read")
-
-    # Get prompt command
-    prompt_parser = subparsers.add_parser("prompt", help="Get a prompt")
-    add_connection_args(prompt_parser)
-    prompt_parser.add_argument("prompt_name", help="Name of the prompt")
-    prompt_parser.add_argument(
-        "--args",
-        "-a",
-        type=str,
-        default="{}",
-        help="Prompt arguments as JSON string",
-    )
-
-    return parser.parse_args()
+# Enums for options
+class OutputFormat(str, Enum):
+    json = "json"
+    table = "table"
+    rich = "rich"
 
 
-def add_connection_args(parser: argparse.ArgumentParser) -> None:
-    """Add connection arguments to a parser."""
-    group = parser.add_mutually_exclusive_group(required=True)
+class LogLevel(str, Enum):
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
 
-    group.add_argument(
-        "--stdio",
-        "-s",
-        nargs="+",
-        metavar=("COMMAND", "ARG"),
-        help="Connect via stdio: command [args...]",
-    )
 
-    group.add_argument(
-        "--sse",
-        type=str,
-        metavar="URL",
-        help="Connect via SSE to URL",
-    )
+# Type aliases for reusable options
+StdioOpt = Annotated[
+    Optional[str],
+    typer.Option(
+        "--stdio", "-s",
+        help="Connect via stdio: 'command arg1 arg2...' (quote the entire command)",
+    ),
+]
 
-    group.add_argument(
-        "--http",
-        type=str,
-        metavar="URL",
-        help="Connect via Streamable HTTP to URL",
-    )
+SseOpt = Annotated[
+    Optional[str],
+    typer.Option("--sse", help="Connect via SSE to URL"),
+]
 
-    group.add_argument(
+HttpOpt = Annotated[
+    Optional[str],
+    typer.Option("--http", help="Connect via Streamable HTTP to URL"),
+]
+
+UvOpt = Annotated[
+    Optional[str],
+    typer.Option(
         "--uv",
-        type=str,
-        metavar="SERVER_NAME",
         help="Connect to UV-installed MCP server (e.g., 'mcp-server-filesystem')",
-    )
+    ),
+]
 
-    group.add_argument(
-        "--uv-local",
-        nargs=2,
-        metavar=("PROJECT_PATH", "SERVER_NAME"),
-        help="Connect to local UV-based MCP server (e.g., './my-server my-mcp')",
-    )
+UvLocalPathOpt = Annotated[
+    Optional[Path],
+    typer.Option(
+        "--uv-local-path",
+        help="Project path for local UV-based MCP server",
+    ),
+]
 
-    # UV-specific options
-    parser.add_argument(
-        "--python",
-        type=str,
-        metavar="VERSION",
-        help="Python version for UV modes (e.g., '3.11')",
-    )
+UvLocalNameOpt = Annotated[
+    Optional[str],
+    typer.Option(
+        "--uv-local-name",
+        help="Server name for local UV-based MCP server",
+    ),
+]
 
-    parser.add_argument(
-        "--with",
-        dest="with_packages",
-        action="append",
-        default=[],
-        metavar="PACKAGE",
-        help="Additional packages for UV modes (repeatable)",
-    )
+PythonOpt = Annotated[
+    Optional[str],
+    typer.Option("--python", help="Python version for UV modes (e.g., '3.11')"),
+]
 
-    parser.add_argument(
-        "--timeout",
-        "-t",
-        type=float,
-        default=30.0,
-        help="Connection timeout in seconds (default: 30)",
-    )
+WithOpt = Annotated[
+    Optional[list[str]],
+    typer.Option("--with", help="Additional packages for UV modes (repeatable)"),
+]
 
-    parser.add_argument(
-        "--log-level",
-        "-l",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-        default="INFO",
-        help="Log level (default: INFO)",
-    )
+TimeoutOpt = Annotated[
+    float,
+    typer.Option("--timeout", "-t", help="Connection timeout in seconds"),
+]
 
-    parser.add_argument(
-        "--output",
-        "-o",
-        choices=["json", "table", "rich"],
-        default="rich",
-        help="Output format (default: rich)",
-    )
+LogLevelOpt = Annotated[
+    LogLevel,
+    typer.Option("--log-level", "-l", help="Log level"),
+]
+
+OutputOpt = Annotated[
+    OutputFormat,
+    typer.Option("--output", "-o", help="Output format"),
+]
 
 
-def build_config(args: argparse.Namespace) -> ClientConfig:
-    """Build a ClientConfig from parsed arguments."""
-    if args.stdio:
-        command = args.stdio[0]
-        cmd_args = args.stdio[1:] if len(args.stdio) > 1 else []
-        return ClientConfig.for_stdio(
-            command=command,
-            args=cmd_args,
+def validate_connection_options(
+    stdio: Optional[str],
+    sse: Optional[str],
+    http: Optional[str],
+    uv: Optional[str],
+    uv_local_path: Optional[Path],
+    uv_local_name: Optional[str],
+) -> None:
+    """Ensure exactly one connection method is specified."""
+    # Count connection methods
+    methods = [
+        stdio is not None,
+        sse is not None,
+        http is not None,
+        uv is not None,
+        uv_local_path is not None or uv_local_name is not None,
+    ]
+    count = sum(methods)
+
+    if count == 0:
+        raise typer.BadParameter(
+            "Must specify a connection method: --stdio, --sse, --http, --uv, or --uv-local-path/--uv-local-name"
         )
-    elif args.sse:
-        return ClientConfig.for_sse(
-            url=args.sse,
-            timeout=args.timeout,
+
+    if count > 1:
+        raise typer.BadParameter(
+            "Only one connection method allowed: --stdio, --sse, --http, --uv, or --uv-local-path/--uv-local-name"
         )
-    elif args.http:
-        return ClientConfig.for_http(
-            url=args.http,
-            timeout=args.timeout,
+
+    # Check uv-local-path and uv-local-name are used together
+    if (uv_local_path is not None) != (uv_local_name is not None):
+        raise typer.BadParameter(
+            "--uv-local-path and --uv-local-name must be used together"
         )
-    elif args.uv:
+
+
+def build_config(
+    stdio: Optional[str],
+    sse: Optional[str],
+    http: Optional[str],
+    uv: Optional[str],
+    uv_local_path: Optional[Path],
+    uv_local_name: Optional[str],
+    python_version: Optional[str],
+    with_packages: Optional[list[str]],
+    timeout: float,
+) -> ClientConfig:
+    """Build a ClientConfig from parsed options."""
+    if stdio:
+        parts = shlex.split(stdio)
+        command = parts[0]
+        cmd_args = parts[1:] if len(parts) > 1 else []
+        return ClientConfig.for_stdio(command=command, args=cmd_args)
+    elif sse:
+        return ClientConfig.for_sse(url=sse, timeout=timeout)
+    elif http:
+        return ClientConfig.for_http(url=http, timeout=timeout)
+    elif uv:
         return ClientConfig.for_uv_installed(
-            server_name=args.uv,
-            python_version=getattr(args, "python", None),
-            with_packages=getattr(args, "with_packages", None) or None,
+            server_name=uv,
+            python_version=python_version,
+            with_packages=with_packages or None,
         )
-    elif args.uv_local:
-        project_path, server_name = args.uv_local
+    elif uv_local_path and uv_local_name:
         return ClientConfig.for_uv_local(
-            project_path=project_path,
-            server_name=server_name,
-            python_version=getattr(args, "python", None),
-            with_packages=getattr(args, "with_packages", None) or None,
+            project_path=str(uv_local_path),
+            server_name=uv_local_name,
+            python_version=python_version,
+            with_packages=with_packages or None,
         )
     else:
         raise ValueError("No connection method specified")
 
 
-async def cmd_connect(config: ClientConfig, args: argparse.Namespace) -> None:
+def version_callback(value: bool) -> None:
+    """Print version and exit."""
+    if value:
+        console.print(f"mamba-mcp-client {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main_callback(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            callback=version_callback,
+            is_eager=True,
+            help="Show version and exit",
+        ),
+    ] = False,
+    env: Annotated[
+        Optional[Path],
+        typer.Option("--env", "-e", help="Path to .env file to load environment variables from"),
+    ] = None,
+) -> None:
+    """MCP Client for testing and debugging MCP Servers."""
+    if env and env.exists():
+        load_dotenv(env)
+        console.print(f"[dim]Loaded environment from {env}[/]")
+    elif env:
+        console.print(f"[yellow]Warning: .env file not found at {env}[/]")
+
+
+@app.command()
+def tui(
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+) -> None:
+    """Launch the interactive TUI."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    app_tui = MCPTestApp(config)
+    app_tui.run()
+
+
+@app.command()
+def connect(
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+) -> None:
+    """Connect and inspect server."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_connect(config, output))
+
+
+async def _cmd_connect(config: ClientConfig, output: OutputFormat) -> None:
     """Connect and show server info."""
     client = MCPTestClient(config)
 
     async with client.connect():
         if client.server_info:
             info = client.server_info
-            if args.output == "json":
+            if output == OutputFormat.json:
                 console.print_json(
                     json.dumps(
                         {
@@ -266,41 +313,85 @@ async def cmd_connect(config: ClientConfig, args: argparse.Namespace) -> None:
                 console.print(table)
 
 
-async def cmd_tools(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def tools(
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+) -> None:
+    """List available tools."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_tools(config, output))
+
+
+async def _cmd_tools(config: ClientConfig, output: OutputFormat) -> None:
     """List available tools."""
     client = MCPTestClient(config)
 
     async with client.connect():
-        tools = await client.list_tools()
+        tools_list = await client.list_tools()
 
-        if args.output == "json":
+        if output == OutputFormat.json:
             console.print_json(
-                json.dumps([{"name": t.name, "description": t.description} for t in tools])
+                json.dumps([{"name": t.name, "description": t.description} for t in tools_list])
             )
         else:
             table = Table(title="Available Tools")
             table.add_column("Name", style="bold cyan")
             table.add_column("Description")
 
-            for tool in tools:
+            for tool in tools_list:
                 table.add_row(tool.name, tool.description or "-")
 
             console.print(table)
 
 
-async def cmd_resources(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def resources(
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+) -> None:
+    """List available resources."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_resources(config, output))
+
+
+async def _cmd_resources(config: ClientConfig, output: OutputFormat) -> None:
     """List available resources."""
     client = MCPTestClient(config)
 
     async with client.connect():
-        resources = await client.list_resources()
+        resources_list = await client.list_resources()
 
-        if args.output == "json":
+        if output == OutputFormat.json:
             console.print_json(
                 json.dumps(
                     [
                         {"name": r.name, "uri": str(r.uri), "description": r.description}
-                        for r in resources
+                        for r in resources_list
                     ]
                 )
             )
@@ -310,62 +401,110 @@ async def cmd_resources(config: ClientConfig, args: argparse.Namespace) -> None:
             table.add_column("URI")
             table.add_column("Description")
 
-            for resource in resources:
+            for resource in resources_list:
                 table.add_row(resource.name, str(resource.uri), resource.description or "-")
 
             console.print(table)
 
 
-async def cmd_prompts(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def prompts(
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+) -> None:
+    """List available prompts."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_prompts(config, output))
+
+
+async def _cmd_prompts(config: ClientConfig, output: OutputFormat) -> None:
     """List available prompts."""
     client = MCPTestClient(config)
 
     async with client.connect():
-        prompts = await client.list_prompts()
+        prompts_list = await client.list_prompts()
 
-        if args.output == "json":
+        if output == OutputFormat.json:
             console.print_json(
-                json.dumps([{"name": p.name, "description": p.description} for p in prompts])
+                json.dumps([{"name": p.name, "description": p.description} for p in prompts_list])
             )
         else:
             table = Table(title="Available Prompts")
             table.add_column("Name", style="bold cyan")
             table.add_column("Description")
 
-            for prompt in prompts:
+            for prompt in prompts_list:
                 table.add_row(prompt.name, prompt.description or "-")
 
             console.print(table)
 
 
-async def cmd_call(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def call(
+    tool_name: Annotated[str, typer.Argument(help="Name of the tool to call")],
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+    args: Annotated[str, typer.Option("--args", "-a", help="Tool arguments as JSON string")] = "{}",
+) -> None:
+    """Call a tool."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_call(config, output, tool_name, args))
+
+
+async def _cmd_call(
+    config: ClientConfig, output: OutputFormat, tool_name: str, args: str
+) -> None:
     """Call a tool."""
     client = MCPTestClient(config)
 
     try:
-        tool_args = json.loads(args.args)
+        tool_args = json.loads(args)
     except json.JSONDecodeError as e:
         console.print(f"[red]Invalid JSON arguments:[/] {e}")
         sys.exit(1)
 
     async with client.connect():
-        result = await client.call_tool(args.tool_name, tool_args)
+        result = await client.call_tool(tool_name, tool_args)
 
-        if args.output == "json":
-            output = {
+        if output == OutputFormat.json:
+            output_data = {
                 "tool": result.tool_name,
                 "arguments": result.arguments,
                 "is_error": result.is_error,
                 "content": [str(c) for c in result.content],
             }
             if result.text:
-                output["text"] = result.text
-            console.print_json(json.dumps(output))
+                output_data["text"] = result.text
+            console.print_json(json.dumps(output_data))
         else:
             if result.is_error:
-                console.print(f"[red]Tool returned error:[/]")
+                console.print("[red]Tool returned error:[/]")
             else:
-                console.print(f"[green]Tool result:[/]")
+                console.print("[green]Tool result:[/]")
 
             if result.text:
                 console.print(result.text)
@@ -374,17 +513,40 @@ async def cmd_call(config: ClientConfig, args: argparse.Namespace) -> None:
                     console.print(content)
 
 
-async def cmd_read(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def read(
+    uri: Annotated[str, typer.Argument(help="Resource URI to read")],
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+) -> None:
+    """Read a resource."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_read(config, output, uri))
+
+
+async def _cmd_read(config: ClientConfig, output: OutputFormat, uri: str) -> None:
     """Read a resource."""
     client = MCPTestClient(config)
 
     async with client.connect():
-        result = await client.read_resource(args.uri)
+        result = await client.read_resource(uri)
 
-        if args.output == "json":
+        if output == OutputFormat.json:
             console.print_json(json.dumps(result.model_dump(), default=str))
         else:
-            console.print(f"[bold]Resource:[/] {args.uri}\n")
+            console.print(f"[bold]Resource:[/] {uri}\n")
             for content in result.contents:
                 if hasattr(content, "text"):
                     console.print(content.text)
@@ -392,23 +554,49 @@ async def cmd_read(config: ClientConfig, args: argparse.Namespace) -> None:
                     console.print(content)
 
 
-async def cmd_prompt(config: ClientConfig, args: argparse.Namespace) -> None:
+@app.command()
+def prompt(
+    prompt_name: Annotated[str, typer.Argument(help="Name of the prompt")],
+    stdio: StdioOpt = None,
+    sse: SseOpt = None,
+    http: HttpOpt = None,
+    uv: UvOpt = None,
+    uv_local_path: UvLocalPathOpt = None,
+    uv_local_name: UvLocalNameOpt = None,
+    python: PythonOpt = None,
+    with_packages: WithOpt = None,
+    timeout: TimeoutOpt = 30.0,
+    log_level: LogLevelOpt = LogLevel.INFO,
+    output: OutputOpt = OutputFormat.rich,
+    args: Annotated[str, typer.Option("--args", "-a", help="Prompt arguments as JSON string")] = "{}",
+) -> None:
+    """Get a prompt."""
+    validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
+    config = build_config(
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+    )
+    asyncio.run(_cmd_prompt(config, output, prompt_name, args))
+
+
+async def _cmd_prompt(
+    config: ClientConfig, output: OutputFormat, prompt_name: str, args: str
+) -> None:
     """Get a prompt."""
     client = MCPTestClient(config)
 
     try:
-        prompt_args = json.loads(args.args)
+        prompt_args = json.loads(args)
     except json.JSONDecodeError as e:
         console.print(f"[red]Invalid JSON arguments:[/] {e}")
         sys.exit(1)
 
     async with client.connect():
-        result = await client.get_prompt(args.prompt_name, prompt_args)
+        result = await client.get_prompt(prompt_name, prompt_args)
 
-        if args.output == "json":
+        if output == OutputFormat.json:
             console.print_json(json.dumps(result.model_dump(), default=str))
         else:
-            console.print(f"[bold]Prompt:[/] {args.prompt_name}\n")
+            console.print(f"[bold]Prompt:[/] {prompt_name}\n")
             for message in result.messages:
                 role = message.role
                 console.print(f"[bold cyan]{role}:[/]")
@@ -421,67 +609,13 @@ async def cmd_prompt(config: ClientConfig, args: argparse.Namespace) -> None:
 
 def main() -> None:
     """Main entry point."""
-    args = parse_args()
-
-    # Load .env file if specified
-    if args.env:
-        env_path = args.env.resolve()
-        if env_path.exists():
-            load_dotenv(env_path)
-            console.print(f"[dim]Loaded environment from {env_path}[/]")
-        else:
-            console.print(f"[yellow]Warning: .env file not found at {env_path}[/]")
-
-    # Handle no command
-    if not args.command:
-        console.print("Usage: mamba-mcp [--env FILE] <command> [options]")
-        console.print("\nCommands:")
-        console.print("  tui        Launch interactive TUI")
-        console.print("  connect    Connect and show server info")
-        console.print("  tools      List available tools")
-        console.print("  resources  List available resources")
-        console.print("  prompts    List available prompts")
-        console.print("  call       Call a tool")
-        console.print("  read       Read a resource")
-        console.print("  prompt     Get a prompt")
-        console.print("\nRun 'mamba-mcp <command> --help' for more info")
-        sys.exit(0)
-
-    # Build config
     try:
-        config = build_config(args)
-    except ValueError as e:
-        console.print(f"[red]Configuration error:[/] {e}")
+        app()
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted[/]")
+    except Exception as e:
+        console.print(f"[red]Error:[/] {e}")
         sys.exit(1)
-
-    # Run command
-    if args.command == "tui":
-        app = MCPTestApp(config)
-        app.run()
-    else:
-        # Map commands to async functions
-        commands = {
-            "connect": cmd_connect,
-            "tools": cmd_tools,
-            "resources": cmd_resources,
-            "prompts": cmd_prompts,
-            "call": cmd_call,
-            "read": cmd_read,
-            "prompt": cmd_prompt,
-        }
-
-        cmd_func = commands.get(args.command)
-        if cmd_func:
-            try:
-                asyncio.run(cmd_func(config, args))
-            except KeyboardInterrupt:
-                console.print("\n[yellow]Interrupted[/]")
-            except Exception as e:
-                console.print(f"[red]Error:[/] {e}")
-                sys.exit(1)
-        else:
-            console.print(f"[red]Unknown command:[/] {args.command}")
-            sys.exit(1)
 
 
 if __name__ == "__main__":
