@@ -52,8 +52,8 @@ class ServerInfoPanel(Static):
 class CapabilityTree(Tree[dict]):
     """Tree widget for displaying MCP capabilities."""
 
-    def __init__(self, label: str = "Capabilities") -> None:
-        super().__init__(label)
+    def __init__(self, label: str = "Capabilities", **kwargs: Any) -> None:
+        super().__init__(label, **kwargs)
         self.root.expand()
 
     def clear_tree(self) -> None:

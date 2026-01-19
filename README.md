@@ -37,8 +37,8 @@ uv install
 Launch the interactive terminal UI to explore your MCP server:
 
 ```bash
-# Connect via stdio
-mamba-mcp tui --stdio python path/to/server.py
+# Connect via stdio (quote the entire command)
+mamba-mcp tui --stdio "python path/to/server.py"
 
 # Connect via SSE
 mamba-mcp tui --sse http://localhost:8000/sse
@@ -50,7 +50,7 @@ mamba-mcp tui --http http://localhost:8000/mcp
 mamba-mcp tui --uv @modelcontextprotocol/server-sqlite
 
 # Connect to local UV-based project
-mamba-mcp tui --uv-local ./my-mcp-server
+mamba-mcp tui --uv-local-path ./my-mcp-server --uv-local-name server
 ```
 
 The TUI provides:
@@ -65,25 +65,25 @@ Quick inspection without the full TUI:
 
 ```bash
 # View server info and capabilities
-mamba-mcp connect --stdio python server.py
+mamba-mcp connect --stdio "python server.py"
 
 # List available tools
-mamba-mcp tools --stdio python server.py
+mamba-mcp tools --stdio "python server.py"
 
 # List resources
 mamba-mcp resources --sse http://localhost:8000/sse
 
 # List prompts
-mamba-mcp prompts --stdio python server.py
+mamba-mcp prompts --stdio "python server.py"
 
 # Call a tool with arguments
-mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio python server.py
+mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 
 # Read a resource
-mamba-mcp read "config://version" --stdio python server.py
+mamba-mcp read "config://version" --stdio "python server.py"
 
 # Get a prompt
-mamba-mcp prompt code_review --args '{"language": "python"}' --stdio python server.py
+mamba-mcp prompt code_review --args '{"language": "python"}' --stdio "python server.py"
 ```
 
 ### Python API
@@ -137,7 +137,11 @@ if __name__ == "__main__":
 
 **Stdio** - Spawn a subprocess and communicate via stdin/stdout:
 ```bash
-mamba-mcp connect --stdio python server.py arg1 arg2
+# Quote the entire command string
+mamba-mcp connect --stdio "python server.py arg1 arg2"
+
+# Short form
+mamba-mcp connect -s "python server.py"
 ```
 
 **SSE** - Connect to an SSE endpoint:
@@ -159,21 +163,23 @@ mamba-mcp connect --uv @modelcontextprotocol/server-sqlite
 mamba-mcp connect --uv my-mcp-server --python 3.11 --with requests --with pandas
 ```
 
-**UV-local** - Connect to local UV-based projects:
+**UV-local** - Connect to local UV-based projects (requires both path and name):
 ```bash
 # Connect to a local UV project
-mamba-mcp connect --uv-local ./my-mcp-server
+mamba-mcp connect --uv-local-path ./my-mcp-server --uv-local-name server
 
 # With additional options
-mamba-mcp connect --uv-local /path/to/project --python 3.12
+mamba-mcp connect --uv-local-path /path/to/project --uv-local-name myserver --python 3.12
 ```
 
 ### Common Options
 
 ```bash
+--stdio, -s       Connect via stdio (command as quoted string)
 --timeout, -t     Connection timeout in seconds (default: 30)
 --log-level, -l   Log level: DEBUG, INFO, WARNING, ERROR (default: INFO)
 --output, -o      Output format: json, table, rich (default: rich)
+--args, -a        Arguments as JSON string (for call/prompt commands)
 --env, -e         Path to .env file for environment variables
 --python          Python version for UV transports (e.g., 3.11, 3.12)
 --with            Additional packages for UV transports (can be used multiple times)
@@ -192,7 +198,7 @@ export MAMBA_MCP_LOG__ENABLED=true
 Or use a `.env` file:
 
 ```bash
-mamba-mcp --env /path/to/.env connect --stdio python server.py
+mamba-mcp --env /path/to/.env connect --stdio "python server.py"
 ```
 
 ### Programmatic Configuration
@@ -228,9 +234,10 @@ config = ClientConfig.for_uv_installed(
     with_packages=["requests", "pandas"],
 )
 
-# UV-local transport
+# UV-local transport (requires both project_path and server_name)
 config = ClientConfig.for_uv_local(
     project_path="./my-mcp-server",
+    server_name="myserver",
     python_version="3.12",
     env={"DEBUG": "1"},
 )
@@ -277,7 +284,7 @@ ClientConfig.for_stdio(command, args=None, env=None)
 ClientConfig.for_sse(url, headers=None, timeout=30.0)
 ClientConfig.for_http(url, headers=None, timeout=30.0)
 ClientConfig.for_uv_installed(server_name, args=None, python_version=None, with_packages=None, env=None)
-ClientConfig.for_uv_local(project_path, server_name=None, args=None, python_version=None, with_packages=None, env=None)
+ClientConfig.for_uv_local(project_path, server_name, args=None, python_version=None, with_packages=None, env=None)
 ```
 
 ## Examples
@@ -290,7 +297,7 @@ The `examples/` directory contains:
 Run the sample server with the TUI:
 
 ```bash
-mamba-mcp tui --stdio python examples/sample_server.py
+mamba-mcp tui --stdio "python examples/sample_server.py"
 ```
 
 ## Development
