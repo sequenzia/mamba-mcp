@@ -8,14 +8,13 @@ from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer, Vertical
+from textual.message import Message
 from textual.widgets import (
     Button,
     Footer,
     Header,
     Input,
     Label,
-    ListItem,
-    ListView,
     RichLog,
     Static,
     TabbedContent,
@@ -145,11 +144,29 @@ class ResultPanel(ScrollableContainer):
 class ToolCallDialog(Container):
     """Dialog for entering tool call arguments."""
 
+    class DialogDismissed(Message):
+        """Sent when dialog should close."""
+
+        pass
+
+    class ToolCallRequested(Message):
+        """Sent when user submits the tool call."""
+
+        def __init__(self, tool_name: str, arguments: dict[str, Any]) -> None:
+            self.tool_name = tool_name
+            self.arguments = arguments
+            super().__init__()
+
+    BINDINGS = [
+        Binding("escape", "cancel", "Cancel", show=False),
+    ]
+
     def __init__(self, tool_name: str, schema: dict[str, Any], **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.tool_name = tool_name
         self.schema = schema
         self.inputs: dict[str, Input] = {}
+        self._call_button: Button | None = None
 
     def compose(self) -> ComposeResult:
         yield Label(f"[bold]Call Tool: {self.tool_name}[/]", id="dialog-title")
@@ -169,7 +186,8 @@ class ToolCallDialog(Container):
                 yield input_widget
 
         with Horizontal(id="dialog-buttons"):
-            yield Button("Call", variant="primary", id="btn-call")
+            self._call_button = Button("Call", variant="primary", id="btn-call")
+            yield self._call_button
             yield Button("Cancel", variant="default", id="btn-cancel")
 
     def get_arguments(self) -> dict[str, Any]:
@@ -204,6 +222,23 @@ class ToolCallDialog(Container):
 
         return args
 
+    def action_cancel(self) -> None:
+        """Cancel the dialog."""
+        self.post_message(self.DialogDismissed())
+
+    def set_loading(self, loading: bool) -> None:
+        """Set the loading state of the dialog."""
+        if self._call_button:
+            self._call_button.disabled = loading
+            self._call_button.label = "Calling..." if loading else "Call"
+
+    @on(Input.Submitted)
+    def handle_input_submitted(self, event: Input.Submitted) -> None:
+        """Handle Enter key in input fields - submit the form."""
+        event.stop()
+        arguments = self.get_arguments()
+        self.post_message(self.ToolCallRequested(self.tool_name, arguments))
+
 
 class MCPTestApp(App[None]):
     """Main TUI application for MCP server testing."""
@@ -213,6 +248,7 @@ class MCPTestApp(App[None]):
         layout: grid;
         grid-size: 2 1;
         grid-columns: 1fr 2fr;
+        layers: base dialog;
     }
 
     #left-panel {
@@ -243,9 +279,11 @@ class MCPTestApp(App[None]):
         align: center middle;
         width: 60;
         height: auto;
+        max-height: 80%;
         padding: 1 2;
         background: $surface;
         border: solid $primary;
+        layer: dialog;
     }
 
     #dialog-title {
@@ -292,6 +330,9 @@ class MCPTestApp(App[None]):
         Binding("l", "show_logs", "Logs"),
         Binding("p", "ping", "Ping"),
         Binding("c", "clear", "Clear"),
+        Binding("t", "call_tool", "Call Tool"),
+        Binding("enter", "call_tool", "Call Tool", show=False),
+        Binding("escape", "close_dialog", "Close", show=False),
     ]
 
     def __init__(self, config: ClientConfig, **kwargs: Any) -> None:
@@ -299,6 +340,7 @@ class MCPTestApp(App[None]):
         self.config = config
         self.client = MCPTestClient(config)
         self._current_tool: dict[str, Any] | None = None
+        self._tool_dialog: ToolCallDialog | None = None
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -336,12 +378,13 @@ class MCPTestApp(App[None]):
                 info_panel = self.query_one("#server-info", ServerInfoPanel)
                 info_panel.update_info(self.client)
 
-                result_panel.write_info(
-                    f"Connected to {self.client.server_info.name if self.client.server_info else 'server'}"
+                server_name = (
+                    self.client.server_info.name if self.client.server_info else "server"
                 )
+                result_panel.write_info(f"Connected to {server_name}")
 
                 # Load capabilities
-                await self.load_capabilities()
+                self.load_capabilities()
 
                 # Keep connection alive
                 while True:
@@ -506,6 +549,97 @@ class MCPTestApp(App[None]):
         """Clear the result panel."""
         result_panel = self.query_one("#result-panel", ResultPanel)
         result_panel.clear()
+
+    def action_call_tool(self) -> None:
+        """Open the tool call dialog for the selected tool."""
+        if self._tool_dialog is not None:
+            # Dialog already open, don't open another
+            return
+
+        if not self._current_tool:
+            result_panel = self.query_one("#result-panel", ResultPanel)
+            result_panel.write_error("No tool selected. Select a tool from the tree first.")
+            return
+
+        tool_name = self._current_tool["name"]
+        schema = self._current_tool["schema"]
+
+        self._tool_dialog = ToolCallDialog(tool_name, schema)
+        self.mount(self._tool_dialog)
+
+        # Focus the first input field after mounting
+        self.call_later(self._focus_dialog_input)
+
+    def _focus_dialog_input(self) -> None:
+        """Focus the first input in the dialog."""
+        if self._tool_dialog and self._tool_dialog.inputs:
+            first_input = next(iter(self._tool_dialog.inputs.values()), None)
+            if first_input:
+                first_input.focus()
+
+    def action_close_dialog(self) -> None:
+        """Close the tool call dialog if open."""
+        if self._tool_dialog is not None:
+            self._tool_dialog.remove()
+            self._tool_dialog = None
+
+    @on(Button.Pressed, "#btn-call")
+    def handle_call_button(self, event: Button.Pressed) -> None:
+        """Handle the Call button press in the dialog."""
+        if self._tool_dialog is not None:
+            arguments = self._tool_dialog.get_arguments()
+            tool_name = self._tool_dialog.tool_name
+            self._tool_dialog.set_loading(True)
+            self.execute_tool_call(tool_name, arguments)
+
+    @on(Button.Pressed, "#btn-cancel")
+    def handle_cancel_button(self, event: Button.Pressed) -> None:
+        """Handle the Cancel button press in the dialog."""
+        self.action_close_dialog()
+
+    @work(exclusive=False)
+    async def execute_tool_call(self, tool_name: str, arguments: dict[str, Any]) -> None:
+        """Execute a tool call and display the result."""
+        result_panel = self.query_one("#result-panel", ResultPanel)
+
+        try:
+            result = await self.client.call_tool(tool_name, arguments)
+            result_panel.write_json(
+                {"tool": tool_name, "arguments": arguments, "result": result},
+                title=f"Tool Call: {tool_name}",
+            )
+        except Exception as e:
+            result_panel.write_error(f"Tool call failed: {e}")
+        finally:
+            # Close the dialog
+            self.action_close_dialog()
+
+    def on_tree_node_activated(self, event: Any) -> None:
+        """Handle double-click on tree node to open tool dialog."""
+        node: TreeNode[dict[str, Any]] = event.node
+        if node.data:
+            item_type = node.data.get("type")
+            if item_type == "tool":
+                # Store the tool and open the dialog
+                item = node.data.get("item")
+                if item is not None:
+                    self._current_tool = {
+                        "name": item.name,
+                        "schema": item.inputSchema or {},
+                    }
+                    self.action_call_tool()
+
+    @on(ToolCallDialog.DialogDismissed)
+    def handle_dialog_dismissed(self, event: ToolCallDialog.DialogDismissed) -> None:
+        """Handle dialog dismissal."""
+        self.action_close_dialog()
+
+    @on(ToolCallDialog.ToolCallRequested)
+    def handle_tool_call_requested(self, event: ToolCallDialog.ToolCallRequested) -> None:
+        """Handle tool call request from dialog."""
+        if self._tool_dialog:
+            self._tool_dialog.set_loading(True)
+        self.execute_tool_call(event.tool_name, event.arguments)
 
 
 def run_tui(config: ClientConfig) -> None:
