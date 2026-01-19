@@ -359,6 +359,7 @@ class MCPTestApp(App[None]):
         Binding("p", "ping", "Ping"),
         Binding("x", "clear", "Clear"),
         Binding("t", "call_tool", "Call Tool"),
+        Binding("/", "command_palette", "Palette"),
         Binding("enter", "call_tool", "Call Tool", show=False),
         Binding("escape", "close_dialog", "Close", show=False),
     ]
