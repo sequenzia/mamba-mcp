@@ -107,12 +107,19 @@ class ClientConfig(BaseSettings):
     client_name: str = Field(default="mamba-mcp-client", description="Client name")
     client_version: str = Field(default="1.0.0", description="Client version")
 
+    # Extra arguments passed to server (CLI args for stdio/UV, query params for HTTP)
+    extra_args: list[str] = Field(
+        default_factory=list,
+        description="Extra args passed to server (CLI args for stdio/UV, query params for HTTP)",
+    )
+
     @classmethod
     def for_stdio(
         cls,
         command: str,
         args: list[str] | None = None,
         env: dict[str, str] | None = None,
+        extra_args: list[str] | None = None,
         **kwargs: Any,
     ) -> "ClientConfig":
         """Create a configuration for stdio transport."""
@@ -123,6 +130,7 @@ class ClientConfig(BaseSettings):
                 args=args or [],
                 env=env or {},
             ),
+            extra_args=extra_args or [],
             **kwargs,
         )
 
@@ -132,6 +140,7 @@ class ClientConfig(BaseSettings):
         url: str,
         headers: dict[str, str] | None = None,
         timeout: float = 30.0,
+        extra_args: list[str] | None = None,
         **kwargs: Any,
     ) -> "ClientConfig":
         """Create a configuration for SSE transport."""
@@ -142,6 +151,7 @@ class ClientConfig(BaseSettings):
                 headers=headers or {},
                 timeout=timeout,
             ),
+            extra_args=extra_args or [],
             **kwargs,
         )
 
@@ -151,6 +161,7 @@ class ClientConfig(BaseSettings):
         url: str,
         headers: dict[str, str] | None = None,
         timeout: float = 30.0,
+        extra_args: list[str] | None = None,
         **kwargs: Any,
     ) -> "ClientConfig":
         """Create a configuration for Streamable HTTP transport."""
@@ -161,6 +172,7 @@ class ClientConfig(BaseSettings):
                 headers=headers or {},
                 timeout=timeout,
             ),
+            extra_args=extra_args or [],
             **kwargs,
         )
 
@@ -172,6 +184,7 @@ class ClientConfig(BaseSettings):
         python_version: str | None = None,
         with_packages: list[str] | None = None,
         env: dict[str, str] | None = None,
+        extra_args: list[str] | None = None,
         **kwargs: Any,
     ) -> "ClientConfig":
         """Create a configuration for UV-installed MCP server (runs via 'uv run <server-name>')."""
@@ -184,6 +197,7 @@ class ClientConfig(BaseSettings):
                 with_packages=with_packages or [],
                 env=env or {},
             ),
+            extra_args=extra_args or [],
             **kwargs,
         )
 
@@ -196,6 +210,7 @@ class ClientConfig(BaseSettings):
         python_version: str | None = None,
         with_packages: list[str] | None = None,
         env: dict[str, str] | None = None,
+        extra_args: list[str] | None = None,
         **kwargs: Any,
     ) -> "ClientConfig":
         """Create a configuration for local UV-based MCP server."""
@@ -209,5 +224,6 @@ class ClientConfig(BaseSettings):
                 with_packages=with_packages or [],
                 env=env or {},
             ),
+            extra_args=extra_args or [],
             **kwargs,
         )

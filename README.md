@@ -172,6 +172,24 @@ mamba-mcp connect --uv-local-path ./my-mcp-server --uv-local-name server
 mamba-mcp connect --uv-local-path /path/to/project --uv-local-name myserver --python 3.12
 ```
 
+### Extra Server Arguments
+
+Pass additional arguments to MCP servers using the `--` separator:
+
+```bash
+# For stdio/UV: extra args become command-line arguments
+mamba-mcp connect --stdio "python server.py" -- --verbose --port 8080
+mamba-mcp connect --uv mcp-server-fs -- --root /home/user
+
+# For SSE/HTTP: extra args become query parameters
+mamba-mcp tui --sse http://localhost:8000/sse -- env=prod debug=true
+# Results in: http://localhost:8000/sse?env=prod&debug=true
+
+# Bare args (without =) become arg=true
+mamba-mcp connect --http http://localhost:8000/mcp -- debug verbose
+# Results in: http://localhost:8000/mcp?debug=true&verbose=true
+```
+
 ### Common Options
 
 ```bash
@@ -183,6 +201,7 @@ mamba-mcp connect --uv-local-path /path/to/project --uv-local-name myserver --py
 --env, -e         Path to .env file for environment variables
 --python          Python version for UV transports (e.g., 3.11, 3.12)
 --with            Additional packages for UV transports (can be used multiple times)
+--                Pass remaining arguments to server (see Extra Server Arguments)
 ```
 
 ### Environment Variables
@@ -211,6 +230,7 @@ config = ClientConfig.for_stdio(
     command="python",
     args=["server.py"],
     env={"DEBUG": "1"},
+    extra_args=["--verbose", "--port", "8080"],  # Appended to command line
 )
 
 # SSE transport
@@ -218,12 +238,14 @@ config = ClientConfig.for_sse(
     url="http://localhost:8000/sse",
     headers={"Authorization": "Bearer token"},
     timeout=60.0,
+    extra_args=["env=prod", "debug=true"],  # Become query parameters
 )
 
 # HTTP transport
 config = ClientConfig.for_http(
     url="http://localhost:8000/mcp",
     timeout=30.0,
+    extra_args=["key=value"],  # Become query parameters
 )
 
 # UV-installed transport
@@ -232,6 +254,7 @@ config = ClientConfig.for_uv_installed(
     args=["--db-path", "./data.db"],
     python_version="3.11",
     with_packages=["requests", "pandas"],
+    extra_args=["--readonly"],  # Appended to server args
 )
 
 # UV-local transport (requires both project_path and server_name)
@@ -240,6 +263,7 @@ config = ClientConfig.for_uv_local(
     server_name="myserver",
     python_version="3.12",
     env={"DEBUG": "1"},
+    extra_args=["--config", "prod.json"],  # Appended to server args
 )
 ```
 
@@ -280,12 +304,16 @@ The main client class providing async methods for all MCP operations.
 Configuration class with factory methods for each transport type.
 
 ```python
-ClientConfig.for_stdio(command, args=None, env=None)
-ClientConfig.for_sse(url, headers=None, timeout=30.0)
-ClientConfig.for_http(url, headers=None, timeout=30.0)
-ClientConfig.for_uv_installed(server_name, args=None, python_version=None, with_packages=None, env=None)
-ClientConfig.for_uv_local(project_path, server_name, args=None, python_version=None, with_packages=None, env=None)
+ClientConfig.for_stdio(command, args=None, env=None, extra_args=None)
+ClientConfig.for_sse(url, headers=None, timeout=30.0, extra_args=None)
+ClientConfig.for_http(url, headers=None, timeout=30.0, extra_args=None)
+ClientConfig.for_uv_installed(server_name, args=None, python_version=None, with_packages=None, env=None, extra_args=None)
+ClientConfig.for_uv_local(project_path, server_name, args=None, python_version=None, with_packages=None, env=None, extra_args=None)
 ```
+
+**extra_args behavior:**
+- For stdio/UV transports: appended to command-line arguments
+- For SSE/HTTP transports: converted to URL query parameters (`key=value` or `arg` → `arg=true`)
 
 ## Examples
 

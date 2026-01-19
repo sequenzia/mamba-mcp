@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any, AsyncIterator
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
@@ -116,14 +117,50 @@ class MCPTestClient:
         """Get server information (available after connect)."""
         return self._server_info
 
+    @staticmethod
+    def _append_query_params(url: str, extra_args: list[str]) -> str:
+        """Append extra_args as query parameters to a URL.
+
+        Args:
+            url: The base URL
+            extra_args: List of arguments in 'key=value' format. Bare args become 'arg=true'.
+
+        Returns:
+            URL with query parameters appended/merged
+        """
+        if not extra_args:
+            return url
+
+        parsed = urlparse(url)
+        existing_params = parse_qs(parsed.query, keep_blank_values=True)
+
+        # Convert existing params from lists to single values for merging
+        merged_params: dict[str, str] = {k: v[0] if v else "" for k, v in existing_params.items()}
+
+        # Parse extra_args: key=value or bare arg becomes arg=true
+        for arg in extra_args:
+            if "=" in arg:
+                key, value = arg.split("=", 1)
+                merged_params[key] = value
+            else:
+                merged_params[arg] = "true"
+
+        new_query = urlencode(merged_params)
+        new_parsed = parsed._replace(query=new_query)
+        return urlunparse(new_parsed)
+
     def _create_transport(self) -> str | StdioTransport:
         """Create the appropriate transport based on configuration."""
+        extra_args = self.config.extra_args
+
         if self.config.transport_type == TransportType.STDIO:
             if not self.config.stdio:
                 raise ValueError("Stdio configuration required for stdio transport")
+            # Combine config args with extra_args
+            combined_args = list(self.config.stdio.args) + extra_args
             return StdioTransport(
                 command=self.config.stdio.command,
-                args=self.config.stdio.args,
+                args=combined_args,
                 env=self.config.stdio.env or None,
             )
         elif self.config.transport_type == TransportType.UV_INSTALLED:
@@ -132,9 +169,11 @@ class MCPTestClient:
             from fastmcp.client.transports import UvStdioTransport
 
             cfg = self.config.uv_installed
+            # Combine config args with extra_args
+            combined_args = list(cfg.args) + extra_args
             return UvStdioTransport(
                 command=cfg.server_name,
-                args=cfg.args or None,
+                args=combined_args or None,
                 python_version=cfg.python_version,
                 with_packages=cfg.with_packages or None,
                 env_vars=cfg.env or None,
@@ -145,9 +184,11 @@ class MCPTestClient:
             from fastmcp.client.transports import UvxStdioTransport
 
             cfg = self.config.uv_local
+            # Combine config args with extra_args
+            combined_args = list(cfg.args) + extra_args
             return UvxStdioTransport(
                 tool_name=cfg.server_name,
-                tool_args=cfg.args or None,
+                tool_args=combined_args or None,
                 from_package=cfg.project_path,
                 python_version=cfg.python_version,
                 with_packages=cfg.with_packages or None,
@@ -156,7 +197,8 @@ class MCPTestClient:
         elif self.config.transport_type in (TransportType.SSE, TransportType.HTTP):
             if not self.config.http:
                 raise ValueError("HTTP configuration required for SSE/HTTP transport")
-            return self.config.http.url
+            # Append extra_args as query parameters
+            return self._append_query_params(self.config.http.url, extra_args)
         else:
             raise ValueError(f"Unknown transport type: {self.config.transport_type}")
 

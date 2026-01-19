@@ -48,6 +48,14 @@ mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 
 # UV-local requires both path and name
 mamba-mcp connect --uv-local-path ./my-server --uv-local-name server
+
+# Pass extra arguments to server using -- separator
+# For stdio/UV: extra args become command-line arguments
+mamba-mcp connect --stdio "python server.py" -- --verbose --port 8080
+
+# For SSE/HTTP: extra args become query parameters
+mamba-mcp tui --sse http://localhost:8000/sse -- env=prod debug=true
+# Results in: http://localhost:8000/sse?env=prod&debug=true
 ```
 
 ## Architecture

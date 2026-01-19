@@ -21,7 +21,16 @@ from mamba_mcp_client.tui import MCPTestApp
 console = Console()
 app = typer.Typer(
     name="mamba-mcp",
-    help="MCP Client for testing and debugging MCP Servers",
+    help="""MCP Client for testing and debugging MCP Servers.
+
+Use -- to pass extra arguments to the server:
+  - Stdio/UV: extra args become command-line arguments
+  - SSE/HTTP: extra args become query parameters (key=value or bare arg becomes arg=true)
+
+Examples:
+  mamba-mcp connect --stdio "python server.py" -- --verbose --port 8080
+  mamba-mcp tui --sse http://localhost:8000/sse -- env=prod debug=true
+""",
     no_args_is_help=True,
 )
 
@@ -155,22 +164,24 @@ def build_config(
     python_version: Optional[str],
     with_packages: Optional[list[str]],
     timeout: float,
+    extra_args: Optional[list[str]] = None,
 ) -> ClientConfig:
     """Build a ClientConfig from parsed options."""
     if stdio:
         parts = shlex.split(stdio)
         command = parts[0]
         cmd_args = parts[1:] if len(parts) > 1 else []
-        return ClientConfig.for_stdio(command=command, args=cmd_args)
+        return ClientConfig.for_stdio(command=command, args=cmd_args, extra_args=extra_args)
     elif sse:
-        return ClientConfig.for_sse(url=sse, timeout=timeout)
+        return ClientConfig.for_sse(url=sse, timeout=timeout, extra_args=extra_args)
     elif http:
-        return ClientConfig.for_http(url=http, timeout=timeout)
+        return ClientConfig.for_http(url=http, timeout=timeout, extra_args=extra_args)
     elif uv:
         return ClientConfig.for_uv_installed(
             server_name=uv,
             python_version=python_version,
             with_packages=with_packages or None,
+            extra_args=extra_args,
         )
     elif uv_local_path and uv_local_name:
         return ClientConfig.for_uv_local(
@@ -178,6 +189,7 @@ def build_config(
             server_name=uv_local_name,
             python_version=python_version,
             with_packages=with_packages or None,
+            extra_args=extra_args,
         )
     else:
         raise ValueError("No connection method specified")
@@ -214,8 +226,9 @@ def main_callback(
         console.print(f"[yellow]Warning: .env file not found at {env}[/]")
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def tui(
+    ctx: typer.Context,
     stdio: StdioOpt = None,
     sse: SseOpt = None,
     http: HttpOpt = None,
@@ -230,14 +243,16 @@ def tui(
     """Launch the interactive TUI."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     app_tui = MCPTestApp(config)
     app_tui.run()
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def connect(
+    ctx: typer.Context,
     stdio: StdioOpt = None,
     sse: SseOpt = None,
     http: HttpOpt = None,
@@ -253,7 +268,8 @@ def connect(
     """Connect and inspect server."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_connect(config, output))
 
@@ -313,8 +329,9 @@ async def _cmd_connect(config: ClientConfig, output: OutputFormat) -> None:
                 console.print(table)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def tools(
+    ctx: typer.Context,
     stdio: StdioOpt = None,
     sse: SseOpt = None,
     http: HttpOpt = None,
@@ -330,7 +347,8 @@ def tools(
     """List available tools."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_tools(config, output))
 
@@ -357,8 +375,9 @@ async def _cmd_tools(config: ClientConfig, output: OutputFormat) -> None:
             console.print(table)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def resources(
+    ctx: typer.Context,
     stdio: StdioOpt = None,
     sse: SseOpt = None,
     http: HttpOpt = None,
@@ -374,7 +393,8 @@ def resources(
     """List available resources."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_resources(config, output))
 
@@ -407,8 +427,9 @@ async def _cmd_resources(config: ClientConfig, output: OutputFormat) -> None:
             console.print(table)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def prompts(
+    ctx: typer.Context,
     stdio: StdioOpt = None,
     sse: SseOpt = None,
     http: HttpOpt = None,
@@ -424,7 +445,8 @@ def prompts(
     """List available prompts."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_prompts(config, output))
 
@@ -451,8 +473,9 @@ async def _cmd_prompts(config: ClientConfig, output: OutputFormat) -> None:
             console.print(table)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def call(
+    ctx: typer.Context,
     tool_name: Annotated[str, typer.Argument(help="Name of the tool to call")],
     stdio: StdioOpt = None,
     sse: SseOpt = None,
@@ -470,7 +493,8 @@ def call(
     """Call a tool."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_call(config, output, tool_name, args))
 
@@ -513,8 +537,9 @@ async def _cmd_call(
                     console.print(content)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def read(
+    ctx: typer.Context,
     uri: Annotated[str, typer.Argument(help="Resource URI to read")],
     stdio: StdioOpt = None,
     sse: SseOpt = None,
@@ -531,7 +556,8 @@ def read(
     """Read a resource."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_read(config, output, uri))
 
@@ -554,8 +580,9 @@ async def _cmd_read(config: ClientConfig, output: OutputFormat, uri: str) -> Non
                     console.print(content)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def prompt(
+    ctx: typer.Context,
     prompt_name: Annotated[str, typer.Argument(help="Name of the prompt")],
     stdio: StdioOpt = None,
     sse: SseOpt = None,
@@ -573,7 +600,8 @@ def prompt(
     """Get a prompt."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout
+        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        extra_args=ctx.args,
     )
     asyncio.run(_cmd_prompt(config, output, prompt_name, args))
 
