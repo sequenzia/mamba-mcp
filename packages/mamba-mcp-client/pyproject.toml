@@ -32,7 +32,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mamba-mcp = "mamba_mcp_client.cli:main"
+mamba-mcp-client = "mamba_mcp_client.cli:main"
 
 [build-system]
 requires = ["hatchling"]
