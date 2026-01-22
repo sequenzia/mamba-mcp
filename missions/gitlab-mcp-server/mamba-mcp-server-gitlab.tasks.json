@@ -1,0 +1,725 @@
+{
+  "mission": {
+    "name": "gitlab-mcp-server",
+    "metadata": {
+      "source_document": "specs/PRD-mamba-mcp-server-gitlab.md",
+      "generated_at": "2025-01-21T00:00:00Z",
+      "last_updated": "2025-01-21T00:00:00Z",
+      "version": "1.0.0",
+      "total_tasks": 32,
+      "completion_percentage": 0
+    },
+    "tasks": [
+      {
+        "id": "TASK-001",
+        "title": "Initialize package structure and pyproject.toml",
+        "description": "Create the mamba-mcp-server-gitlab package directory structure under packages/ with pyproject.toml, README.md placeholder, and src/mamba_mcp_server_gitlab/ directory with __init__.py",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": [],
+        "blocked_by": [],
+        "blocks": ["TASK-002", "TASK-003", "TASK-004", "TASK-005"],
+        "acceptance_criteria": [
+          "Package directory exists at packages/mamba-mcp-server-gitlab/",
+          "pyproject.toml configured with correct dependencies (python-gitlab>=4.0.0, mcp>=1.0.0, mamba-mcp-core workspace, pydantic>=2.0.0, pydantic-settings>=2.0.0)",
+          "src/mamba_mcp_server_gitlab/__init__.py exists",
+          "Package can be installed with uv sync"
+        ],
+        "source_requirements": ["TS1: Package Structure", "TS2: Dependencies"],
+        "notes": "Follow existing mamba-mcp-client package structure as reference"
+      },
+      {
+        "id": "TASK-002",
+        "title": "Implement configuration system with Pydantic",
+        "description": "Create config.py with Pydantic settings for GitLab URL, token, token type, SSL verification, timeout, and default project. Support environment variables with GITLAB_ prefix and optional config file loading.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-001"],
+        "blocked_by": ["TASK-001"],
+        "blocks": ["TASK-003", "TASK-006"],
+        "acceptance_criteria": [
+          "GitLabConfig class with all required fields (url, token, token_type, ssl_verify, timeout, default_project)",
+          "Environment variable support with GITLAB_ prefix",
+          "Optional config file loading (gitlab-mcp.yaml)",
+          "Configuration priority: CLI args > env vars > config file > defaults",
+          "Validation for required fields (url, token)"
+        ],
+        "source_requirements": ["TS3: Configuration"],
+        "notes": "Use pydantic-settings for environment variable binding"
+      },
+      {
+        "id": "TASK-003",
+        "title": "Create GitLab client wrapper",
+        "description": "Create gitlab_client.py wrapping python-gitlab library. Handle authentication with PAT, project tokens, and group tokens. Implement connection testing and graceful error handling.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-001", "TASK-002"],
+        "blocked_by": ["TASK-001", "TASK-002"],
+        "blocks": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013", "TASK-014", "TASK-015", "TASK-016", "TASK-017", "TASK-018"],
+        "acceptance_criteria": [
+          "GitLabClientWrapper class that wraps python-gitlab.Gitlab",
+          "Support for PAT, project token, and group token authentication",
+          "SSL verification configurable",
+          "Timeout configuration applied",
+          "Connection validation method",
+          "Graceful handling of authentication failures"
+        ],
+        "source_requirements": ["TS4: Authentication"],
+        "notes": "Consider lazy initialization of the gitlab client"
+      },
+      {
+        "id": "TASK-004",
+        "title": "Implement structured error handling",
+        "description": "Create errors.py with custom exception classes and error codes. Map GitLab API errors to structured error responses with actionable messages.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": ["TASK-001"],
+        "blocked_by": ["TASK-001"],
+        "blocks": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013"],
+        "acceptance_criteria": [
+          "Error codes defined: GITLAB_UNAUTHORIZED, GITLAB_FORBIDDEN, GITLAB_NOT_FOUND, GITLAB_CONFLICT, GITLAB_RATE_LIMITED, GITLAB_SERVER_ERROR, CONFIG_INVALID, VALIDATION_ERROR",
+          "ErrorDetail model with code, message, details fields",
+          "ToolResponse model with success, data, error fields",
+          "Helper function to convert python-gitlab exceptions to structured errors"
+        ],
+        "source_requirements": ["TS5: MCP Tool Design", "TS6: Error Handling"],
+        "notes": null
+      },
+      {
+        "id": "TASK-005",
+        "title": "Set up MCP server entry point with transport support",
+        "description": "Create server.py with MCP server initialization. Support STDIO and Streamable HTTP transports. Wire up configuration loading and tool registration.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-001"],
+        "blocked_by": ["TASK-001"],
+        "blocks": ["TASK-006"],
+        "acceptance_criteria": [
+          "MCP Server class properly initialized",
+          "STDIO transport working (mamba-mcp-server-gitlab command)",
+          "Streamable HTTP transport working with configurable host/port",
+          "Transport selection via config or CLI argument",
+          "Server starts without errors"
+        ],
+        "source_requirements": ["TS7: Transport Protocols"],
+        "notes": "Use MCP Python SDK patterns"
+      },
+      {
+        "id": "TASK-006",
+        "title": "Wire up tool registration system",
+        "description": "Create tools/__init__.py with tool registration mechanism. Connect server.py to load and register all tools from the tools/ directory.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": ["TASK-002", "TASK-005"],
+        "blocked_by": ["TASK-002", "TASK-005"],
+        "blocks": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013"],
+        "acceptance_criteria": [
+          "tools/__init__.py exports tool registration function",
+          "All tools from submodules auto-registered with server",
+          "Tool naming follows gitlab_{resource}_{action} convention",
+          "Server lists all registered tools correctly"
+        ],
+        "source_requirements": ["TS5: MCP Tool Design"],
+        "notes": null
+      },
+      {
+        "id": "TASK-007",
+        "title": "Implement gitlab_mr_list tool",
+        "description": "Create merge request list tool with filtering by state (opened, closed, merged, all), author, assignee, labels. Support pagination.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_list",
+          "Parameters: project_id (required), state (optional), author (optional), assignee (optional), labels (optional), page (optional), per_page (optional)",
+          "Returns list of MRs with iid, title, description, source_branch, target_branch, state, author",
+          "Pagination works correctly",
+          "Handles empty results gracefully"
+        ],
+        "source_requirements": ["FR1.1"],
+        "notes": null
+      },
+      {
+        "id": "TASK-008",
+        "title": "Implement gitlab_mr_get tool",
+        "description": "Create tool to get full merge request details including commit list, approval status, and pipeline status.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_get",
+          "Parameters: project_id (required), mr_iid (required)",
+          "Returns full MR metadata including title, description, source/target branches",
+          "Includes commit list",
+          "Includes approval status (approved_by, approvals_required, approvals_left)",
+          "Includes pipeline status if available",
+          "Returns GITLAB_NOT_FOUND for non-existent MR"
+        ],
+        "source_requirements": ["FR1.2"],
+        "notes": null
+      },
+      {
+        "id": "TASK-009",
+        "title": "Implement gitlab_mr_diff tool",
+        "description": "Create tool to get merge request diff with file changes in unified format. Handle binary files gracefully.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_diff",
+          "Parameters: project_id (required), mr_iid (required)",
+          "Returns file changes with context lines",
+          "Unified diff format",
+          "Includes old_path and new_path for renames",
+          "Binary files marked appropriately without content",
+          "Large diffs truncated with indicator"
+        ],
+        "source_requirements": ["FR1.3"],
+        "notes": "Consider truncation strategy for very large diffs"
+      },
+      {
+        "id": "TASK-010",
+        "title": "Implement gitlab_mr_comment tool (general)",
+        "description": "Create tool to post general discussion comments on a merge request with markdown support.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_comment",
+          "Parameters: project_id (required), mr_iid (required), body (required)",
+          "Supports markdown formatting in body",
+          "Returns created comment/note ID",
+          "Validates body is non-empty"
+        ],
+        "source_requirements": ["FR1.4"],
+        "notes": null
+      },
+      {
+        "id": "TASK-011",
+        "title": "Implement gitlab_mr_comment_line tool",
+        "description": "Create tool to post line-specific comments on merge request diffs. Support old/new line positions and commit association.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "L",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_comment_line",
+          "Parameters: project_id, mr_iid, body, path (file path), line (line number), line_type (old/new), commit_sha (optional)",
+          "Comment appears on correct line in diff view",
+          "Supports specifying old vs new side of diff",
+          "Returns created comment ID",
+          "Handles invalid line/path gracefully"
+        ],
+        "source_requirements": ["FR1.5"],
+        "notes": "GitLab API uses position object for diff comments - requires careful construction"
+      },
+      {
+        "id": "TASK-012",
+        "title": "Implement gitlab_mr_approve tool",
+        "description": "Create tool to approve a merge request. Handle already-approved case gracefully.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_approve",
+          "Parameters: project_id (required), mr_iid (required)",
+          "Adds current user's approval",
+          "Returns updated approval status (total approvals, approved_by list)",
+          "Handles already-approved case (idempotent or informative message)",
+          "Returns GITLAB_FORBIDDEN if user lacks approval permission"
+        ],
+        "source_requirements": ["FR1.6"],
+        "notes": null
+      },
+      {
+        "id": "TASK-013",
+        "title": "Implement gitlab_mr_unapprove tool",
+        "description": "Create tool to remove current user's approval from a merge request.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_unapprove",
+          "Parameters: project_id (required), mr_iid (required)",
+          "Removes current user's approval",
+          "Returns updated approval status",
+          "Handles not-approved case gracefully"
+        ],
+        "source_requirements": ["FR1.7"],
+        "notes": null
+      },
+      {
+        "id": "TASK-014",
+        "title": "Implement gitlab_mr_merge tool",
+        "description": "Create tool to merge a merge request with squash and delete source branch options. Handle merge conflicts gracefully.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_merge",
+          "Parameters: project_id, mr_iid, squash (optional bool), delete_source_branch (optional bool), merge_commit_message (optional)",
+          "Executes merge operation",
+          "Returns merge result with merged commit SHA",
+          "Returns GITLAB_CONFLICT if merge conflicts exist",
+          "Returns appropriate error if MR not in mergeable state"
+        ],
+        "source_requirements": ["FR1.8"],
+        "notes": null
+      },
+      {
+        "id": "TASK-015",
+        "title": "Implement gitlab_mr_discussions tool",
+        "description": "Create tool to list all discussion threads on a merge request including resolved status and replies.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-019"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_mr_discussions",
+          "Parameters: project_id (required), mr_iid (required)",
+          "Returns all discussion threads",
+          "Includes resolved/unresolved status",
+          "Includes all notes/replies within each thread",
+          "Includes author and timestamp for each note"
+        ],
+        "source_requirements": ["FR1.9"],
+        "notes": null
+      },
+      {
+        "id": "TASK-016",
+        "title": "Implement gitlab_pipeline_list tool",
+        "description": "Create tool to list pipelines for a project with filtering by ref, status, and source. Support pagination.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-020"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_list",
+          "Parameters: project_id, ref (optional), status (optional), source (optional), page (optional), per_page (optional)",
+          "Returns list of pipelines with id, status, ref, sha, created_at",
+          "Pagination works correctly",
+          "Status filter values: running, pending, success, failed, canceled, skipped"
+        ],
+        "source_requirements": ["FR2.1"],
+        "notes": null
+      },
+      {
+        "id": "TASK-017",
+        "title": "Implement gitlab_pipeline_get tool",
+        "description": "Create tool to get detailed pipeline status including job breakdown, duration, and timestamps.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-020"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_get",
+          "Parameters: project_id (required), pipeline_id (required)",
+          "Returns full pipeline details: id, status, ref, sha, before_sha, tag, user, created_at, started_at, finished_at, duration",
+          "Includes job breakdown by stage",
+          "Returns GITLAB_NOT_FOUND for invalid pipeline_id"
+        ],
+        "source_requirements": ["FR2.2"],
+        "notes": null
+      },
+      {
+        "id": "TASK-018",
+        "title": "Implement gitlab_job_logs tool",
+        "description": "Create tool to get job log output. Handle large logs with truncation and indicator.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-020"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_job_logs",
+          "Parameters: project_id (required), job_id (required)",
+          "Returns full job log output as text",
+          "Large logs truncated with clear indicator (e.g., '[truncated - showing last N lines]')",
+          "Returns GITLAB_NOT_FOUND for invalid job_id",
+          "Handles jobs with no logs yet"
+        ],
+        "source_requirements": ["FR2.3"],
+        "notes": "Consider configurable truncation limit"
+      },
+      {
+        "id": "TASK-019",
+        "title": "Write unit tests for MR tools",
+        "description": "Create comprehensive unit tests for all merge request tools using mocked GitLab API responses.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "L",
+        "dependencies": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013", "TASK-014", "TASK-015"],
+        "blocked_by": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013", "TASK-014", "TASK-015"],
+        "blocks": ["TASK-021"],
+        "acceptance_criteria": [
+          "tests/test_merge_requests.py exists",
+          "Mock fixtures for GitLab client",
+          "Success path tests for each MR tool",
+          "Error scenario tests (not found, forbidden, conflict)",
+          "Pagination tests for list operations",
+          ">80% code coverage for merge_requests.py"
+        ],
+        "source_requirements": ["Testing Strategy"],
+        "notes": "Use pytest-mock or responses library"
+      },
+      {
+        "id": "TASK-020",
+        "title": "Write unit tests for pipeline tools",
+        "description": "Create unit tests for pipeline and job tools using mocked GitLab API responses.",
+        "status": "not_started",
+        "priority": "critical",
+        "complexity": "M",
+        "dependencies": ["TASK-016", "TASK-017", "TASK-018"],
+        "blocked_by": ["TASK-016", "TASK-017", "TASK-018"],
+        "blocks": ["TASK-021"],
+        "acceptance_criteria": [
+          "tests/test_pipelines.py exists",
+          "Success path tests for pipeline_list, pipeline_get, job_logs",
+          "Error scenario tests",
+          "Log truncation behavior tested",
+          ">80% code coverage for pipelines.py"
+        ],
+        "source_requirements": ["Testing Strategy"],
+        "notes": null
+      },
+      {
+        "id": "TASK-021",
+        "title": "Write README documentation for MVP",
+        "description": "Create comprehensive README with installation, configuration, quick start, and tool reference for all MVP tools.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-019", "TASK-020"],
+        "blocked_by": ["TASK-019", "TASK-020"],
+        "blocks": [],
+        "acceptance_criteria": [
+          "README.md includes overview and features",
+          "Installation instructions (uv add, pip install)",
+          "Configuration guide for env vars and config file",
+          "Quick start examples for common workflows",
+          "Tool reference with parameters and examples for all MR tools",
+          "Troubleshooting section for common errors"
+        ],
+        "source_requirements": ["Documentation Requirements"],
+        "notes": null
+      },
+      {
+        "id": "TASK-022",
+        "title": "Write unit tests for configuration",
+        "description": "Create tests for config.py covering environment variables, config file loading, and validation.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "S",
+        "dependencies": ["TASK-002"],
+        "blocked_by": ["TASK-002"],
+        "blocks": [],
+        "acceptance_criteria": [
+          "tests/test_config.py exists",
+          "Tests for required field validation",
+          "Tests for environment variable loading",
+          "Tests for config file loading",
+          "Tests for configuration priority ordering"
+        ],
+        "source_requirements": ["Testing Strategy"],
+        "notes": null
+      },
+      {
+        "id": "TASK-023",
+        "title": "Implement gitlab_pipeline_trigger tool",
+        "description": "Create tool to trigger a new pipeline on a ref with optional variables.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-028"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_trigger",
+          "Parameters: project_id, ref (required), variables (optional dict)",
+          "Triggers new pipeline on specified ref",
+          "Variables passed correctly to pipeline",
+          "Returns new pipeline ID and status"
+        ],
+        "source_requirements": ["FR2.4"],
+        "notes": null
+      },
+      {
+        "id": "TASK-024",
+        "title": "Implement gitlab_pipeline_retry tool",
+        "description": "Create tool to retry a failed pipeline.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-028"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_retry",
+          "Parameters: project_id, pipeline_id",
+          "Retries failed pipeline",
+          "Returns new pipeline status",
+          "Handles already-running pipeline gracefully"
+        ],
+        "source_requirements": ["FR2.5"],
+        "notes": null
+      },
+      {
+        "id": "TASK-025",
+        "title": "Implement gitlab_pipeline_cancel tool",
+        "description": "Create tool to cancel a running pipeline.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "S",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-028"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_cancel",
+          "Parameters: project_id, pipeline_id",
+          "Cancels running pipeline",
+          "Returns confirmation with final status",
+          "Handles already-finished pipeline gracefully"
+        ],
+        "source_requirements": ["FR2.6"],
+        "notes": null
+      },
+      {
+        "id": "TASK-026",
+        "title": "Implement gitlab_pipeline_jobs tool",
+        "description": "Create tool to list jobs for a specific pipeline with status, duration, and stage info.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-028"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_pipeline_jobs",
+          "Parameters: project_id, pipeline_id",
+          "Returns list of jobs with id, name, status, stage, duration, started_at, finished_at",
+          "Jobs ordered by stage execution order",
+          "Includes failure reason for failed jobs"
+        ],
+        "source_requirements": ["FR2.7"],
+        "notes": null
+      },
+      {
+        "id": "TASK-027",
+        "title": "Implement gitlab_issue_list tool",
+        "description": "Create tool to list issues with filtering by state, labels, assignee, milestone. Support search and pagination.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocked_by": ["TASK-003", "TASK-004", "TASK-006"],
+        "blocks": ["TASK-029"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_issue_list",
+          "Parameters: project_id, state (optional), labels (optional), assignee (optional), milestone (optional), search (optional), page (optional), per_page (optional)",
+          "Returns list of issues with iid, title, state, labels, assignees, milestone",
+          "Search works against title and description",
+          "Pagination works correctly"
+        ],
+        "source_requirements": ["FR3.1"],
+        "notes": null
+      },
+      {
+        "id": "TASK-028",
+        "title": "Write unit tests for remaining pipeline tools",
+        "description": "Create unit tests for pipeline trigger, retry, cancel, and jobs tools.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-023", "TASK-024", "TASK-025", "TASK-026"],
+        "blocked_by": ["TASK-023", "TASK-024", "TASK-025", "TASK-026"],
+        "blocks": [],
+        "acceptance_criteria": [
+          "Tests added to tests/test_pipelines.py",
+          "Success path tests for trigger, retry, cancel, jobs",
+          "Error scenario tests",
+          ">80% code coverage for pipelines.py"
+        ],
+        "source_requirements": ["Testing Strategy"],
+        "notes": null
+      },
+      {
+        "id": "TASK-029",
+        "title": "Implement gitlab_issue_get tool",
+        "description": "Create tool to get full issue details including labels, assignees, milestone, and related MRs.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-027"],
+        "blocked_by": ["TASK-027"],
+        "blocks": ["TASK-032"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_issue_get",
+          "Parameters: project_id (required), issue_iid (required)",
+          "Returns full issue data including all labels, assignees, milestone",
+          "Includes list of related merge requests",
+          "Returns GITLAB_NOT_FOUND for invalid issue_iid"
+        ],
+        "source_requirements": ["FR3.2"],
+        "notes": null
+      },
+      {
+        "id": "TASK-030",
+        "title": "Implement gitlab_issue_create tool",
+        "description": "Create tool to create a new issue with title, description, labels, assignee, and milestone.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-027"],
+        "blocked_by": ["TASK-027"],
+        "blocks": ["TASK-032"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_issue_create",
+          "Parameters: project_id, title (required), description (optional), labels (optional list), assignee_ids (optional list), milestone_id (optional)",
+          "Creates issue with all specified fields",
+          "Returns created issue with iid",
+          "Validates title is non-empty"
+        ],
+        "source_requirements": ["FR3.3"],
+        "notes": null
+      },
+      {
+        "id": "TASK-031",
+        "title": "Implement gitlab_issue_update tool",
+        "description": "Create tool to update issue fields supporting partial updates.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-027"],
+        "blocked_by": ["TASK-027"],
+        "blocks": ["TASK-032"],
+        "acceptance_criteria": [
+          "Tool name: gitlab_issue_update",
+          "Parameters: project_id, issue_iid, title (optional), description (optional), labels (optional), assignee_ids (optional), milestone_id (optional), state_event (optional: close/reopen)",
+          "Only updates provided fields",
+          "Returns updated issue",
+          "Returns GITLAB_NOT_FOUND for invalid issue_iid"
+        ],
+        "source_requirements": ["FR3.4", "FR3.6", "FR3.7"],
+        "notes": "Combines update, close, and reopen functionality via state_event"
+      },
+      {
+        "id": "TASK-032",
+        "title": "Write unit tests for issue tools",
+        "description": "Create unit tests for all issue management tools.",
+        "status": "not_started",
+        "priority": "high",
+        "complexity": "M",
+        "dependencies": ["TASK-029", "TASK-030", "TASK-031"],
+        "blocked_by": ["TASK-029", "TASK-030", "TASK-031"],
+        "blocks": [],
+        "acceptance_criteria": [
+          "tests/test_issues.py exists",
+          "Success path tests for list, get, create, update",
+          "Error scenario tests",
+          "Partial update behavior tested",
+          ">80% code coverage for issues.py"
+        ],
+        "source_requirements": ["Testing Strategy"],
+        "notes": null
+      }
+    ],
+    "execution_phases": [
+      {
+        "phase": 1,
+        "name": "Foundation - Package Setup",
+        "tasks": ["TASK-001"]
+      },
+      {
+        "phase": 2,
+        "name": "Core Infrastructure",
+        "tasks": ["TASK-002", "TASK-004", "TASK-005"]
+      },
+      {
+        "phase": 3,
+        "name": "Client & Tool System",
+        "tasks": ["TASK-003", "TASK-006", "TASK-022"]
+      },
+      {
+        "phase": 4,
+        "name": "MVP MR Tools",
+        "tasks": ["TASK-007", "TASK-008", "TASK-009", "TASK-010", "TASK-011", "TASK-012", "TASK-013"]
+      },
+      {
+        "phase": 5,
+        "name": "MVP Pipeline Tools & Remaining MR Tools",
+        "tasks": ["TASK-014", "TASK-015", "TASK-016", "TASK-017", "TASK-018"]
+      },
+      {
+        "phase": 6,
+        "name": "MVP Testing",
+        "tasks": ["TASK-019", "TASK-020"]
+      },
+      {
+        "phase": 7,
+        "name": "MVP Documentation",
+        "tasks": ["TASK-021"]
+      },
+      {
+        "phase": 8,
+        "name": "Phase 2 - Extended Pipeline Tools",
+        "tasks": ["TASK-023", "TASK-024", "TASK-025", "TASK-026"]
+      },
+      {
+        "phase": 9,
+        "name": "Phase 3 - Issue Management",
+        "tasks": ["TASK-027"]
+      },
+      {
+        "phase": 10,
+        "name": "Phase 2 Testing",
+        "tasks": ["TASK-028"]
+      },
+      {
+        "phase": 11,
+        "name": "Phase 3 - Issue Tools Continued",
+        "tasks": ["TASK-029", "TASK-030", "TASK-031"]
+      },
+      {
+        "phase": 12,
+        "name": "Phase 3 Testing",
+        "tasks": ["TASK-032"]
+      }
+    ]
+  }
+}
