@@ -14,7 +14,7 @@
         "id": "TASK-001",
         "title": "Initialize package structure and pyproject.toml",
         "description": "Create the mamba-mcp-server-gitlab package directory structure under packages/ with pyproject.toml, README.md placeholder, and src/mamba_mcp_server_gitlab/ directory with __init__.py",
-        "status": "not_started",
+        "status": "complete",
         "priority": "critical",
         "complexity": "S",
         "dependencies": [],

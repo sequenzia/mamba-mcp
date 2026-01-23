@@ -14,6 +14,7 @@ members = ["packages/*"]
 [tool.uv.sources]
 mamba-mcp-core = { workspace = true }
 mamba-mcp-client = { workspace = true }
+mamba-mcp-server-gitlab = { workspace = true }
 
 [dependency-groups]
 dev = [
