@@ -1,0 +1,6 @@
+{
+  "env": {
+    "CLAUDE_CODE_TASK_LIST_ID": "mamba-mcp"
+  },
+  "enabledMcpjsonServers": ["context7"]
+}
