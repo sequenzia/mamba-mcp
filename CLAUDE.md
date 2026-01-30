@@ -6,7 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) packages:
 
-- **mamba-mcp-core** - Shared utilities and types
 - **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
 
 ## Development Commands
@@ -61,10 +60,6 @@ mamba-mcp/
 ├── pyproject.toml              # Workspace configuration
 ├── uv.lock                     # Shared lockfile
 ├── packages/
-│   ├── mamba-mcp-core/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_core/
-│   │   └── tests/
 │   └── mamba-mcp-client/
 │       ├── pyproject.toml
 │       ├── src/mamba_mcp_client/

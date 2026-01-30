@@ -17,7 +17,6 @@ Testing MCP servers is difficult—debugging is painful, and there are few good 
 | Package | Description |
 |---------|-------------|
 | [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with TUI, CLI, and Python API |
-| [mamba-mcp-core](packages/mamba-mcp-core/) | Shared utilities and types for Mamba MCP packages |
 
 ## Quick Start
 
@@ -68,8 +67,6 @@ mamba-mcp/
 ├── pyproject.toml              # Workspace configuration
 ├── uv.lock                     # Shared lockfile
 ├── packages/
-│   ├── mamba-mcp-core/         # Shared utilities
-│   │   └── src/mamba_mcp_core/
 │   └── mamba-mcp-client/       # MCP testing client
 │       ├── src/mamba_mcp_client/
 │       │   ├── cli.py          # CLI entry point
