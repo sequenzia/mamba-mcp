@@ -4,6 +4,10 @@ A Python-based MCP (Model Context Protocol) Client for testing and debugging MCP
 
 Testing MCP servers is difficult—debugging is painful, and there are few good tools to inspect MCP communication in detail. Mamba MCP Client provides both an interactive terminal UI and a programmatic Python API for comprehensive MCP server testing.
 
+![Claude Task Manager](../../internal/images/mcp-client-01.png)
+
+**See more screenshots [screenshots](#screenshots) below**
+
 ## Features
 
 - **Interactive TUI** - Textual-based terminal interface with real-time updates
@@ -322,6 +326,14 @@ Run the sample server with the TUI:
 ```bash
 mamba-mcp tui --stdio "python examples/sample_server.py"
 ```
+
+## Screenshots
+
+### Mamba MCP Client TUI - List Tools
+![Mamba MCP Client](../../internal/images/mcp-client-02.png)
+
+### Mamba MCP Client TUI - Call Tool
+![Mamba MCP Client](../../internal/images/mcp-client-03.png)
 
 ## License
 
