@@ -13,6 +13,11 @@ A Python monorepo of MCP (Model Context Protocol) tools — a testing client and
 
 Testing and debugging tool for MCP servers. Supports stdio, SSE, HTTP, and UV-based transports.
 
+#### Mamba MCP Client TUI
+
+![Mamba MCP Client](./internal/images/mcp-client-01.png)
+
+
 - **Interactive TUI** — Textual-based terminal interface for exploring servers in real-time
 - **CLI Commands** — Quick one-off commands for inspection and scripting
 - **Python API** — Fully async programmatic interface for test automation
