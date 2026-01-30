@@ -1,53 +1,60 @@
 # Mamba MCP
 
-A Python toolkit for testing and debugging MCP (Model Context Protocol) servers.
-
-Testing MCP servers is difficult—debugging is painful, and there are few good tools to inspect MCP communication in detail. Mamba MCP provides an interactive terminal UI, CLI commands, and a programmatic Python API for comprehensive MCP server testing.
-
-## Features
-
-- **Interactive TUI** - Textual-based terminal interface for exploring servers in real-time
-- **CLI Commands** - Quick one-off commands for inspection and scripting
-- **Python API** - Fully async programmatic interface for test automation
-- **Multi-Transport** - Supports stdio, SSE, HTTP, and UV-based transports
-- **Protocol Logging** - Detailed request/response capture with timing
+A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.
 
 ## Packages
 
 | Package | Description |
 |---------|-------------|
-| [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with TUI, CLI, and Python API |
+| [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
+| [mamba-mcp-postgres](packages/mamba-mcp-postgres/) | PostgreSQL MCP server with layered schema discovery |
 
-## Quick Start
+### mamba-mcp-client
+
+Testing and debugging tool for MCP servers. Supports stdio, SSE, HTTP, and UV-based transports.
+
+- **Interactive TUI** — Textual-based terminal interface for exploring servers in real-time
+- **CLI Commands** — Quick one-off commands for inspection and scripting
+- **Python API** — Fully async programmatic interface for test automation
+- **Protocol Logging** — Detailed request/response capture with timing
 
 ```bash
-# Clone and install
-git clone https://github.com/sequenzia/mamba-mcp.git
-cd mamba-mcp
-uv sync --group dev
-
 # Launch interactive TUI
-uv run --package mamba-mcp-client mamba-mcp tui --stdio "python server.py"
+mamba-mcp tui --stdio "python server.py"
 
-# Or try with the included sample server
-uv run --package mamba-mcp-client mamba-mcp tui --stdio "python packages/mamba-mcp-client/examples/sample_server.py"
-
-# CLI commands for quick inspection
-uv run --package mamba-mcp-client mamba-mcp connect --stdio "python server.py"  # View server info
-uv run --package mamba-mcp-client mamba-mcp tools --stdio "python server.py"    # List tools
-uv run --package mamba-mcp-client mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
+# CLI inspection
+mamba-mcp tools --stdio "python server.py"
+mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 ```
 
-For detailed documentation on all CLI commands, Python API, and configuration options, see [packages/mamba-mcp-client/README.md](packages/mamba-mcp-client/README.md).
+### mamba-mcp-postgres
+
+PostgreSQL MCP server with a 3-layer tool architecture for AI assistants.
+
+- **Layer 1: Schema Discovery** — List schemas, tables, describe columns, sample rows
+- **Layer 2: Relationship Discovery** — Foreign keys, join path finding (BFS)
+- **Layer 3: Query Execution** — Read-only SQL with parameterized queries and EXPLAIN support
+
+```bash
+# Test database connection
+mamba-mcp-postgres --env-file mamba.env test
+
+# Run the MCP server
+mamba-mcp-postgres --env-file mamba.env
+```
+
+## Configuration
+
+All packages use `mamba.env` for environment-based configuration. Default file locations (checked in order):
+
+1. `./mamba.env` (project-local)
+2. `~/mamba.env` (global fallback)
 
 ## Development
 
 ```bash
 # Install all packages
 uv sync --group dev
-
-# Run CLI
-uv run --package mamba-mcp-client mamba-mcp --help
 
 # Run tests
 pytest packages/
@@ -67,13 +74,12 @@ mamba-mcp/
 ├── pyproject.toml              # Workspace configuration
 ├── uv.lock                     # Shared lockfile
 ├── packages/
-│   └── mamba-mcp-client/       # MCP testing client
-│       ├── src/mamba_mcp_client/
-│       │   ├── cli.py          # CLI entry point
-│       │   ├── client.py       # MCPTestClient
-│       │   ├── config.py       # Transport configs
-│       │   └── tui/            # Terminal UI
-│       └── examples/           # Sample server and API usage
+│   ├── mamba-mcp-client/       # MCP testing client
+│   │   ├── src/mamba_mcp_client/
+│   │   └── examples/
+│   └── mamba-mcp-postgres/     # PostgreSQL MCP server
+│       ├── src/mamba_mcp_postgres/
+│       └── tests/
 └── specs/                      # Specifications
 ```
 

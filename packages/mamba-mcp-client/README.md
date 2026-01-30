@@ -193,7 +193,7 @@ mamba-mcp connect --http http://localhost:8000/mcp -- debug verbose
 --log-level, -l   Log level: DEBUG, INFO, WARNING, ERROR (default: INFO)
 --output, -o      Output format: json, table, rich (default: rich)
 --args, -a        Arguments as JSON string (for call/prompt commands)
---env, -e         Path to .env file for environment variables
+--env-file, -e    Path to env file (default: ./mamba.env or ~/mamba.env)
 --python          Python version for UV transports (e.g., 3.11, 3.12)
 --with            Additional packages for UV transports (can be used multiple times)
 --                Pass remaining arguments to server (see Extra Server Arguments)
@@ -201,18 +201,18 @@ mamba-mcp connect --http http://localhost:8000/mcp -- debug verbose
 
 ### Environment Variables
 
-Configure via environment variables with the `MAMBA_MCP_` prefix:
+Configure via environment variables with the `MAMBA_MCP_CLIENT_` prefix:
 
 ```bash
-export MAMBA_MCP_STDIO__COMMAND=python
-export MAMBA_MCP_STDIO__ARGS='["server.py"]'
-export MAMBA_MCP_LOG__ENABLED=true
+export MAMBA_MCP_CLIENT_STDIO__COMMAND=python
+export MAMBA_MCP_CLIENT_STDIO__ARGS='["server.py"]'
+export MAMBA_MCP_CLIENT_LOGGING__ENABLED=true
 ```
 
-Or use a `.env` file:
+Or use a `mamba.env` file (auto-detected from `./mamba.env` or `~/mamba.env`):
 
 ```bash
-mamba-mcp --env /path/to/.env connect --stdio "python server.py"
+mamba-mcp --env-file /path/to/mamba.env connect --stdio "python server.py"
 ```
 
 ### Programmatic Configuration

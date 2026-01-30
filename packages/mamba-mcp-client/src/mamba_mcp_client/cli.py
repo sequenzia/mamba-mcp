@@ -215,7 +215,7 @@ def main_callback(
     ] = False,
     env: Annotated[
         Optional[Path],
-        typer.Option("--env", "-e", help="Path to .env file to load environment variables from"),
+        typer.Option("--env-file", "-e", help="Path to env file (default: ./mamba.env or ~/mamba.env)"),
     ] = None,
 ) -> None:
     """MCP Client for testing and debugging MCP Servers."""

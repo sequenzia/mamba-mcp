@@ -73,7 +73,7 @@ class ClientConfig(BaseSettings):
     """Main configuration for the MCP test client."""
 
     model_config = SettingsConfigDict(
-        env_prefix="MAMBA_MCP_",
+        env_prefix="MAMBA_MCP_CLIENT_",
         env_nested_delimiter="__",
         extra="ignore",
     )
