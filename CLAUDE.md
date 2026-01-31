@@ -8,6 +8,7 @@ Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) pac
 
 - **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
 - **mamba-mcp-postgres** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
+- **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
 
 ## Development Commands
 
@@ -71,18 +72,30 @@ mamba-mcp/
 │   │   │   └── tui/app.py      # Textual TUI
 │   │   ├── tests/
 │   │   └── examples/
-│   └── mamba-mcp-postgres/
+│   ├── mamba-mcp-postgres/
+│   │   ├── pyproject.toml
+│   │   ├── src/mamba_mcp_postgres/
+│   │   │   ├── __main__.py     # Typer CLI (test, serve)
+│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_POSTGRES_*)
+│   │   │   ├── errors.py       # Error codes & fuzzy matching
+│   │   │   ├── server.py       # FastMCP server & lifespan
+│   │   │   ├── database/       # SQLAlchemy async services
+│   │   │   ├── models/         # Pydantic I/O models
+│   │   │   └── tools/          # MCP tool definitions (8 tools)
+│   │   └── tests/
+│   └── mamba-mcp-fs/
 │       ├── pyproject.toml
-│       ├── src/mamba_mcp_postgres/
+│       ├── src/mamba_mcp_fs/
 │       │   ├── __main__.py     # Typer CLI (test, serve)
-│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_POSTGRES_*)
-│       │   ├── errors.py       # Error codes & fuzzy matching
+│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
+│       │   ├── security.py     # Sandbox & path traversal enforcement
+│       │   ├── rate_limit.py   # Sliding window rate limiter
 │       │   ├── server.py       # FastMCP server & lifespan
-│       │   ├── database/       # SQLAlchemy async services
+│       │   ├── backends/       # LocalBackend, S3Backend, BackendManager
 │       │   ├── models/         # Pydantic I/O models
-│       │   └── tools/          # MCP tool definitions (8 tools)
+│       │   └── tools/          # MCP tool definitions (12 tools)
 │       └── tests/
-└── specs/
+└── internal/                   # Specs & images
 ```
 
 ## Architecture (mamba-mcp-client)
@@ -103,6 +116,19 @@ mamba-mcp/
 - Config via `MAMBA_MCP_POSTGRES_*` env vars or `.env` file, auto-detected from cwd
 - CLI: `mamba-mcp-postgres --env-file .env test` / `mamba-mcp-postgres` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `sqlalchemy[asyncio]`, `asyncpg`
+
+## Architecture (mamba-mcp-fs)
+
+- 3-layer MCP tool architecture:
+  - **Layer 1 (Discovery):** `list_directory`, `get_file_info`, `read_file`, `search_files` (always registered)
+  - **Layer 2 (S3 Extras):** `list_buckets`, `get_presigned_url`, `get_object_metadata` (when S3 enabled)
+  - **Layer 3 (Mutation):** `write_file`, `delete_file`, `move_file`, `copy_file`, `create_directory` (when `read_only=false`)
+- Backends: `LocalBackend` (fsspec), `S3Backend` (s3fs) via `BackendManager` abstraction
+- Security: sandbox enforcement, path traversal prevention, symlink/hidden file policies, extension filtering
+- Rate limiting: sliding window per-server-instance limiter
+- Config via `MAMBA_MCP_FS_*` env vars or `mamba.env` file, auto-detected from cwd
+- CLI: `mamba-mcp-fs --env-file mamba.env test` / `mamba-mcp-fs` (serve)
+- Uses `mcp>=1.0.0` (FastMCP), `fsspec`, `s3fs`, `pydantic-settings`
 
 ## Code Standards
 

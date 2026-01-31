@@ -8,6 +8,7 @@ A Python monorepo of MCP (Model Context Protocol) tools — a testing client and
 |---------|-------------|
 | [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
 | [mamba-mcp-postgres](packages/mamba-mcp-postgres/) | PostgreSQL MCP server with layered schema discovery |
+| [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backend support |
 
 ### mamba-mcp-client
 
@@ -48,6 +49,22 @@ mamba-mcp-postgres --env-file mamba.env test
 mamba-mcp-postgres --env-file mamba.env
 ```
 
+### mamba-mcp-fs
+
+Filesystem MCP server with local and S3 backends for AI assistants.
+
+- **Layer 1: Discovery** — List directories, read files, get metadata, search by name/content
+- **Layer 2: S3 Extras** — List buckets, presigned URLs, object metadata (when S3 enabled)
+- **Layer 3: Mutation** — Write, delete, move, copy files, create directories (when read-write)
+
+```bash
+# Test configuration and backend connectivity
+mamba-mcp-fs --env-file mamba.env test
+
+# Run the MCP server
+mamba-mcp-fs --env-file mamba.env
+```
+
 ## Configuration
 
 All packages use `mamba.env` for environment-based configuration. Default file locations (checked in order):
@@ -82,10 +99,13 @@ mamba-mcp/
 │   ├── mamba-mcp-client/       # MCP testing client
 │   │   ├── src/mamba_mcp_client/
 │   │   └── examples/
-│   └── mamba-mcp-postgres/     # PostgreSQL MCP server
-│       ├── src/mamba_mcp_postgres/
+│   ├── mamba-mcp-postgres/     # PostgreSQL MCP server
+│   │   ├── src/mamba_mcp_postgres/
+│   │   └── tests/
+│   └── mamba-mcp-fs/           # Filesystem MCP server
+│       ├── src/mamba_mcp_fs/
 │       └── tests/
-└── specs/                      # Specifications
+└── internal/                   # Specs & images
 ```
 
 ## License
