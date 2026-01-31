@@ -1,0 +1,36 @@
+[project]
+name = "mamba-mcp-fs"
+version = "0.1.0"
+description = "Filesystem MCP Server with local and S3 backend support"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Sequenzia" }]
+keywords = ["mcp", "filesystem", "s3", "llm", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "fsspec",
+    "s3fs",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "typer>=0.12.0",
+]
+
+[project.scripts]
+mamba-mcp-fs = "mamba_mcp_fs.__main__:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mamba_mcp_fs"]
