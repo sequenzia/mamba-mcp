@@ -1,0 +1,27 @@
+{
+  "id": "7",
+  "subject": "Add Phase 1 unit tests",
+  "description": "Create tests for all Phase 1 foundation components:\n\nTest files to create:\n- `tests/conftest.py` \u2014 Mock hdbcli fixtures (mock connection, mock cursor, mock pool)\n- `tests/test_config.py` \u2014 Configuration loading, env var parsing, auto-TLS, cascading env files\n- `tests/test_pool.py` \u2014 Pool acquire/release, timeout, health checks, dispose\n- `tests/test_cli.py` \u2014 CLI test/serve commands with mocked dependencies\n\nKey fixtures in `conftest.py`:\n- `mock_hdbcli_connection`: Mock PEP 249 connection with cursor support\n- `mock_cursor`: Mock cursor with `fetchall`, `fetchone`, `description`, `execute`\n- `mock_pool`: Mock connection pool for tool/service tests\n- `hana_config`: Test configuration with safe defaults\n\nAll tests must:\n- Use pytest asyncio auto mode\n- Mock hdbcli (no real HANA connection needed)\n- Follow existing monorepo test patterns\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] `conftest.py` provides reusable mock fixtures for hdbcli\n- [ ] `test_config.py` covers all config loading scenarios\n- [ ] `test_pool.py` covers pool lifecycle and error scenarios\n- [ ] `test_cli.py` covers test and serve command paths\n- [ ] All tests pass with `pytest packages/mamba-mcp-hana/`\n\n_Edge Cases:_\n- [ ] Test config with hdbuserstore key (no user/password)\n- [ ] Test pool timeout and dead connection recovery\n\n**Testing Requirements:**\n\u2022 Target: >80% coverage for Phase 1 modules\n\u2022 All tests mock hdbcli \u2014 no real HANA dependency\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 9.1, 3.2",
+  "activeForm": "Adding Phase 1 unit tests",
+  "status": "completed",
+  "blocks": [
+    "17",
+    "21"
+  ],
+  "blockedBy": [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "L",
+    "source_section": "9.1, 3.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Phase 1 Tests",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:tests:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

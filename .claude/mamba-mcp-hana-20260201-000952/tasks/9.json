@@ -1,0 +1,23 @@
+{
+  "id": "9",
+  "subject": "Create Layer 2 Pydantic I/O models",
+  "description": "Create `src/mamba_mcp_sap_hana/models/relationships.py` with Pydantic input/output models for Layer 2 relationship discovery tools.\n\nModels to create:\n\n**Output models:**\n- `ForeignKeyInfo`: constraint_name, source_schema, source_table, source_columns (list[str]), target_schema, target_table, target_columns (list[str]), delete_rule\n- `ForeignKeysOutput`: table_name, schema_name, outgoing (list[ForeignKeyInfo]), incoming (list[ForeignKeyInfo]), outgoing_count, incoming_count\n- `JoinStep`: from_schema, from_table, from_column, to_schema, to_table, to_column, constraint_name, direction (outgoing/incoming)\n- `JoinPath`: steps (list[JoinStep]), length, sql_example (str)\n- `FindJoinPathOutput`: from_table, to_table, paths (list[JoinPath]), path_count\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] FK model captures both direction (outgoing/incoming) with full details\n- [ ] JoinPath includes generated SQL JOIN example\n- [ ] Paths sorted by length (shortest first)\n- [ ] All models serializable for MCP transport\n\n_Edge Cases:_\n- [ ] Cross-schema foreign keys: schema fields populated on both sides\n- [ ] Empty FK lists serialize correctly\n\n**Testing Requirements:**\n• Unit: Model instantiation with valid FK data\n• Unit: Model serialization to dict/JSON\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.2, 9.2",
+  "activeForm": "Creating Layer 2 Pydantic models",
+  "status": "completed",
+  "blocks": [
+    "12",
+    "15"
+  ],
+  "blockedBy": [
+    "1"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "S",
+    "source_section": "5.2, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Layer 2 Models",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:models-relationships:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "1",
+  "subject": "Scaffold mamba-mcp-hana package",
+  "description": "Create the package directory structure for `packages/mamba-mcp-hana/` following the monorepo conventions established by mamba-mcp-postgres.\n\nStructure to create:\n```\npackages/mamba-mcp-hana/\n├── pyproject.toml\n├── src/mamba_mcp_sap_hana/\n│   ├── __init__.py\n│   ├── database/\n│   │   └── __init__.py\n│   ├── models/\n│   │   └── __init__.py\n│   └── tools/\n│       └── __init__.py\n└── tests/\n    └── __init__.py\n```\n\npyproject.toml must include:\n- Package name: `mamba-mcp-hana`\n- Python >=3.11\n- Dependencies: `hdbcli`, `mcp>=1.0.0`, `pydantic>=2.0.0`, `pydantic-settings>=2.0.0`, `typer>=0.12.0`\n- Console script entry point: `mamba-mcp-hana = \"mamba_mcp_sap_hana.__main__:app\"`\n- Ruff and MyPy strict configuration matching workspace standards (line-length=100, rules: E, F, I, N, W, UP)\n\nAlso update the workspace `pyproject.toml` to register the new package member.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Package directory structure matches spec appendix 13.3\n- [ ] pyproject.toml has all required dependencies and metadata\n- [ ] `__init__.py` files exist in all Python packages\n- [ ] Workspace pyproject.toml includes `packages/mamba-mcp-hana` as a member\n- [ ] Console script entry point configured for `mamba-mcp-hana`\n\n_Edge Cases:_\n- [ ] Ruff and MyPy config aligned with workspace-level settings\n\n_Error Handling:_\n- [ ] `uv sync` succeeds with the new package registered\n\n**Testing Requirements:**\n• Unit: `uv sync --group dev` completes without errors\n• Unit: Package is importable (`import mamba_mcp_sap_hana`)\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 9.1, 13.3",
+  "activeForm": "Scaffolding mamba-mcp-hana package",
+  "status": "completed",
+  "blocks": [
+    "2",
+    "4",
+    "3",
+    "8",
+    "9",
+    "10",
+    "18"
+  ],
+  "blockedBy": [],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "9.1, 13.3",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Package Scaffolding",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:scaffold:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

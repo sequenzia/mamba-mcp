@@ -1,0 +1,28 @@
+{
+  "id": "5",
+  "subject": "Implement FastMCP server with lifespan management",
+  "description": "Create `src/mamba_mcp_sap_hana/server.py` with FastMCP server setup and connection pool lifespan.\n\nMust implement:\n- FastMCP server instance with `name=\"mamba-mcp-hana\"`\n- Lifespan context manager that:\n  1. Creates and initializes the connection pool on startup\n  2. Tests the connection (fail-fast if HANA is unreachable)\n  3. Stores pool reference in server context for tool access\n  4. Disposes all connections on shutdown\n- Support for stdio and HTTP transports (configurable via settings)\n- Logging setup: JSON or text format, configurable level, output to stderr\n- `create_server(config)` factory function that wires everything together\n\nReference: mamba-mcp-postgres `server.py` for the FastMCP lifespan pattern.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] FastMCP server created with correct name and description\n- [ ] Lifespan initializes pool, tests connection, stores in context\n- [ ] Lifespan disposes pool on shutdown\n- [ ] Server supports both stdio and HTTP transport modes\n- [ ] Logging configured per settings (format, level, stderr)\n\n_Edge Cases:_\n- [ ] HANA unreachable on startup: fails fast with clear error message\n- [ ] Graceful shutdown during active queries: waits for completion\n\n_Error Handling:_\n- [ ] Startup connection failure: logged and re-raised with guidance\n\n**Testing Requirements:**\n• Unit: Lifespan initializes and disposes pool correctly (mocked)\n• Unit: Server creation with different transport configs\n• Unit: Fail-fast behavior when connection test fails\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 9.1, 7.1",
+  "activeForm": "Implementing FastMCP server",
+  "status": "completed",
+  "blocks": [
+    "6",
+    "7",
+    "14",
+    "15",
+    "16",
+    "20"
+  ],
+  "blockedBy": [
+    "2",
+    "3"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "9.1, 7.1",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "FastMCP Server",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:server:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

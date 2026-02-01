@@ -1,0 +1,24 @@
+{
+  "id": "11",
+  "subject": "Implement SchemaService for Layer 1 database operations",
+  "description": "Create `src/mamba_mcp_sap_hana/database/schema.py` with async service methods querying HANA `SYS.*` system views for schema discovery.\n\nMethods to implement:\n- `async def list_schemas(pool, include_system: bool) -> list[SchemaInfo]`\n  - Queries `SYS.SCHEMAS` joined with table counts\n  - Filters `_SYS_*`, `SYS`, `SYSTEM` unless `include_system=True`\n- `async def list_tables(pool, schema_name, include_views, name_pattern) -> list[TableInfo]`\n  - Queries `SYS.TABLES` for tables; optionally `SYS.VIEWS` for views\n  - `name_pattern` applied via SQL LIKE\n  - Validates schema existence, returns fuzzy suggestions if not found\n- `async def describe_table(pool, table_name, schema_name, include_indexes, include_constraints) -> DescribeTableOutput`\n  - Queries `SYS.TABLE_COLUMNS` (or `SYS.VIEW_COLUMNS` for views)\n  - Optionally queries `SYS.INDEXES` + `SYS.INDEX_COLUMNS`\n  - Optionally queries `SYS.CONSTRAINTS`\n  - Validates table/view existence first\n- `async def get_sample_rows(pool, table_name, schema_name, limit, columns, where_clause, randomize) -> SampleRowsOutput`\n  - Builds SELECT with optional column filter, WHERE clause, LIMIT\n  - Reports total row count alongside sample\n  - Validates column names if specified\n\nAll methods use `asyncio.to_thread()` for hdbcli calls and return Pydantic models.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] `list_schemas` returns schemas with table counts, filters system by default\n- [ ] `list_tables` queries both tables and views when requested\n- [ ] `describe_table` handles both tables and views (VIEW_COLUMNS for views)\n- [ ] `get_sample_rows` supports column selection, WHERE, and randomization\n- [ ] All methods use asyncio.to_thread() for non-blocking execution\n\n_Edge Cases:_\n- [ ] Schema not found: returns error with fuzzy suggestions\n- [ ] Table not found: returns error with fuzzy suggestions\n- [ ] View instead of table: describe_table skips indexes/constraints\n- [ ] Empty table: get_sample_rows returns row_count=0 with note\n- [ ] Wide table (100+ columns): returns all columns with width warning\n\n_Error Handling:_\n- [ ] Permission denied: returns PERMISSION_DENIED error with grant guidance\n- [ ] Invalid column in get_sample_rows: returns COLUMN_NOT_FOUND with suggestions\n\n**Testing Requirements:**\n• Unit: Each service method with mocked cursor returning expected rows\n• Unit: System schema filtering logic\n• Unit: Fuzzy matching integration for name suggestions\n• Unit: View detection and VIEW_COLUMNS fallback\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.1, 9.2, 13.2",
+  "activeForm": "Implementing SchemaService",
+  "status": "completed",
+  "blocks": [
+    "14"
+  ],
+  "blockedBy": [
+    "3",
+    "4",
+    "8"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "L",
+    "source_section": "5.1, 9.2, 13.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "SchemaService",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:service-schema:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

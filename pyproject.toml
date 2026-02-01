@@ -15,6 +15,7 @@ members = ["packages/*"]
 mamba-mcp-client = { workspace = true }
 mamba-mcp-postgres = { workspace = true }
 mamba-mcp-fs = { workspace = true }
+mamba-mcp-hana = { workspace = true }
 
 [dependency-groups]
 dev = [

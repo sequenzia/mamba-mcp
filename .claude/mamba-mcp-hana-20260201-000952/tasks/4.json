@@ -1,0 +1,27 @@
+{
+  "id": "4",
+  "subject": "Implement error handling system with fuzzy matching",
+  "description": "Create `src/mamba_mcp_sap_hana/errors.py` with structured error codes, factory function, and Levenshtein distance fuzzy matching.\n\nMust implement:\n- `ErrorCode` string constants: `SCHEMA_NOT_FOUND`, `TABLE_NOT_FOUND`, `COLUMN_NOT_FOUND`, `INVALID_SQL`, `WRITE_OPERATION_DENIED`, `QUERY_TIMEOUT`, `CONNECTION_ERROR`, `PERMISSION_DENIED`, `PARAMETER_ERROR`, `PATH_NOT_FOUND`, `VIEW_NOT_FOUND`, `PROCEDURE_NOT_FOUND`\n- `ToolError` Pydantic model with fields: code, message, suggestion, context, tool_name, input_received\n- `create_tool_error(code, message, ...)` factory function\n- Levenshtein distance implementation for fuzzy name matching\n- `suggest_similar(name, candidates, max_suggestions=3)` function\n- Default suggestions map: each error code has a helpful fallback suggestion text\n\nReference: mamba-mcp-postgres `errors.py` for pattern.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All 12 `ErrorCode` constants defined\n- [ ] `create_tool_error` returns structured `ToolError` model with all fields\n- [ ] Levenshtein fuzzy matching returns closest matches from candidate list\n- [ ] `suggest_similar` returns top-N closest names by edit distance\n- [ ] Default suggestions map provides fallback for each error code\n\n_Edge Cases:_\n- [ ] Empty candidate list: `suggest_similar` returns empty list\n- [ ] Exact match in candidates: returns it first\n- [ ] All candidates have high edit distance: returns empty (threshold-based)\n\n_Error Handling:_\n- [ ] `create_tool_error` handles `None` optional fields gracefully\n\n**Testing Requirements:**\n• Unit: Each error code resolves to expected string\n• Unit: `create_tool_error` produces correct ToolError model\n• Unit: Levenshtein distance calculation for known pairs\n• Unit: `suggest_similar` returns correct top-N matches\n• Unit: Default suggestions map has entry for each ErrorCode\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.7",
+  "activeForm": "Implementing error handling system",
+  "status": "completed",
+  "blocks": [
+    "7",
+    "10",
+    "11",
+    "12",
+    "13",
+    "19"
+  ],
+  "blockedBy": [
+    "1"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.7",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Error Handling System",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:errors:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

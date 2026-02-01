@@ -1,0 +1,25 @@
+{
+  "id": "20",
+  "subject": "Implement HANA-specific MCP tools",
+  "description": "Create `src/mamba_mcp_sap_hana/tools/hana_tools.py` with 3 MCP tool definitions for HANA-specific features.\n\nTools to register with FastMCP:\n1. `list_calculation_views(schema_name: str, include_columns: bool = False) -> str`\n   - Calls HanaService.list_calculation_views\n   - Returns JSON-serialized ListCalcViewsOutput\n   - Docstring notes analytic privilege requirements\n2. `get_table_store_type(table_name: str, schema_name: str) -> str`\n   - Calls HanaService.get_table_store_type\n   - Returns JSON-serialized GetStoreTypeOutput\n   - Docstring explains column vs row store implications\n3. `list_procedures(schema_name: str, include_parameters: bool = False) -> str`\n   - Calls HanaService.list_procedures\n   - Returns JSON-serialized ListProceduresOutput\n\nEach tool must:\n- Have descriptive docstrings (used as MCP tool descriptions)\n- Extract pool from server context\n- Call appropriate HanaService method\n- Handle errors via create_tool_error\n- Use `@mcp.tool()` decorator\n\nRegister all tools with the FastMCP server.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All 3 HANA-specific tools registered with FastMCP\n- [ ] Total tool count reaches 11 (8 core + 3 HANA)\n- [ ] Each tool has descriptive docstring for MCP clients\n- [ ] Results serialized as JSON strings\n\n_Edge Cases:_\n- [ ] Default schema from config used when applicable\n\n_Error Handling:_\n- [ ] Service errors wrapped in ToolError response\n\n**Testing Requirements:**\n\u2022 Unit: Each tool with mocked HanaService\n\u2022 Unit: Error wrapping for service exceptions\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.4, 9.3",
+  "activeForm": "Implementing HANA-specific tools",
+  "status": "completed",
+  "blocks": [
+    "21",
+    "22"
+  ],
+  "blockedBy": [
+    "5",
+    "18",
+    "19"
+  ],
+  "metadata": {
+    "priority": "high",
+    "complexity": "S",
+    "source_section": "5.4, 9.3",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "HANA Tools",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:hana-extras:tools-hana:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

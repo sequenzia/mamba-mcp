@@ -1,0 +1,24 @@
+{
+  "id": "10",
+  "subject": "Create Layer 3 Pydantic I/O models",
+  "description": "Create `src/mamba_mcp_sap_hana/models/results.py` with Pydantic input/output models for Layer 3 query execution tools.\n\nModels to create:\n\n**Output models:**\n- `QueryColumn`: name, data_type\n- `ExecuteQueryOutput`: columns (list[QueryColumn]), rows (list[dict]), row_count, has_more (bool), execution_time_ms (float), query_hash (str)\n- `PlanOperator`: operator_name, execution_engine, operator_details, subtree_cost (optional)\n- `ExplainQueryOutput`: sql, plan (list[PlanOperator]), format (\"text\" or \"json\")\n\n**Error models** (shared across all layers):\n- `ToolError`: code (str), message (str), suggestion (str | None), context (dict | None), tool_name (str), input_received (dict | None)\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] ExecuteQueryOutput captures all result metadata\n- [ ] `has_more` flag indicates truncated results\n- [ ] `query_hash` for deduplication/caching\n- [ ] ExplainQueryOutput supports both text and JSON format\n- [ ] ToolError model matches errors.py factory output\n\n_Edge Cases:_\n- [ ] Empty result set: rows=[], row_count=0, has_more=False\n- [ ] Large execution_time_ms values handled correctly\n\n**Testing Requirements:**\n• Unit: Model instantiation with valid query results\n• Unit: ToolError model serialization\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.3, 9.2",
+  "activeForm": "Creating Layer 3 Pydantic models",
+  "status": "completed",
+  "blocks": [
+    "13",
+    "16"
+  ],
+  "blockedBy": [
+    "1",
+    "4"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "S",
+    "source_section": "5.3, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Layer 3 Models",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:models-results:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

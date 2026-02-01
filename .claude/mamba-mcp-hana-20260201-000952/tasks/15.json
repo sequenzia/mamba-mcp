@@ -1,0 +1,25 @@
+{
+  "id": "15",
+  "subject": "Implement Layer 2 relationship discovery MCP tools",
+  "description": "Create `src/mamba_mcp_sap_hana/tools/relationship_tools.py` with 2 MCP tool definitions for Layer 2 relationship discovery.\n\nTools to register with FastMCP:\n1. `get_foreign_keys(table_name: str, schema_name: str) -> str`\n   - Calls RelationshipService.get_foreign_keys\n   - Returns JSON-serialized ForeignKeysOutput\n2. `find_join_path(from_table: str, to_table: str, from_schema: str, to_schema: str | None = None, max_depth: int = 4) -> str`\n   - Calls RelationshipService.find_join_path\n   - `to_schema` defaults to `from_schema` if not provided\n   - Returns JSON-serialized FindJoinPathOutput\n\nEach tool must:\n- Have a descriptive docstring\n- Extract pool from server context\n- Call the appropriate service method\n- Handle errors via create_tool_error\n- Use `@mcp.tool()` decorator\n\nRegister tools with the FastMCP server.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Both tools registered with FastMCP\n- [ ] `get_foreign_keys` returns outgoing and incoming FK details\n- [ ] `find_join_path` returns all paths with SQL JOIN examples\n- [ ] `max_depth` validated (1-6 range)\n\n_Edge Cases:_\n- [ ] `to_schema` not provided: defaults to `from_schema`\n- [ ] Row store table: informative note about FK limitations\n\n_Error Handling:_\n- [ ] Service errors wrapped in ToolError response\n\n**Testing Requirements:**\n\u2022 Unit: Each tool with mocked RelationshipService\n\u2022 Unit: Default schema handling for find_join_path\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.2, 9.2",
+  "activeForm": "Implementing Layer 2 relationship tools",
+  "status": "completed",
+  "blocks": [
+    "17",
+    "22"
+  ],
+  "blockedBy": [
+    "5",
+    "9",
+    "12"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "S",
+    "source_section": "5.2, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Relationship Tools",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:tools-relationships:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "14",
+  "subject": "Implement Layer 1 schema discovery MCP tools",
+  "description": "Create `src/mamba_mcp_sap_hana/tools/schema_tools.py` with 4 MCP tool definitions for Layer 1 schema discovery.\n\nTools to register with FastMCP:\n1. `list_schemas(include_system: bool = False) -> str`\n   - Calls SchemaService.list_schemas\n   - Returns JSON-serialized ListSchemasOutput\n2. `list_tables(schema_name: str, include_views: bool = True, name_pattern: str | None = None) -> str`\n   - Calls SchemaService.list_tables\n   - Returns JSON-serialized ListTablesOutput\n3. `describe_table(table_name: str, schema_name: str, include_indexes: bool = True, include_constraints: bool = True) -> str`\n   - Calls SchemaService.describe_table\n   - Returns JSON-serialized DescribeTableOutput\n4. `get_sample_rows(table_name: str, schema_name: str, limit: int = 10, columns: list[str] | None = None, where_clause: str | None = None, randomize: bool = False) -> str`\n   - Calls SchemaService.get_sample_rows\n   - Returns JSON-serialized SampleRowsOutput\n\nEach tool must:\n- Have a descriptive docstring (used by MCP as tool description)\n- Extract pool from server context\n- Call the appropriate service method\n- Handle errors via create_tool_error and return structured error JSON\n- Use `@mcp.tool()` decorator\n\nRegister all tools with the FastMCP server instance in `server.py`.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All 4 tools registered with FastMCP\n- [ ] Each tool has descriptive docstring for MCP clients\n- [ ] Tools delegate to SchemaService methods\n- [ ] Results serialized as JSON strings for MCP transport\n- [ ] Error responses use structured ToolError format\n\n_Edge Cases:_\n- [ ] `limit` out of range (get_sample_rows): validation error before service call\n- [ ] Default schema from config used when schema_name not provided\n\n_Error Handling:_\n- [ ] Service errors caught and wrapped in ToolError response\n\n**Testing Requirements:**\n• Unit: Each tool with mocked SchemaService\n• Unit: Error wrapping for service exceptions\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.1, 9.2",
+  "activeForm": "Implementing Layer 1 schema tools",
+  "status": "completed",
+  "blocks": [
+    "17",
+    "22"
+  ],
+  "blockedBy": [
+    "5",
+    "8",
+    "11"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.1, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Schema Tools",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:tools-schema:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

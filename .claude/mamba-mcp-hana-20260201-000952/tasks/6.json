@@ -1,0 +1,23 @@
+{
+  "id": "6",
+  "subject": "Implement Typer CLI with test and serve commands",
+  "description": "Create `src/mamba_mcp_sap_hana/__main__.py` with Typer CLI providing test and default serve commands.\n\nMust implement:\n- Typer `app` instance\n- Default command (no subcommand): starts MCP server with configured transport\n- `test` subcommand: tests HANA connection and exits with success/failure code\n  - Loads config, creates connection, runs `SELECT 1 FROM DUMMY`, reports result\n- `--env-file` option: specify custom environment file path\n  - Validates file existence and that it's a regular file\n- Logging setup based on config (`LOG_LEVEL`, `LOG_FORMAT`)\n- Rich console output for test results (success/failure with connection details)\n\nReference: mamba-mcp-postgres `__main__.py` for the CLI pattern.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Default invocation starts MCP server\n- [ ] `test` subcommand tests connection and reports success/failure\n- [ ] `--env-file` option overrides default env file discovery\n- [ ] Exit code 0 on success, 1 on failure for `test` command\n- [ ] Entry point: `mamba-mcp-hana` console script\n\n_Edge Cases:_\n- [ ] `--env-file` pointing to non-existent file: clear error before any connection attempt\n- [ ] `--env-file` pointing to a directory: clear error\n\n_Error Handling:_\n- [ ] Connection failure in `test`: prints error details, exits with code 1\n- [ ] Missing required env vars: prints which vars are missing\n\n**Testing Requirements:**\n\u2022 Unit: CLI `test` command with mocked connection (success path)\n\u2022 Unit: CLI `test` command with mocked connection (failure path)\n\u2022 Unit: `--env-file` validation logic\n\u2022 Unit: Default serve command invocation\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.6",
+  "activeForm": "Implementing Typer CLI",
+  "status": "completed",
+  "blocks": [
+    "7"
+  ],
+  "blockedBy": [
+    "2",
+    "5"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.6",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "CLI Interface",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:cli:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

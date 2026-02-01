@@ -1,0 +1,25 @@
+{
+  "id": "2",
+  "subject": "Implement Pydantic settings configuration system",
+  "description": "Create `src/mamba_mcp_sap_hana/config.py` with Pydantic settings for HANA connection configuration.\n\nMust implement:\n- Env var prefix: `MAMBA_MCP_HANA_*`\n- Nested model structure with `__` delimiter support\n- Database settings: `DB_HOST` (default: localhost), `DB_PORT` (default: 30015), `DB_NAME` (optional), `DB_USER` (required), `DB_PASSWORD` (SecretStr, required), `DB_ENCRYPT` (auto-detect), `DB_SSL_VALIDATE` (default: True), `DB_USERKEY` (optional hdbuserstore key)\n- Server settings: `TRANSPORT` (stdio/http, default: stdio), `SERVER_HOST` (default: 0.0.0.0), `SERVER_PORT` (default: 8080), `LOG_LEVEL` (default: INFO), `LOG_FORMAT` (default: json)\n- Pool settings: `POOL_SIZE` (default: 5, range 1-20), `POOL_TIMEOUT` (default: 30.0)\n- Query settings: `STATEMENT_TIMEOUT` (default: 30000ms), `DEFAULT_SCHEMA` (optional)\n- Cascading env file resolution: explicit path > `./mamba.env` > `~/mamba.env`\n- Auto-detect TLS when port is 443 (HANA Cloud), allow manual override\n\nReference: mamba-mcp-postgres `config.py` for patterns.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All env vars from spec appendix 13.4 are supported\n- [ ] `DB_PASSWORD` stored as Pydantic `SecretStr`, never logged\n- [ ] Auto-TLS detection: port 443 → `DB_ENCRYPT=True` unless manually overridden\n- [ ] Nested delimiter `__` works (e.g., `MAMBA_MCP_HANA_DB__HOST`)\n- [ ] Env file cascading: explicit > `./mamba.env` > `~/mamba.env`\n\n_Edge Cases:_\n- [ ] `DB_USERKEY` provided without `DB_USER`/`DB_PASSWORD`: valid (hdbuserstore auth)\n- [ ] Both `DB_USERKEY` and `DB_USER`/`DB_PASSWORD` provided: user/password takes precedence\n- [ ] `POOL_SIZE` outside range 1-20: validation error\n\n_Error Handling:_\n- [ ] Missing required fields raise clear validation errors\n- [ ] Invalid env file path raises FileNotFoundError with descriptive message\n\n**Testing Requirements:**\n• Unit: Config loads from env vars correctly\n• Unit: Auto-TLS detection for port 443\n• Unit: Env file cascading resolution order\n• Unit: SecretStr does not leak in repr/str\n• Unit: Validation rejects invalid pool size\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.5, 13.4",
+  "activeForm": "Implementing configuration system",
+  "status": "completed",
+  "blocks": [
+    "3",
+    "5",
+    "6",
+    "7"
+  ],
+  "blockedBy": [
+    "1"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.5, 13.4",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Configuration System",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:config:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "16",
+  "subject": "Implement Layer 3 query execution MCP tools",
+  "description": "Create `src/mamba_mcp_sap_hana/tools/query_tools.py` with 2 MCP tool definitions for Layer 3 query execution.\n\nTools to register with FastMCP:\n1. `execute_query(sql: str, params: dict | list | None = None, limit: int = 1000, timeout_ms: int | None = None) -> str`\n   - Calls QueryService.execute_query\n   - `params` supports both named dict (`:param`) and positional list (`?`)\n   - `limit` range: 1-10000\n   - Returns JSON-serialized ExecuteQueryOutput\n2. `explain_query(sql: str, params: dict | list | None = None, format: str = \"text\") -> str`\n   - Calls QueryService.explain_query\n   - `format` accepts \"text\" or \"json\"\n   - Returns JSON-serialized ExplainQueryOutput\n\nEach tool must:\n- Have a descriptive docstring emphasizing read-only nature\n- Extract pool from server context\n- Call the appropriate service method\n- Handle errors via create_tool_error\n- Use `@mcp.tool()` decorator\n\nRegister tools with the FastMCP server.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Both tools registered with FastMCP\n- [ ] `execute_query` enforces read-only validation before execution\n- [ ] `execute_query` supports both positional and named parameters\n- [ ] `explain_query` returns formatted execution plan\n- [ ] `limit` validated (1-10000 range)\n\n_Edge Cases:_\n- [ ] `params=None`: no parameters passed to hdbcli\n- [ ] `timeout_ms=None`: uses config default\n\n_Error Handling:_\n- [ ] Write attempt: clear WRITE_OPERATION_DENIED message\n- [ ] Timeout: QUERY_TIMEOUT with suggestion\n- [ ] Invalid SQL syntax: INVALID_SQL error\n\n**Testing Requirements:**\n\u2022 Unit: Each tool with mocked QueryService\n\u2022 Unit: Parameter validation (limit range, format values)\n\u2022 Unit: Error wrapping for write attempts\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.3, 9.2",
+  "activeForm": "Implementing Layer 3 query tools",
+  "status": "completed",
+  "blocks": [
+    "17",
+    "22"
+  ],
+  "blockedBy": [
+    "5",
+    "10",
+    "13"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "S",
+    "source_section": "5.3, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Query Tools",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:tools-queries:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

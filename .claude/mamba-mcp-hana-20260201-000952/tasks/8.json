@@ -1,0 +1,24 @@
+{
+  "id": "8",
+  "subject": "Create Layer 1 Pydantic I/O models",
+  "description": "Create `src/mamba_mcp_sap_hana/models/schema.py` with Pydantic input/output models for Layer 1 schema discovery tools.\n\nModels to create:\n\n**Output models:**\n- `SchemaInfo`: name, owner, table_count, is_system\n- `ListSchemasOutput`: schemas (list[SchemaInfo]), count\n- `TableInfo`: name, type (TABLE/VIEW), record_count, column_count, store_type (COLUMN/ROW), is_column_table\n- `ListTablesOutput`: tables (list[TableInfo]), schema_name, count\n- `ColumnInfo`: name, data_type, length, scale, nullable, default_value, position, comment\n- `IndexInfo`: name, columns (list[str]), is_unique, index_type\n- `ConstraintInfo`: name, constraint_type (PK/UNIQUE/CHECK), columns (list[str])\n- `DescribeTableOutput`: table_name, schema_name, columns, indexes, constraints, is_view\n- `SampleRowsOutput`: table_name, schema_name, columns, rows, row_count, total_count\n\n**Input models** (as needed for tool parameter validation):\n- Input validation for `limit` ranges, `name_pattern` format, etc.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All output models defined with correct field types\n- [ ] Models use strict Pydantic v2 syntax\n- [ ] `store_type` field captures COLUMN vs ROW distinction\n- [ ] `is_view` flag in DescribeTableOutput for view-specific behavior\n- [ ] All models serializable to JSON for MCP transport\n\n_Edge Cases:_\n- [ ] Optional fields (default_value, comment) handle None correctly\n- [ ] Empty lists for indexes/constraints when not requested\n\n**Testing Requirements:**\n• Unit: Model instantiation with valid data\n• Unit: Model serialization to dict/JSON\n• Unit: Validation rejects invalid field values\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.1, 9.2",
+  "activeForm": "Creating Layer 1 Pydantic models",
+  "status": "completed",
+  "blocks": [
+    "11",
+    "14",
+    "18"
+  ],
+  "blockedBy": [
+    "1"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.1, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Layer 1 Models",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:models-schema:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

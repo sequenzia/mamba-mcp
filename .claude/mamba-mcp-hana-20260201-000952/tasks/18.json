@@ -1,0 +1,24 @@
+{
+  "id": "18",
+  "subject": "Create HANA-specific Pydantic I/O models",
+  "description": "Create `src/mamba_mcp_sap_hana/models/hana.py` with Pydantic input/output models for HANA-specific tools.\n\nModels to create:\n\n**Calculation View models:**\n- `CalcViewInfo`: name, schema_name, column_count, is_valid (bool), columns (optional list[ColumnInfo])\n- `ListCalcViewsOutput`: views (list[CalcViewInfo]), schema_name, count, note (str, about analytic privileges)\n\n**Store Type models:**\n- `StoreTypeInfo`: table_name, schema_name, store_type (\"COLUMN\" or \"ROW\"), is_column_table (bool), partition_info (str | None), compression_status (str | None), implications (str)\n- `GetStoreTypeOutput`: info (StoreTypeInfo)\n\n**Procedure models:**\n- `ProcedureParam`: name, data_type, direction (\"IN\" | \"OUT\" | \"INOUT\"), position\n- `ProcedureInfo`: name, schema_name, procedure_type (str), parameter_count, parameters (optional list[ProcedureParam])\n- `ListProceduresOutput`: procedures (list[ProcedureInfo]), schema_name, count\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] All HANA-specific output models defined\n- [ ] `CalcViewInfo` optionally includes column metadata\n- [ ] `StoreTypeInfo` includes human-readable implications text\n- [ ] `ProcedureInfo` optionally includes parameter details\n- [ ] All models serializable for MCP transport\n\n_Edge Cases:_\n- [ ] Optional column lists default to None/empty\n- [ ] Procedure with no parameters: empty parameter list\n\n**Testing Requirements:**\n• Unit: Model instantiation with valid data\n• Unit: Optional field handling (columns, parameters)\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.4, 9.3",
+  "activeForm": "Creating HANA-specific Pydantic models",
+  "status": "completed",
+  "blocks": [
+    "19",
+    "20"
+  ],
+  "blockedBy": [
+    "1",
+    "8"
+  ],
+  "metadata": {
+    "priority": "high",
+    "complexity": "S",
+    "source_section": "5.4, 9.3",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "HANA Models",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:hana-extras:models-hana:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

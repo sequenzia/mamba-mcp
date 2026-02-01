@@ -1,0 +1,24 @@
+{
+  "id": "12",
+  "subject": "Implement RelationshipService for Layer 2 database operations",
+  "description": "Create `src/mamba_mcp_sap_hana/database/relationships.py` with async service methods for foreign key discovery and BFS join path finding.\n\nMethods to implement:\n- `async def get_foreign_keys(pool, table_name, schema_name) -> ForeignKeysOutput`\n  - Queries `SYS.REFERENTIAL_CONSTRAINTS` for both outgoing and incoming FKs\n  - Returns separate lists for outgoing (this table references others) and incoming (others reference this table)\n  - Includes constraint name, source/target schema, table, columns, delete rule\n- `async def find_join_path(pool, from_table, to_table, from_schema, to_schema, max_depth) -> FindJoinPathOutput`\n  - Loads all FK relationships in relevant schemas\n  - Builds bidirectional adjacency graph\n  - BFS traversal from source to target table\n  - Returns all paths up to `max_depth` (1-6, default 4), sorted by length\n  - Generates executable SQL JOIN clause for each path\n\nAll methods use `asyncio.to_thread()` for hdbcli calls.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] `get_foreign_keys` returns both outgoing and incoming FKs with full metadata\n- [ ] `find_join_path` uses BFS to find all paths within max_depth\n- [ ] Paths sorted by length (shortest first)\n- [ ] SQL JOIN examples generated for each discovered path\n- [ ] Bidirectional graph handles FKs in both directions\n\n_Edge Cases:_\n- [ ] Row store table: returns empty results with note about HANA FK limitation\n- [ ] No FKs on table: returns empty lists with informative note\n- [ ] No path exists: returns PATH_NOT_FOUND with suggestion about row store\n- [ ] Multiple paths of same length: all returned\n- [ ] Cross-schema paths: fully qualified table names in SQL examples\n\n_Error Handling:_\n- [ ] Table not found: returns TABLE_NOT_FOUND error with fuzzy suggestions\n- [ ] max_depth exceeded: returns partial results with note\n\n**Testing Requirements:**\n• Unit: FK retrieval with mocked referential constraints data\n• Unit: BFS pathfinding with various graph topologies\n• Unit: SQL JOIN generation for multi-hop paths\n• Unit: Bidirectional edge handling\n• Unit: Cross-schema path resolution\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.2, 9.2, 13.2",
+  "activeForm": "Implementing RelationshipService",
+  "status": "completed",
+  "blocks": [
+    "15"
+  ],
+  "blockedBy": [
+    "3",
+    "4",
+    "9"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "M",
+    "source_section": "5.2, 9.2, 13.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "RelationshipService",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:service-relationships:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

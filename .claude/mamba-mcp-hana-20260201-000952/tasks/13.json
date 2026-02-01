@@ -1,0 +1,24 @@
+{
+  "id": "13",
+  "subject": "Implement QueryService for Layer 3 database operations",
+  "description": "Create `src/mamba_mcp_sap_hana/database/queries.py` with async service methods for read-only query execution and EXPLAIN PLAN adaptation.\n\nMethods to implement:\n- `validate_query(sql) -> bool`: Read-only validation\n  - Blocked keyword regex: INSERT, UPDATE, DELETE, DROP, CREATE, ALTER, TRUNCATE, GRANT, REVOKE (case-insensitive, word boundary matching)\n  - Query must start with SELECT or WITH\n  - Returns validation result with error details if invalid\n- `async def execute_query(pool, sql, params, limit, timeout_ms) -> ExecuteQueryOutput`\n  - Validates query is read-only\n  - Auto-appends LIMIT if query doesn't have one\n  - Uses parameterized queries via hdbcli (positional `?` or named `:param`)\n  - Sets statement timeout if configured\n  - Returns columns, rows, row_count, has_more, execution_time, query_hash\n  - Measures execution time\n  - Generates query hash for deduplication\n- `async def explain_query(pool, sql, params, format) -> ExplainQueryOutput`\n  - HANA-specific EXPLAIN PLAN adaptation:\n    1. Generate unique statement name (UUID-based)\n    2. Execute `EXPLAIN PLAN SET STATEMENT_NAME = '{uuid}' FOR {sql}`\n    3. Read results from `EXPLAIN_PLAN_TABLE` filtered by statement name\n    4. Clean up: DELETE from `EXPLAIN_PLAN_TABLE` WHERE STATEMENT_NAME = '{uuid}'\n  - Cleanup in finally block (never skip)\n  - Return plan operators with names, engines, and details\n\nAll methods use `asyncio.to_thread()` for hdbcli calls.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Query validation blocks all write keywords (INSERT, UPDATE, DELETE, DROP, CREATE, ALTER, TRUNCATE, GRANT, REVOKE)\n- [ ] Query validation enforces SELECT/WITH start\n- [ ] `execute_query` uses parameterized queries (never string interpolation)\n- [ ] Auto-LIMIT appended when query lacks one\n- [ ] `explain_query` implements write-read-cleanup cycle with unique statement names\n- [ ] Execution time measured and reported\n\n_Edge Cases:_\n- [ ] Subqueries containing blocked keywords in string literals: not falsely blocked\n- [ ] `WITH` CTE queries: allowed\n- [ ] Query already has LIMIT: don't double-add\n- [ ] Concurrent EXPLAIN calls: UUID-based names prevent conflicts\n- [ ] EXPLAIN_PLAN_TABLE doesn't exist: clear error with guidance\n\n_Error Handling:_\n- [ ] Write attempt: returns WRITE_OPERATION_DENIED with clear explanation\n- [ ] Query timeout: returns QUERY_TIMEOUT with suggestion to add filters\n- [ ] Permission denied: returns PERMISSION_DENIED with grant guidance\n- [ ] EXPLAIN cleanup failure: logged as warning, doesn't fail the response\n\n_Performance:_\n- [ ] Statement timeout respected (configurable, default 30s)\n\n**Testing Requirements:**\n• Unit: Query validation with various write keyword positions\n• Unit: Query validation allows valid SELECT/WITH queries\n• Unit: Auto-LIMIT append logic\n• Unit: EXPLAIN PLAN write-read-cleanup cycle (mocked)\n• Unit: Parameterized query parameter binding\n• Unit: Execution time measurement\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.3, 6.2, 9.2",
+  "activeForm": "Implementing QueryService",
+  "status": "completed",
+  "blocks": [
+    "16"
+  ],
+  "blockedBy": [
+    "3",
+    "4",
+    "10"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "XL",
+    "source_section": "5.3, 6.2, 9.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "QueryService",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:core-tools:service-queries:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

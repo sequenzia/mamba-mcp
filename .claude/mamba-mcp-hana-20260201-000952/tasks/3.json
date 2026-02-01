@@ -1,0 +1,28 @@
+{
+  "id": "3",
+  "subject": "Implement async connection pool and engine",
+  "description": "Create `src/mamba_mcp_sap_hana/database/pool.py` and `src/mamba_mcp_sap_hana/database/engine.py` for async-safe hdbcli connection management.\n\n**pool.py** — Async queue-based connection pool:\n- Uses `asyncio.Queue` to manage a pool of hdbcli connections\n- Configurable pool size (from config `POOL_SIZE`, 1-20)\n- Acquire timeout (from config `POOL_TIMEOUT`)\n- Health check: test query (`SELECT 1 FROM DUMMY`) before returning connection\n- Reconnection on stale/dead connections\n- `async def acquire() -> Connection` and `async def release(conn)` methods\n- Context manager support: `async with pool.acquire() as conn:`\n- Graceful shutdown: `async def dispose()` closes all connections\n- All hdbcli calls wrapped with `asyncio.to_thread()` for non-blocking execution\n\n**engine.py** — Connection creation and testing:\n- `create_connection(config)` → creates hdbcli connection with proper params\n- `test_connection(config)` → tests connectivity, returns success/failure\n- `dispose_connection(conn)` → safely closes a connection\n- Support both user/password auth and hdbuserstore key auth\n- Set `encrypt=True` and `sslValidateCertificate` based on config\n- Set `databaseName` for tenant routing if provided\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] Pool manages configurable number of hdbcli connections via asyncio.Queue\n- [ ] `acquire()` returns a healthy connection (pre-ping tested)\n- [ ] `release()` returns connection to pool for reuse\n- [ ] All synchronous hdbcli calls wrapped in `asyncio.to_thread()`\n- [ ] `dispose()` closes all connections cleanly\n\n_Edge Cases:_\n- [ ] Pool exhausted: `acquire()` waits up to `POOL_TIMEOUT` then raises timeout error\n- [ ] Dead connection detected: pool creates a new replacement connection\n- [ ] `dispose()` called while connections are in use: waits for return then closes\n\n_Error Handling:_\n- [ ] Connection failure on creation: raises `ConnectionError` with actionable message\n- [ ] Health check failure: connection is discarded, new one created\n- [ ] Transient connection errors trigger automatic reconnection\n\n_Performance:_\n- [ ] Event loop never blocked by synchronous hdbcli calls\n\n**Testing Requirements:**\n• Unit: Pool acquire/release lifecycle with mocked hdbcli\n• Unit: Pool timeout behavior when exhausted\n• Unit: Health check detects and replaces dead connections\n• Unit: Engine creates connection with correct params for Cloud (port 443, TLS)\n• Unit: Engine creates connection with hdbuserstore key\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 9.1, 7.1, 6.4",
+  "activeForm": "Implementing connection pool and engine",
+  "status": "completed",
+  "blocks": [
+    "5",
+    "7",
+    "11",
+    "12",
+    "13",
+    "19"
+  ],
+  "blockedBy": [
+    "1",
+    "2"
+  ],
+  "metadata": {
+    "priority": "critical",
+    "complexity": "L",
+    "source_section": "9.1, 7.1, 6.4",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "Connection Pool & Engine",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:foundation:pool:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}

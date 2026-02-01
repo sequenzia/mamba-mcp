@@ -1,0 +1,24 @@
+{
+  "id": "19",
+  "subject": "Implement HanaService for HANA-specific database operations",
+  "description": "Create `src/mamba_mcp_sap_hana/database/hana.py` with async service methods for HANA-specific features (calculation views, store types, procedures).\n\nMethods to implement:\n- `async def list_calculation_views(pool, schema_name, include_columns: bool) -> list[CalcViewInfo]`\n  - Queries `SYS.VIEWS` where `VIEW_TYPE` indicates calculation view\n  - Returns name, schema, column count, validity status\n  - If `include_columns=True`: also queries `SYS.VIEW_COLUMNS` for each view\n  - Includes informational note about analytic privilege requirements\n- `async def get_table_store_type(pool, table_name, schema_name) -> StoreTypeInfo`\n  - Queries `SYS.TABLES` for `IS_COLUMN_TABLE` and related fields\n  - Returns COLUMN or ROW store type with metadata\n  - Includes partitioning info and compression status\n  - Adds implications text (column: FK support + analytics optimization; row: point lookup optimization)\n- `async def list_procedures(pool, schema_name, include_parameters: bool) -> list[ProcedureInfo]`\n  - Queries `SYS.PROCEDURES` for procedure listing\n  - Returns name, type (SQLScript/R/L), parameter count\n  - If `include_parameters=True`: also queries `SYS.PROCEDURE_PARAMETERS`\n\nAll methods use `asyncio.to_thread()` for hdbcli calls.\n\n**Acceptance Criteria:**\n\n_Functional:_\n- [ ] `list_calculation_views` filters for calc view type from SYS.VIEWS\n- [ ] Optional column metadata included when requested\n- [ ] `get_table_store_type` returns COLUMN/ROW with metadata and implications\n- [ ] `list_procedures` returns procedures with optional parameter details\n- [ ] All methods use asyncio.to_thread()\n\n_Edge Cases:_\n- [ ] No calc views in schema: empty list with informative note\n- [ ] Table doesn't exist for store type query: TABLE_NOT_FOUND error\n- [ ] View passed to store type: informative note (views don't have store type)\n- [ ] No procedures in schema: empty list\n- [ ] Procedure with no parameters: empty parameter list\n\n_Error Handling:_\n- [ ] Schema not found: SCHEMA_NOT_FOUND with fuzzy suggestions\n- [ ] Permission denied: PERMISSION_DENIED with guidance\n\n**Testing Requirements:**\n• Unit: Each method with mocked cursor data\n• Unit: Calc view column metadata inclusion\n• Unit: Store type implications text generation\n• Unit: Procedure parameter retrieval\n\nSource: internal/specs/mamba-mcp-hana-SPEC.md Section 5.4, 9.3, 13.2",
+  "activeForm": "Implementing HanaService",
+  "status": "completed",
+  "blocks": [
+    "20"
+  ],
+  "blockedBy": [
+    "3",
+    "4",
+    "18"
+  ],
+  "metadata": {
+    "priority": "high",
+    "complexity": "M",
+    "source_section": "5.4, 9.3, 13.2",
+    "spec_path": "internal/specs/mamba-mcp-hana-SPEC.md",
+    "feature_name": "HanaService",
+    "task_uid": "internal/specs/mamba-mcp-hana-SPEC.md:hana-extras:service-hana:001",
+    "task_group": "mamba-mcp-hana"
+  }
+}
