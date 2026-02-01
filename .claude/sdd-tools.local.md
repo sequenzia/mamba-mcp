@@ -1,4 +1,4 @@
 ---
-output_path: internal/specs/{name}.md
+output_path: internal/specs/{name}-SPEC.md
 author: Stephen Sequenzia
 ---
