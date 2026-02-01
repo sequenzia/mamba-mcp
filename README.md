@@ -9,6 +9,7 @@ A Python monorepo of MCP (Model Context Protocol) tools — a testing client and
 | [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
 | [mamba-mcp-pg](packages/mamba-mcp-pg/) | PostgreSQL MCP server with layered schema discovery |
 | [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backend support |
+| [mamba-mcp-hana](packages/mamba-mcp-hana/) | SAP HANA MCP server with layered schema discovery |
 
 ### mamba-mcp-client
 
@@ -65,6 +66,23 @@ mamba-mcp-fs --env-file mamba.env test
 mamba-mcp-fs --env-file mamba.env
 ```
 
+### mamba-mcp-hana
+
+SAP HANA MCP server with a 4-layer tool architecture for AI assistants.
+
+- **Layer 1: Schema Discovery** — List schemas, tables, describe columns, sample rows
+- **Layer 2: Relationship Discovery** — Foreign keys, join path finding (BFS)
+- **Layer 3: Query Execution** — Read-only SQL with parameterized queries and EXPLAIN support
+- **HANA-Specific Tools** — Calculation views, column/row store type, stored procedures
+
+```bash
+# Test database connection
+mamba-mcp-hana --env-file mamba.env test
+
+# Run the MCP server
+mamba-mcp-hana --env-file mamba.env
+```
+
 ## Configuration
 
 All packages use `mamba.env` for environment-based configuration. Default file locations (checked in order):
@@ -102,8 +120,11 @@ mamba-mcp/
 │   ├── mamba-mcp-pg/     # PostgreSQL MCP server
 │   │   ├── src/mamba_mcp_pg/
 │   │   └── tests/
-│   └── mamba-mcp-fs/           # Filesystem MCP server
-│       ├── src/mamba_mcp_fs/
+│   ├── mamba-mcp-fs/           # Filesystem MCP server
+│   │   ├── src/mamba_mcp_fs/
+│   │   └── tests/
+│   └── mamba-mcp-hana/          # SAP HANA MCP server
+│       ├── src/mamba_mcp_sap_hana/
 │       └── tests/
 └── internal/                   # Specs & images
 ```
