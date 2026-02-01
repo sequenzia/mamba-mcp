@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from mamba_mcp_postgres.database.schema import SchemaService
+from mamba_mcp_pg.database.schema import SchemaService
 
 from tests.conftest import create_mock_result
 

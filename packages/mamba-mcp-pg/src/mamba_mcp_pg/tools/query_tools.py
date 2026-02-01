@@ -12,14 +12,14 @@ from mcp.server.fastmcp import Context
 from mcp.server.session import ServerSession
 from mcp.types import ToolAnnotations
 
-from mamba_mcp_postgres.database.queries import QueryService, QueryValidationError
-from mamba_mcp_postgres.errors import ErrorCode, create_tool_error
-from mamba_mcp_postgres.models.results import (
+from mamba_mcp_pg.database.queries import QueryService, QueryValidationError
+from mamba_mcp_pg.errors import ErrorCode, create_tool_error
+from mamba_mcp_pg.models.results import (
     ExecuteQueryOutput,
     ExplainQueryOutput,
     QueryColumn,
 )
-from mamba_mcp_postgres.server import AppContext, mcp
+from mamba_mcp_pg.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
 

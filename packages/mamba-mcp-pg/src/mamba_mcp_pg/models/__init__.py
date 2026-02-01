@@ -1,6 +1,6 @@
 """Pydantic models for MCP tool inputs and outputs."""
 
-from mamba_mcp_postgres.models.relationships import (
+from mamba_mcp_pg.models.relationships import (
     FindJoinPathInput,
     FindJoinPathOutput,
     ForeignKeyRelation,
@@ -9,7 +9,7 @@ from mamba_mcp_postgres.models.relationships import (
     JoinPath,
     JoinStep,
 )
-from mamba_mcp_postgres.models.results import (
+from mamba_mcp_pg.models.results import (
     ErrorDetail,
     ExecuteQueryInput,
     ExecuteQueryOutput,
@@ -18,7 +18,7 @@ from mamba_mcp_postgres.models.results import (
     QueryColumn,
     ToolError,
 )
-from mamba_mcp_postgres.models.schema import (
+from mamba_mcp_pg.models.schema import (
     ColumnInfo,
     ConstraintInfo,
     DescribeTableInput,

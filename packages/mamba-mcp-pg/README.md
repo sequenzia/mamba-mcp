@@ -1,4 +1,4 @@
-# mamba-mcp-postgres
+# mamba-mcp-pg
 
 PostgreSQL MCP Server with layered schema discovery for AI assistants.
 
@@ -12,15 +12,15 @@ PostgreSQL MCP Server with layered schema discovery for AI assistants.
 
 ```bash
 # Test database connection
-mamba-mcp-postgres --env-file mamba.env test
+mamba-mcp-pg --env-file mamba.env test
 
 # Run the MCP server
-mamba-mcp-postgres --env-file mamba.env
+mamba-mcp-pg --env-file mamba.env
 ```
 
 ## Configuration
 
-Set via environment variables (prefix: `MAMBA_MCP_POSTGRES_`) or `mamba.env` file.
+Set via environment variables (prefix: `MAMBA_MCP_PG_`) or `mamba.env` file.
 
 Default file locations (checked in order):
 1. `./mamba.env` (project-local)
@@ -28,9 +28,9 @@ Default file locations (checked in order):
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MAMBA_MCP_POSTGRES_DB_HOST` | PostgreSQL host | `localhost` |
-| `MAMBA_MCP_POSTGRES_DB_PORT` | PostgreSQL port | `5432` |
-| `MAMBA_MCP_POSTGRES_DB_NAME` | Database name | *required* |
-| `MAMBA_MCP_POSTGRES_DB_USER` | Database user | *required* |
-| `MAMBA_MCP_POSTGRES_DB_PASSWORD` | Database password | *required* |
-| `MAMBA_MCP_POSTGRES_LOG_LEVEL` | Log level | `INFO` |
+| `MAMBA_MCP_PG_DB_HOST` | PostgreSQL host | `localhost` |
+| `MAMBA_MCP_PG_DB_PORT` | PostgreSQL port | `5432` |
+| `MAMBA_MCP_PG_DB_NAME` | Database name | *required* |
+| `MAMBA_MCP_PG_DB_USER` | Database user | *required* |
+| `MAMBA_MCP_PG_DB_PASSWORD` | Database password | *required* |
+| `MAMBA_MCP_PG_LOG_LEVEL` | Log level | `INFO` |

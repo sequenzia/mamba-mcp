@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) packages:
 
 - **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
-- **mamba-mcp-postgres** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
+- **mamba-mcp-pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
 - **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
 
 ## Development Commands
@@ -72,11 +72,11 @@ mamba-mcp/
 │   │   │   └── tui/app.py      # Textual TUI
 │   │   ├── tests/
 │   │   └── examples/
-│   ├── mamba-mcp-postgres/
+│   ├── mamba-mcp-pg/
 │   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_postgres/
+│   │   ├── src/mamba_mcp_pg/
 │   │   │   ├── __main__.py     # Typer CLI (test, serve)
-│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_POSTGRES_*)
+│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_PG_*)
 │   │   │   ├── errors.py       # Error codes & fuzzy matching
 │   │   │   ├── server.py       # FastMCP server & lifespan
 │   │   │   ├── database/       # SQLAlchemy async services
@@ -105,7 +105,7 @@ mamba-mcp/
 - Transport types: `STDIO`, `SSE`, `HTTP`, `UV_INSTALLED`, `UV_LOCAL`
 - Environment config prefix: `MAMBA_MCP_CLIENT_` (e.g., `MAMBA_MCP_CLIENT_STDIO__COMMAND`)
 
-## Architecture (mamba-mcp-postgres)
+## Architecture (mamba-mcp-pg)
 
 - 3-layer MCP tool architecture:
   - **Layer 1 (Schema Discovery):** `list_schemas`, `list_tables`, `describe_table`, `get_sample_rows`
@@ -113,8 +113,8 @@ mamba-mcp/
   - **Layer 3 (Query Execution):** `execute_query`, `explain_query` (read-only, parameterized)
 - Database services in `database/` module (SchemaService, RelationshipService, QueryService)
 - Query security: blocked keyword validation, SELECT/WITH-only enforcement
-- Config via `MAMBA_MCP_POSTGRES_*` env vars or `.env` file, auto-detected from cwd
-- CLI: `mamba-mcp-postgres --env-file .env test` / `mamba-mcp-postgres` (serve)
+- Config via `MAMBA_MCP_PG_*` env vars or `.env` file, auto-detected from cwd
+- CLI: `mamba-mcp-pg --env-file .env test` / `mamba-mcp-pg` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `sqlalchemy[asyncio]`, `asyncpg`
 
 ## Architecture (mamba-mcp-fs)

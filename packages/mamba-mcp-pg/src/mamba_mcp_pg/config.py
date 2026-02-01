@@ -32,7 +32,7 @@ class DatabaseSettings(BaseSettings):
     """PostgreSQL connection configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix="MAMBA_MCP_POSTGRES_",
+        env_prefix="MAMBA_MCP_PG_",
         env_file="mamba.env",
         env_file_encoding="utf-8",
         extra="ignore",
@@ -70,7 +70,7 @@ class ServerSettings(BaseSettings):
     """MCP server configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix="MAMBA_MCP_POSTGRES_",
+        env_prefix="MAMBA_MCP_PG_",
         env_file="mamba.env",
         env_file_encoding="utf-8",
         extra="ignore",

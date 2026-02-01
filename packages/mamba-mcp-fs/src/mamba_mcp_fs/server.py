@@ -3,7 +3,7 @@
 Creates the FastMCP server instance with lifespan management for backend
 initialization, security validation, and conditional tool registration.
 
-Based on spec Section 7.1, following the mamba-mcp-postgres pattern.
+Based on spec Section 7.1, following the mamba-mcp-pg pattern.
 """
 
 from __future__ import annotations

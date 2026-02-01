@@ -7,7 +7,7 @@ A Python monorepo of MCP (Model Context Protocol) tools — a testing client and
 | Package | Description |
 |---------|-------------|
 | [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
-| [mamba-mcp-postgres](packages/mamba-mcp-postgres/) | PostgreSQL MCP server with layered schema discovery |
+| [mamba-mcp-pg](packages/mamba-mcp-pg/) | PostgreSQL MCP server with layered schema discovery |
 | [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backend support |
 
 ### mamba-mcp-client
@@ -33,7 +33,7 @@ mamba-mcp tools --stdio "python server.py"
 mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 ```
 
-### mamba-mcp-postgres
+### mamba-mcp-pg
 
 PostgreSQL MCP server with a 3-layer tool architecture for AI assistants.
 
@@ -43,10 +43,10 @@ PostgreSQL MCP server with a 3-layer tool architecture for AI assistants.
 
 ```bash
 # Test database connection
-mamba-mcp-postgres --env-file mamba.env test
+mamba-mcp-pg --env-file mamba.env test
 
 # Run the MCP server
-mamba-mcp-postgres --env-file mamba.env
+mamba-mcp-pg --env-file mamba.env
 ```
 
 ### mamba-mcp-fs
@@ -99,8 +99,8 @@ mamba-mcp/
 │   ├── mamba-mcp-client/       # MCP testing client
 │   │   ├── src/mamba_mcp_client/
 │   │   └── examples/
-│   ├── mamba-mcp-postgres/     # PostgreSQL MCP server
-│   │   ├── src/mamba_mcp_postgres/
+│   ├── mamba-mcp-pg/     # PostgreSQL MCP server
+│   │   ├── src/mamba_mcp_pg/
 │   │   └── tests/
 │   └── mamba-mcp-fs/           # Filesystem MCP server
 │       ├── src/mamba_mcp_fs/

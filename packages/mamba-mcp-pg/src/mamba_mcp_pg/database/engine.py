@@ -3,7 +3,7 @@
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from mamba_mcp_postgres.config import DatabaseSettings
+from mamba_mcp_pg.config import DatabaseSettings
 
 
 async def create_engine(settings: DatabaseSettings) -> AsyncEngine:

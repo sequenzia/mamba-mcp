@@ -8,7 +8,7 @@ members = [
     "mamba-mcp-client",
     "mamba-mcp-fs",
     "mamba-mcp-hana",
-    "mamba-mcp-postgres",
+    "mamba-mcp-pg",
 ]
 
 [[package]]
@@ -1370,9 +1370,9 @@ requires-dist = [
 ]
 
 [[package]]
-name = "mamba-mcp-postgres"
+name = "mamba-mcp-pg"
 version = "0.1.0"
-source = { editable = "packages/mamba-mcp-postgres" }
+source = { editable = "packages/mamba-mcp-pg" }
 dependencies = [
     { name = "asyncpg" },
     { name = "mcp" },

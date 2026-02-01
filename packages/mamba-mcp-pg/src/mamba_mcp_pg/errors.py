@@ -5,7 +5,7 @@ Based on PRD Section 7.
 
 from typing import Any
 
-from mamba_mcp_postgres.models.results import ErrorDetail, ToolError
+from mamba_mcp_pg.models.results import ErrorDetail, ToolError
 
 
 class ErrorCode:

@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from mcp.server.fastmcp import FastMCP
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from mamba_mcp_postgres.config import Settings, get_settings
-from mamba_mcp_postgres.database.engine import create_engine, dispose_engine, test_connection
+from mamba_mcp_pg.config import Settings, get_settings
+from mamba_mcp_pg.database.engine import create_engine, dispose_engine, test_connection
 
 logger = logging.getLogger(__name__)
 

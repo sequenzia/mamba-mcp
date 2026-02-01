@@ -9,15 +9,15 @@ from typing import Annotated
 
 import typer
 
-from mamba_mcp_postgres.config import get_settings, set_env_file_path
-from mamba_mcp_postgres.database.engine import create_engine, dispose_engine, test_connection
-from mamba_mcp_postgres.server import mcp
+from mamba_mcp_pg.config import get_settings, set_env_file_path
+from mamba_mcp_pg.database.engine import create_engine, dispose_engine, test_connection
+from mamba_mcp_pg.server import mcp
 
 # Import tools to register them with the server
-from mamba_mcp_postgres.tools import query_tools, relationship_tools, schema_tools  # noqa: F401
+from mamba_mcp_pg.tools import query_tools, relationship_tools, schema_tools  # noqa: F401
 
 app = typer.Typer(
-    name="mamba-mcp-postgres",
+    name="mamba-mcp-pg",
     no_args_is_help=False,
 )
 

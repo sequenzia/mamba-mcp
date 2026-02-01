@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import typer
-from mamba_mcp_postgres.__main__ import app, resolve_default_env_file, validate_env_file
-from mamba_mcp_postgres.config import get_env_file_path, set_env_file_path
+from mamba_mcp_pg.__main__ import app, resolve_default_env_file, validate_env_file
+from mamba_mcp_pg.config import get_env_file_path, set_env_file_path
 from typer.testing import CliRunner
 
 runner = CliRunner()
@@ -43,19 +43,19 @@ class TestCLI:
         # Create mamba.env file in tmp_path
         env_file = tmp_path / "mamba.env"
         env_file.write_text(
-            "MAMBA_MCP_POSTGRES_DB_HOST=auto-loaded-host\n"
-            "MAMBA_MCP_POSTGRES_DB_NAME=testdb\n"
-            "MAMBA_MCP_POSTGRES_DB_USER=testuser\n"
-            "MAMBA_MCP_POSTGRES_DB_PASSWORD=testpass\n"
+            "MAMBA_MCP_PG_DB_HOST=auto-loaded-host\n"
+            "MAMBA_MCP_PG_DB_NAME=testdb\n"
+            "MAMBA_MCP_PG_DB_USER=testuser\n"
+            "MAMBA_MCP_PG_DB_PASSWORD=testpass\n"
         )
 
         # Change cwd to tmp_path
         monkeypatch.chdir(tmp_path)
 
         with (
-            patch("mamba_mcp_postgres.__main__.create_engine") as mock_create,
-            patch("mamba_mcp_postgres.__main__.test_connection"),
-            patch("mamba_mcp_postgres.__main__.dispose_engine"),
+            patch("mamba_mcp_pg.__main__.create_engine") as mock_create,
+            patch("mamba_mcp_pg.__main__.test_connection"),
+            patch("mamba_mcp_pg.__main__.dispose_engine"),
         ):
             mock_create.return_value = AsyncMock()
 
@@ -73,15 +73,15 @@ class TestCLI:
         """Test CLI proceeds without error when no mamba.env in cwd and no --env-file."""
         # tmp_path has no mamba.env file, but set required env vars
         monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv("MAMBA_MCP_POSTGRES_DB_HOST", "env-var-host")
-        monkeypatch.setenv("MAMBA_MCP_POSTGRES_DB_NAME", "testdb")
-        monkeypatch.setenv("MAMBA_MCP_POSTGRES_DB_USER", "testuser")
-        monkeypatch.setenv("MAMBA_MCP_POSTGRES_DB_PASSWORD", "testpass")
+        monkeypatch.setenv("MAMBA_MCP_PG_DB_HOST", "env-var-host")
+        monkeypatch.setenv("MAMBA_MCP_PG_DB_NAME", "testdb")
+        monkeypatch.setenv("MAMBA_MCP_PG_DB_USER", "testuser")
+        monkeypatch.setenv("MAMBA_MCP_PG_DB_PASSWORD", "testpass")
 
         with (
-            patch("mamba_mcp_postgres.__main__.create_engine") as mock_create,
-            patch("mamba_mcp_postgres.__main__.test_connection"),
-            patch("mamba_mcp_postgres.__main__.dispose_engine"),
+            patch("mamba_mcp_pg.__main__.create_engine") as mock_create,
+            patch("mamba_mcp_pg.__main__.test_connection"),
+            patch("mamba_mcp_pg.__main__.dispose_engine"),
         ):
             mock_create.return_value = AsyncMock()
 
@@ -112,7 +112,7 @@ class TestValidateEnvFile:
     def test_validate_env_file_valid_file(self, tmp_path: Path) -> None:
         """Test validation with valid file returns resolved path."""
         env_file = tmp_path / "test.env"
-        env_file.write_text("MAMBA_MCP_POSTGRES_DB_HOST=localhost")
+        env_file.write_text("MAMBA_MCP_PG_DB_HOST=localhost")
 
         ctx = self._make_context()
         result = validate_env_file(ctx, str(env_file))
@@ -142,7 +142,7 @@ class TestValidateEnvFile:
         ctx = self._make_context(resilient_parsing=True)
         # Even with a valid path, should return None during completion
         env_file = tmp_path / "test.env"
-        env_file.write_text("MAMBA_MCP_POSTGRES_DB_HOST=localhost")
+        env_file.write_text("MAMBA_MCP_PG_DB_HOST=localhost")
         result = validate_env_file(ctx, str(env_file))
         assert result is None
 
@@ -153,7 +153,7 @@ class TestResolveDefaultEnvFile:
     def test_returns_explicit_path_unchanged(self, tmp_path: Path) -> None:
         """Test that explicitly provided path is returned unchanged."""
         env_file = tmp_path / "custom.env"
-        env_file.write_text("MAMBA_MCP_POSTGRES_DB_HOST=localhost")
+        env_file.write_text("MAMBA_MCP_PG_DB_HOST=localhost")
         result = resolve_default_env_file(str(env_file))
         assert result == str(env_file)
 
@@ -162,7 +162,7 @@ class TestResolveDefaultEnvFile:
     ) -> None:
         """Test that mamba.env in cwd is detected when no explicit path provided."""
         env_file = tmp_path / "mamba.env"
-        env_file.write_text("MAMBA_MCP_POSTGRES_DB_HOST=localhost")
+        env_file.write_text("MAMBA_MCP_PG_DB_HOST=localhost")
 
         monkeypatch.chdir(tmp_path)
 
@@ -180,7 +180,7 @@ class TestResolveDefaultEnvFile:
         fake_home = tmp_path / "fakehome"
         fake_home.mkdir()
         home_env = fake_home / "mamba.env"
-        home_env.write_text("MAMBA_MCP_POSTGRES_DB_HOST=home-host")
+        home_env.write_text("MAMBA_MCP_PG_DB_HOST=home-host")
 
         monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
 
@@ -193,13 +193,13 @@ class TestResolveDefaultEnvFile:
         """Test that cwd mamba.env takes priority over ~/mamba.env."""
         # Create mamba.env in cwd
         cwd_env = tmp_path / "mamba.env"
-        cwd_env.write_text("MAMBA_MCP_POSTGRES_DB_HOST=cwd-host")
+        cwd_env.write_text("MAMBA_MCP_PG_DB_HOST=cwd-host")
 
         # Create mamba.env in fake home
         fake_home = tmp_path / "fakehome"
         fake_home.mkdir()
         home_env = fake_home / "mamba.env"
-        home_env.write_text("MAMBA_MCP_POSTGRES_DB_HOST=home-host")
+        home_env.write_text("MAMBA_MCP_PG_DB_HOST=home-host")
 
         monkeypatch.chdir(tmp_path)
         monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
@@ -266,19 +266,19 @@ class TestSettingsWithEnvFile:
         # Create a custom env file with test values
         env_file = tmp_path / "custom.env"
         env_file.write_text(
-            "MAMBA_MCP_POSTGRES_DB_HOST=custom-host\n"
-            "MAMBA_MCP_POSTGRES_DB_PORT=5433\n"
-            "MAMBA_MCP_POSTGRES_DB_NAME=custom_db\n"
-            "MAMBA_MCP_POSTGRES_DB_USER=custom_user\n"
-            "MAMBA_MCP_POSTGRES_DB_PASSWORD=custom_pass\n"
-            "MAMBA_MCP_POSTGRES_LOG_LEVEL=DEBUG\n"
+            "MAMBA_MCP_PG_DB_HOST=custom-host\n"
+            "MAMBA_MCP_PG_DB_PORT=5433\n"
+            "MAMBA_MCP_PG_DB_NAME=custom_db\n"
+            "MAMBA_MCP_PG_DB_USER=custom_user\n"
+            "MAMBA_MCP_PG_DB_PASSWORD=custom_pass\n"
+            "MAMBA_MCP_PG_LOG_LEVEL=DEBUG\n"
         )
 
         # Set the custom env file path
         set_env_file_path(str(env_file))
 
         # Import get_settings here to avoid caching issues
-        from mamba_mcp_postgres.config import get_settings
+        from mamba_mcp_pg.config import get_settings
 
         settings = get_settings()
 
@@ -301,16 +301,16 @@ class TestTestCommand:
         # Create env file with test values
         env_file = tmp_path / "test.env"
         env_file.write_text(
-            "MAMBA_MCP_POSTGRES_DB_HOST=localhost\n"
-            "MAMBA_MCP_POSTGRES_DB_NAME=testdb\n"
-            "MAMBA_MCP_POSTGRES_DB_USER=testuser\n"
-            "MAMBA_MCP_POSTGRES_DB_PASSWORD=testpass\n"
+            "MAMBA_MCP_PG_DB_HOST=localhost\n"
+            "MAMBA_MCP_PG_DB_NAME=testdb\n"
+            "MAMBA_MCP_PG_DB_USER=testuser\n"
+            "MAMBA_MCP_PG_DB_PASSWORD=testpass\n"
         )
 
         with (
-            patch("mamba_mcp_postgres.__main__.create_engine") as mock_create,
-            patch("mamba_mcp_postgres.__main__.test_connection") as mock_test,
-            patch("mamba_mcp_postgres.__main__.dispose_engine") as mock_dispose,
+            patch("mamba_mcp_pg.__main__.create_engine") as mock_create,
+            patch("mamba_mcp_pg.__main__.test_connection") as mock_test,
+            patch("mamba_mcp_pg.__main__.dispose_engine") as mock_dispose,
         ):
             mock_engine = AsyncMock()
             mock_create.return_value = mock_engine
@@ -330,16 +330,16 @@ class TestTestCommand:
         """Test failed connection test exits with code 1."""
         env_file = tmp_path / "test.env"
         env_file.write_text(
-            "MAMBA_MCP_POSTGRES_DB_HOST=localhost\n"
-            "MAMBA_MCP_POSTGRES_DB_NAME=testdb\n"
-            "MAMBA_MCP_POSTGRES_DB_USER=testuser\n"
-            "MAMBA_MCP_POSTGRES_DB_PASSWORD=testpass\n"
+            "MAMBA_MCP_PG_DB_HOST=localhost\n"
+            "MAMBA_MCP_PG_DB_NAME=testdb\n"
+            "MAMBA_MCP_PG_DB_USER=testuser\n"
+            "MAMBA_MCP_PG_DB_PASSWORD=testpass\n"
         )
 
         with (
-            patch("mamba_mcp_postgres.__main__.create_engine") as mock_create,
-            patch("mamba_mcp_postgres.__main__.test_connection") as mock_test,
-            patch("mamba_mcp_postgres.__main__.dispose_engine") as mock_dispose,
+            patch("mamba_mcp_pg.__main__.create_engine") as mock_create,
+            patch("mamba_mcp_pg.__main__.test_connection") as mock_test,
+            patch("mamba_mcp_pg.__main__.dispose_engine") as mock_dispose,
         ):
             mock_engine = AsyncMock()
             mock_create.return_value = mock_engine
@@ -357,16 +357,16 @@ class TestTestCommand:
         """Test that --env-file option works with test command."""
         env_file = tmp_path / "custom.env"
         env_file.write_text(
-            "MAMBA_MCP_POSTGRES_DB_HOST=custom-host\n"
-            "MAMBA_MCP_POSTGRES_DB_NAME=custom_db\n"
-            "MAMBA_MCP_POSTGRES_DB_USER=custom_user\n"
-            "MAMBA_MCP_POSTGRES_DB_PASSWORD=custom_pass\n"
+            "MAMBA_MCP_PG_DB_HOST=custom-host\n"
+            "MAMBA_MCP_PG_DB_NAME=custom_db\n"
+            "MAMBA_MCP_PG_DB_USER=custom_user\n"
+            "MAMBA_MCP_PG_DB_PASSWORD=custom_pass\n"
         )
 
         with (
-            patch("mamba_mcp_postgres.__main__.create_engine") as mock_create,
-            patch("mamba_mcp_postgres.__main__.test_connection"),
-            patch("mamba_mcp_postgres.__main__.dispose_engine"),
+            patch("mamba_mcp_pg.__main__.create_engine") as mock_create,
+            patch("mamba_mcp_pg.__main__.test_connection"),
+            patch("mamba_mcp_pg.__main__.dispose_engine"),
         ):
             mock_create.return_value = AsyncMock()
 

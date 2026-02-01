@@ -17,7 +17,7 @@ The server supports both STDIO and Streamable HTTP transports for local CLI usag
 
 ### 2.1 The Problem
 
-AI assistants and LLMs interacting through the Model Context Protocol currently lack a standardized, secure way to browse, read, and manage files on local and remote filesystems. While the `mamba-mcp` ecosystem provides database access via `mamba-mcp-postgres`, there is no equivalent for filesystem operations -- a fundamental capability for many AI assistant workflows.
+AI assistants and LLMs interacting through the Model Context Protocol currently lack a standardized, secure way to browse, read, and manage files on local and remote filesystems. While the `mamba-mcp` ecosystem provides database access via `mamba-mcp-pg`, there is no equivalent for filesystem operations -- a fundamental capability for many AI assistant workflows.
 
 ### 2.2 Current State
 
@@ -602,7 +602,7 @@ Completing the `mamba-mcp` ecosystem with filesystem capabilities alongside the 
 
 ### 7.1 Architecture Overview
 
-The server follows the same architectural pattern as `mamba-mcp-postgres`:
+The server follows the same architectural pattern as `mamba-mcp-pg`:
 
 ```
 CLI (__main__.py)
@@ -739,7 +739,7 @@ class ServerSettings(BaseSettings):
 
 ### 7.6 Error Handling
 
-Following the `mamba-mcp-postgres` pattern with structured error responses:
+Following the `mamba-mcp-pg` pattern with structured error responses:
 
 ```python
 class ErrorCode:
@@ -995,7 +995,7 @@ def localstack_s3() -> S3Client:
 - [FastMCP Documentation](https://github.com/jlowin/fastmcp)
 - [fsspec Documentation](https://filesystem-spec.readthedocs.io/)
 - [s3fs Documentation](https://s3fs.readthedocs.io/)
-- [mamba-mcp-postgres](../../../packages/mamba-mcp-postgres/) -- Reference implementation for patterns
+- [mamba-mcp-pg](../../packages/mamba-mcp-pg/) -- Reference implementation for patterns
 - [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 
 ### 15.3 Agent Recommendations Incorporated

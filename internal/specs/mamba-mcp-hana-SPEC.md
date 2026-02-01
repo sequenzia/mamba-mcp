@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-mamba-mcp-hana is a new package in the mamba-mcp monorepo that provides a Model Context Protocol (MCP) server for SAP HANA databases. It follows the same 3-layer progressive disclosure architecture established by mamba-mcp-postgres (schema discovery, relationships, query execution) while adding HANA-specific tools for calculation views, column/row store type information, and stored procedure listing. The server is strictly read-only, supports both HANA Cloud and on-premise environments, and uses SAP's official `hdbcli` driver with async wrappers.
+mamba-mcp-hana is a new package in the mamba-mcp monorepo that provides a Model Context Protocol (MCP) server for SAP HANA databases. It follows the same 3-layer progressive disclosure architecture established by mamba-mcp-pg (schema discovery, relationships, query execution) while adding HANA-specific tools for calculation views, column/row store type information, and stored procedure listing. The server is strictly read-only, supports both HANA Cloud and on-premise environments, and uses SAP's official `hdbcli` driver with async wrappers.
 
 ## 2. Problem Statement
 
@@ -21,7 +21,7 @@ AI/LLM agents and users need structured, safe access to SAP HANA databases throu
 
 ### 2.2 Current State
 
-- The mamba-mcp monorepo has a proven architecture for database MCP servers (mamba-mcp-postgres).
+- The mamba-mcp monorepo has a proven architecture for database MCP servers (mamba-mcp-pg).
 - No existing MCP server targets SAP HANA specifically.
 - SAP HANA users rely on SAP HANA Studio, DBeaver, or raw SQL against system views for schema exploration.
 - AI agents connected to HANA must navigate HANA's unique SQL dialect and system view structure without protocol-level guidance.
@@ -249,7 +249,7 @@ AI/LLM agents and users need structured, safe access to SAP HANA databases throu
 - [ ] Writes plan to `EXPLAIN_PLAN_TABLE` with a unique statement name, reads results, then cleans up
 - [ ] Returns plan details including operator names, execution engine, and operator details
 - [ ] Accepts `sql`, `params`, and `format` ("text" or "json") parameters
-- [ ] Same interface as mamba-mcp-postgres `explain_query` from the caller's perspective
+- [ ] Same interface as mamba-mcp-pg `explain_query` from the caller's perspective
 
 **Edge Cases**:
 - `EXPLAIN_PLAN_TABLE` does not exist: Return clear error with guidance (table is auto-created in user's schema)
@@ -417,7 +417,7 @@ GRANT RESTRICTED_USER_ODBC_ACCESS TO mcp_reader;
 
 ### 7.1 Architecture Overview
 
-The package follows the same architecture as mamba-mcp-postgres with a key difference in the database layer: instead of SQLAlchemy with asyncpg, it uses hdbcli directly with `asyncio.to_thread()` wrappers for non-blocking execution.
+The package follows the same architecture as mamba-mcp-pg with a key difference in the database layer: instead of SQLAlchemy with asyncpg, it uses hdbcli directly with `asyncio.to_thread()` wrappers for non-blocking execution.
 
 ```
 MCP Protocol Layer (FastMCP)
@@ -469,7 +469,7 @@ hdbcli (synchronous PEP 249 driver) --> SAP HANA Database
 
 ### 7.5 Key SQL Differences from PostgreSQL
 
-| Capability | mamba-mcp-postgres (PostgreSQL) | mamba-mcp-hana (HANA) |
+| Capability | mamba-mcp-pg (PostgreSQL) | mamba-mcp-hana (HANA) |
 |------------|-------------------------------|---------------------------|
 | Schema discovery | `pg_catalog.*`, `information_schema` | `SYS.SCHEMAS`, `SYS.TABLES`, `SYS.TABLE_COLUMNS` |
 | Foreign keys | `information_schema.table_constraints` | `SYS.REFERENTIAL_CONSTRAINTS` |
@@ -509,7 +509,7 @@ hdbcli (synchronous PEP 249 driver) --> SAP HANA Database
 
 ### 8.3 Future Considerations
 
-- **Shared database service protocol**: Define a common interface/protocol across mamba-mcp-postgres and mamba-mcp-hana for consistent behavior and potential code reuse
+- **Shared database service protocol**: Define a common interface/protocol across mamba-mcp-pg and mamba-mcp-hana for consistent behavior and potential code reuse
 - **X.509 certificate authentication**: Add certificate-based auth for enterprise environments
 - **Calculation view data access**: With analytic privilege handling and better error messaging
 - **SAP HANA Cloud HDI container support**: Integration with HDI (HANA Deployment Infrastructure) schemas
@@ -589,7 +589,7 @@ hdbcli (synchronous PEP 249 driver) --> SAP HANA Database
 
 | Package | Dependency | Status |
 |---------|-----------|--------|
-| mamba-mcp-postgres | Reference architecture (patterns, not code) | Complete |
+| mamba-mcp-pg | Reference architecture (patterns, not code) | Complete |
 | Workspace pyproject.toml | Package registration | Requires update |
 
 ## 11. Risks & Mitigations
@@ -717,7 +717,7 @@ packages/mamba-mcp-hana/
 - [SAP HANA System Views Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20cbb10c75191014b47ba845bfe499fe.html)
 - [SAP HANA SQL Reference](https://help.sap.com/doc/9b40bf74f8644b898fb07dabdd2a36ad/2.0.03/en-US/SAP_HANA_SQL_and_System_Views_Reference_en.pdf)
 - [MCP Protocol Specification](https://modelcontextprotocol.io/)
-- [mamba-mcp-postgres](../mamba-mcp-postgres/) — Reference architecture
+- [mamba-mcp-pg](../../packages/mamba-mcp-pg/) — Reference architecture
 
 ---
 

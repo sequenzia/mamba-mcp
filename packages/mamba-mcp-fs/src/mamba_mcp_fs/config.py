@@ -1,7 +1,7 @@
 """Configuration management for the Filesystem MCP Server.
 
 Uses pydantic-settings to load configuration from environment variables
-and .env files. Based on spec Section 7.4, following mamba-mcp-postgres patterns.
+and .env files. Based on spec Section 7.4, following mamba-mcp-pg patterns.
 
 Three settings classes handle different configuration scopes:
 - ServerSettings: MCP server transport, logging, permissions, rate limiting

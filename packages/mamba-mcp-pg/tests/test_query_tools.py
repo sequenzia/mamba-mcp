@@ -1,7 +1,7 @@
 """Tests for query execution tools (Layer 3)."""
 
 import pytest
-from mamba_mcp_postgres.database.queries import QueryService, QueryValidationError
+from mamba_mcp_pg.database.queries import QueryService, QueryValidationError
 
 
 class TestQuerySecurity:

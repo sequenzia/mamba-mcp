@@ -6,7 +6,7 @@ Provides a Typer CLI with:
 - `--env-file` option: Specify custom config file path
 - `--transport` option: Override transport setting
 
-Based on spec Section 7.1, 7.3, 5.4 -- following the mamba-mcp-postgres pattern.
+Based on spec Section 7.1, 7.3, 5.4 -- following the mamba-mcp-pg pattern.
 """
 
 from __future__ import annotations

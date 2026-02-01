@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from mamba_mcp_postgres.database.engine import test_connection as db_test_connection
+from mamba_mcp_pg.database.engine import test_connection as db_test_connection
 
 
 class TestTestConnection:

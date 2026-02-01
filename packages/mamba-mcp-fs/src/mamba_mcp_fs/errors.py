@@ -1,6 +1,6 @@
 """Structured error handling for MCP filesystem tools.
 
-Based on spec Section 7.6. Follows the mamba-mcp-postgres error pattern
+Based on spec Section 7.6. Follows the mamba-mcp-pg error pattern
 with error codes, suggestion mappings, structured responses, and custom exceptions.
 """
 

@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from mamba_mcp_postgres.database.relationships import RelationshipService
+from mamba_mcp_pg.database.relationships import RelationshipService
 
 from tests.conftest import create_mock_result
 

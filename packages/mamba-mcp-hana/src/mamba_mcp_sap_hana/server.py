@@ -5,7 +5,7 @@ management. The lifespan loads settings, creates the HanaConnectionPool,
 verifies connectivity, and makes the pool available to all tool functions
 via the server context.
 
-Based on spec Section 9.1, following the mamba-mcp-postgres pattern.
+Based on spec Section 9.1, following the mamba-mcp-pg pattern.
 """
 
 from __future__ import annotations

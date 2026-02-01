@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_asyncio
-from mamba_mcp_postgres.config import DatabaseSettings, ServerSettings, Settings, set_env_file_path
+from mamba_mcp_pg.config import DatabaseSettings, ServerSettings, Settings, set_env_file_path
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 

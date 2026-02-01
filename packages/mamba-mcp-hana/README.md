@@ -604,6 +604,6 @@ hdbcli (synchronous PEP 249 driver) --> SAP HANA Database
 
 - **hdbcli + asyncio.to_thread()**: SAP's official `hdbcli` driver is synchronous. All database calls are wrapped with `asyncio.to_thread()` for non-blocking async execution.
 - **Queue-based pool**: Uses `asyncio.Queue` for connection management with health checks via `SELECT 1 FROM DUMMY`.
-- **No SQLAlchemy**: Unlike mamba-mcp-postgres, HANA uses hdbcli directly because `sqlalchemy-hana` adds complexity without benefit for read-only system view queries.
+- **No SQLAlchemy**: Unlike mamba-mcp-pg, HANA uses hdbcli directly because `sqlalchemy-hana` adds complexity without benefit for read-only system view queries.
 - **Service-per-layer**: Each tool layer has a dedicated service class that encapsulates database query logic and error handling.
 - **Union return types**: Services return `Output | ToolError` rather than raising exceptions, enabling clean error handling at the tool layer.
