@@ -83,6 +83,30 @@ mamba-mcp-hana --env-file mamba.env test
 mamba-mcp-hana --env-file mamba.env
 ```
 
+## Architecture
+
+All three MCP server packages follow a consistent internal architecture built on **FastMCP** with a **layered tool system**:
+
+```
+__main__.py (Typer CLI)
+  → server.py (FastMCP + lifespan resource management)
+    → tools/ (MCP tool handlers, organized by layer)
+      → database/ or backends/ (service layer)
+        → models/ (Pydantic I/O contracts)
+```
+
+**Shared patterns across servers:**
+
+- **Layered Tools** — Tools progress from discovery → relationships → execution, designed for incremental exploration by AI agents
+- **AppContext via Lifespan** — Resources (DB engines, connection pools, backends) initialized at startup, cleaned up on shutdown
+- **Pydantic Settings** — Environment-based configuration with `MAMBA_MCP_{PKG}_*` prefix and `mamba.env` file auto-discovery
+- **Error Framework** — Structured error codes with fuzzy name matching ("did you mean?") suggestions
+- **Service Layer** — Thin tool handlers delegate to service classes that encapsulate domain logic
+
+**Tech stack:** Python 3.11+, FastMCP, Pydantic, Typer, Textual, SQLAlchemy+asyncpg, hdbcli, fsspec+s3fs
+
+Each package is self-contained with no cross-package runtime dependencies — patterns are shared by convention rather than a shared library.
+
 ## Configuration
 
 All packages use `mamba.env` for environment-based configuration. Default file locations (checked in order):
