@@ -17,6 +17,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "mamba-mcp-core",
     "mcp>=1.0.0",
     "fsspec",
     "s3fs",

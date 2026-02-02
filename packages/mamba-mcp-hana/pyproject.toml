@@ -17,6 +17,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "mamba-mcp-core",
     "hdbcli",
     "mcp>=1.0.0",
     "pydantic>=2.0.0",

@@ -1,11 +1,13 @@
 """Structured error handling for MCP tools.
 
-Based on PRD Section 7.
+Based on PRD Section 7. Uses mamba-mcp-core for shared error model
+and fuzzy matching, with a thin wrapper to preserve dict return type.
 """
 
 from typing import Any
 
-from mamba_mcp_pg.models.results import ErrorDetail, ToolError
+from mamba_mcp_core.errors import create_tool_error as _core_create_tool_error
+from mamba_mcp_core.fuzzy import find_similar_names
 
 
 class ErrorCode:
@@ -48,6 +50,9 @@ def create_tool_error(
 ) -> dict[str, Any]:
     """Create a structured error response.
 
+    Wraps core create_tool_error and converts to dict to preserve
+    existing PG tool return type contract (OutputModel | dict[str, Any]).
+
     Args:
         code: Machine-readable error code.
         message: Human-readable error message.
@@ -59,52 +64,16 @@ def create_tool_error(
     Returns:
         Dictionary representation of ToolError.
     """
-    error = ToolError(
-        error=ErrorDetail(
-            code=code,
-            message=message,
-            suggestion=suggestion or ERROR_SUGGESTIONS.get(code),
-            context=context,
-        ),
+    error = _core_create_tool_error(
+        code=code,
+        message=message,
         tool_name=tool_name,
         input_received=input_received,
+        context=context,
+        suggestion=suggestion,
+        suggestions_map=ERROR_SUGGESTIONS,
     )
     return error.model_dump()
 
 
-def find_similar_names(name: str, candidates: list[str], max_results: int = 3) -> list[str]:
-    """Find similar names using Levenshtein distance.
-
-    Args:
-        name: The name to match against.
-        candidates: List of candidate names.
-        max_results: Maximum number of results to return.
-
-    Returns:
-        List of similar names sorted by similarity.
-    """
-
-    def levenshtein_distance(s1: str, s2: str) -> int:
-        """Calculate Levenshtein distance between two strings."""
-        if len(s1) < len(s2):
-            return levenshtein_distance(s2, s1)
-        if len(s2) == 0:
-            return len(s1)
-
-        prev_row = list(range(len(s2) + 1))
-        for i, c1 in enumerate(s1):
-            curr_row = [i + 1]
-            for j, c2 in enumerate(s2):
-                insertions = prev_row[j + 1] + 1
-                deletions = curr_row[j] + 1
-                substitutions = prev_row[j] + (c1 != c2)
-                curr_row.append(min(insertions, deletions, substitutions))
-            prev_row = curr_row
-        return prev_row[-1]
-
-    # Calculate distances and filter by threshold
-    scored = [(c, levenshtein_distance(name.lower(), c.lower())) for c in candidates]
-    scored.sort(key=lambda x: x[1])
-
-    # Return names within edit distance of 3
-    return [c for c, d in scored[:max_results] if d <= 3]
+__all__ = ["ErrorCode", "ERROR_SUGGESTIONS", "create_tool_error", "find_similar_names"]

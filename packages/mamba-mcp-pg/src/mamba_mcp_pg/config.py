@@ -2,30 +2,12 @@
 
 from typing import Any
 
+from mamba_mcp_core.config import get_env_file_path, set_env_file_path
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Module-level state for env file path
-_env_file_path: str | None = None
-
-
-def set_env_file_path(path: str | None) -> None:
-    """Set the env file path for settings to use.
-
-    Args:
-        path: Path to .env file, or None to use default (.env in current directory).
-    """
-    global _env_file_path
-    _env_file_path = path
-
-
-def get_env_file_path() -> str | None:
-    """Get the currently configured env file path.
-
-    Returns:
-        The configured env file path, or None if using default.
-    """
-    return _env_file_path
+# Re-export for backward compatibility
+__all__ = ["get_env_file_path", "set_env_file_path", "get_settings", "Settings"]
 
 
 class DatabaseSettings(BaseSettings):
@@ -76,7 +58,11 @@ class ServerSettings(BaseSettings):
         extra="ignore",
     )
 
-    transport: str = Field(default="stdio", pattern="^(stdio|http)$", description="Transport type")
+    transport: str = Field(
+        default="stdio",
+        pattern=r"^(stdio|http|streamable-http)$",
+        description="Transport type",
+    )
     server_host: str = Field(default="0.0.0.0", description="HTTP server host")
     server_port: int = Field(default=8080, ge=1, le=65535, description="HTTP server port")
 
@@ -101,7 +87,7 @@ class Settings(BaseSettings):
     @classmethod
     def load_nested_settings(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Load nested settings with the configured env file path."""
-        env_file = _env_file_path
+        env_file = get_env_file_path()
         if "database" not in data or data["database"] is None:
             # _env_file is a valid pydantic-settings init parameter
             data["database"] = DatabaseSettings(_env_file=env_file)  # type: ignore[call-arg]
