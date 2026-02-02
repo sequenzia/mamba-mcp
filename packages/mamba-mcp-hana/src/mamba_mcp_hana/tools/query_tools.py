@@ -17,6 +17,7 @@ from mcp.server.session import ServerSession
 
 from mamba_mcp_hana.database.query_service import QueryService
 from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.query import ExecuteQueryOutput, ExplainQueryOutput
 from mamba_mcp_hana.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ async def execute_query(
     limit: int = 1000,
     timeout_ms: int | None = None,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ExecuteQueryOutput | dict[str, Any]:
     """Execute a read-only SQL query against SAP HANA.
 
     Runs SELECT/WITH queries with optional parameterized values. Use ? for
@@ -48,7 +49,7 @@ async def execute_query(
         timeout_ms: Query timeout in milliseconds (uses server default if not set).
 
     Returns:
-        JSON-serialized ExecuteQueryOutput with columns, rows, and metadata.
+        Query results with columns, rows, and metadata.
 
     Security:
         Only SELECT and WITH...SELECT queries are allowed.
@@ -68,7 +69,7 @@ async def execute_query(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="execute_query",
-        ).model_dump_json()
+        ).model_dump()
 
     # Clamp limit to valid range (1-10000)
     limit = max(1, min(10000, limit))
@@ -87,9 +88,9 @@ async def execute_query(
     )
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool()
@@ -98,7 +99,7 @@ async def explain_query(
     params: dict[str, Any] | list[Any] | None = None,
     format: str = "text",
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ExplainQueryOutput | dict[str, Any]:
     """Get the execution plan for a read-only SQL query on SAP HANA.
 
     Uses HANA's EXPLAIN PLAN mechanism to analyze query performance without
@@ -114,7 +115,7 @@ async def explain_query(
         format: Output format for the plan ("text" or "json"). Default: "text".
 
     Returns:
-        JSON-serialized ExplainQueryOutput with plan nodes and cost estimates.
+        Execution plan with plan nodes and cost estimates.
 
     Security:
         Only SELECT and WITH...SELECT queries are accepted for explanation.
@@ -131,7 +132,7 @@ async def explain_query(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="explain_query",
-        ).model_dump_json()
+        ).model_dump()
 
     # Validate format (fallback to text)
     if format not in ("text", "json"):
@@ -150,6 +151,6 @@ async def explain_query(
     )
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result

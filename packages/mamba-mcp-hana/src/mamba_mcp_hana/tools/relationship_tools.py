@@ -9,12 +9,14 @@ Based on Spec Section 5.2, 9.2.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from mcp.server.fastmcp import Context
 from mcp.server.session import ServerSession
 
 from mamba_mcp_hana.database.relationship_service import RelationshipService
 from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.relationships import FindJoinPathOutput, ForeignKeysOutput
 from mamba_mcp_hana.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ async def get_foreign_keys(
     table_name: str,
     schema_name: str,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ForeignKeysOutput | dict[str, Any]:
     """Get foreign key relationships for a table.
 
     Returns both outgoing (this table references other tables) and incoming
@@ -40,19 +42,18 @@ async def get_foreign_keys(
         schema_name: Schema containing the table.
 
     Returns:
-        JSON with outgoing and incoming foreign key details.
+        Outgoing and incoming foreign key details.
 
     Example:
         get_foreign_keys(table_name="ORDERS", schema_name="SALES")
     """
     if ctx is None:
         logger.error("get_foreign_keys: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="get_foreign_keys",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = RelationshipService(app_ctx.pool)
@@ -63,9 +64,9 @@ async def get_foreign_keys(
     )
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool()
@@ -76,7 +77,7 @@ async def find_join_path(
     to_schema: str | None = None,
     max_depth: int = 4,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> FindJoinPathOutput | dict[str, Any]:
     """Find join paths between two tables via foreign key relationships.
 
     Uses breadth-first search to discover paths through foreign key
@@ -97,7 +98,7 @@ async def find_join_path(
         max_depth: Maximum number of joins to traverse (1-6, default 4).
 
     Returns:
-        JSON with discovered join paths and SQL JOIN examples.
+        Discovered join paths and SQL JOIN examples.
 
     Example:
         find_join_path(
@@ -108,12 +109,11 @@ async def find_join_path(
     """
     if ctx is None:
         logger.error("find_join_path: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="find_join_path",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     # Default to_schema to from_schema if not provided
     resolved_to_schema = to_schema if to_schema is not None else from_schema
@@ -133,6 +133,6 @@ async def find_join_path(
     )
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result

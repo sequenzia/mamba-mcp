@@ -2,7 +2,7 @@
 
 Registers 3 MCP tools for HANA-specific database operations with the FastMCP
 server instance. Each tool extracts the connection pool from the server
-context, delegates to HanaService, and returns JSON-serialized output.
+context, delegates to HanaService, and returns typed output models.
 
 Based on Spec Section 5.4, 9.3.
 """
@@ -10,12 +10,18 @@ Based on Spec Section 5.4, 9.3.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from mcp.server.fastmcp import Context
 from mcp.server.session import ServerSession
 
 from mamba_mcp_hana.database.hana import HanaService
 from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.hana import (
+    GetTableStoreTypeOutput,
+    ListCalcViewsOutput,
+    ListProceduresOutput,
+)
 from mamba_mcp_hana.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
@@ -26,7 +32,7 @@ async def list_calculation_views(
     schema_name: str,
     include_columns: bool = False,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ListCalcViewsOutput | dict[str, Any]:
     """List calculation views in a SAP HANA schema.
 
     Enumerates calculation views (CALC, JOIN, OLAP types) from SYS.VIEWS
@@ -43,8 +49,8 @@ async def list_calculation_views(
         include_columns: Include column metadata for each view. Default: False
 
     Returns:
-        JSON string with calculation view information including names,
-        types, validity status, and column counts.
+        Calculation view information including names, types, validity status,
+        and column counts.
 
     Example:
         list_calculation_views(schema_name="MY_SCHEMA")
@@ -58,12 +64,11 @@ async def list_calculation_views(
 
     if ctx is None:
         logger.error("list_calculation_views: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="list_calculation_views",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = HanaService(app_ctx.pool)
@@ -75,7 +80,7 @@ async def list_calculation_views(
         )
     except Exception as exc:
         logger.error("list_calculation_views failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to list calculation views: {exc}",
             tool_name="list_calculation_views",
@@ -83,13 +88,12 @@ async def list_calculation_views(
                 "schema_name": schema_name,
                 "include_columns": include_columns,
             },
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool()
@@ -97,7 +101,7 @@ async def get_table_store_type(
     table_name: str,
     schema_name: str,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> GetTableStoreTypeOutput | dict[str, Any]:
     """Get the storage type (COLUMN or ROW) for a SAP HANA table.
 
     Returns whether a table uses column store or row store, along with
@@ -119,8 +123,8 @@ async def get_table_store_type(
         schema_name: Schema containing the table.
 
     Returns:
-        JSON string with store type details including type, partitioning,
-        compression, and implications.
+        Store type details including type, partitioning, compression,
+        and implications.
 
     Example:
         get_table_store_type(table_name="ORDERS", schema_name="SALES")
@@ -134,12 +138,11 @@ async def get_table_store_type(
 
     if ctx is None:
         logger.error("get_table_store_type: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="get_table_store_type",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = HanaService(app_ctx.pool)
@@ -151,7 +154,7 @@ async def get_table_store_type(
         )
     except Exception as exc:
         logger.error("get_table_store_type failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to get table store type: {exc}",
             tool_name="get_table_store_type",
@@ -159,13 +162,12 @@ async def get_table_store_type(
                 "table_name": table_name,
                 "schema_name": schema_name,
             },
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool()
@@ -173,7 +175,7 @@ async def list_procedures(
     schema_name: str,
     include_parameters: bool = False,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ListProceduresOutput | dict[str, Any]:
     """List stored procedures in a SAP HANA schema.
 
     Enumerates stored procedures with their names, types (SQLScript, R, L),
@@ -186,8 +188,8 @@ async def list_procedures(
             Default: False
 
     Returns:
-        JSON string with procedure information including names, types,
-        parameter counts, and optionally parameter details.
+        Procedure information including names, types, parameter counts,
+        and optionally parameter details.
 
     Example:
         list_procedures(schema_name="MY_SCHEMA")
@@ -201,12 +203,11 @@ async def list_procedures(
 
     if ctx is None:
         logger.error("list_procedures: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="list_procedures",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = HanaService(app_ctx.pool)
@@ -218,7 +219,7 @@ async def list_procedures(
         )
     except Exception as exc:
         logger.error("list_procedures failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to list procedures: {exc}",
             tool_name="list_procedures",
@@ -226,10 +227,9 @@ async def list_procedures(
                 "schema_name": schema_name,
                 "include_parameters": include_parameters,
             },
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result

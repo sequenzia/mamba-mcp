@@ -1,13 +1,12 @@
 """Tests for Layer 3 query execution MCP tools.
 
 Tests both execute_query and explain_query tool functions with mocked
-QueryService to verify parameter handling, error wrapping, and JSON
+QueryService to verify parameter handling, error wrapping, and
 serialization.
 """
 
 from __future__ import annotations
 
-import json
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -92,7 +91,7 @@ class TestExecuteQueryTool:
 
     @pytest.mark.anyio
     async def test_successful_query(self) -> None:
-        """Test execute_query returns JSON-serialized ExecuteQueryOutput."""
+        """Test execute_query returns ExecuteQueryOutput model."""
         ctx = _make_ctx()
         expected = _make_execute_output()
 
@@ -105,10 +104,10 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["query_hash"] == "abc12345"
-        assert parsed["result"]["columns"] == ["id", "name"]
-        assert parsed["result"]["row_count"] == 1
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.query_hash == "abc12345"
+        assert result.result.columns == ["id", "name"]
+        assert result.result.row_count == 1
 
     @pytest.mark.anyio
     async def test_with_named_params(self) -> None:
@@ -126,8 +125,8 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["query_hash"] == "abc12345"
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.query_hash == "abc12345"
 
         # Verify service was called with named params
         mock_service.execute_query.assert_called_once_with(
@@ -153,8 +152,8 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert "result" in parsed
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result is not None
 
         mock_service.execute_query.assert_called_once_with(
             sql="SELECT * FROM USERS WHERE id = ?",
@@ -285,7 +284,7 @@ class TestExecuteQueryTool:
 
     @pytest.mark.anyio
     async def test_write_operation_denied(self) -> None:
-        """Test execute_query returns error JSON for write attempts."""
+        """Test execute_query returns error dict for write attempts."""
         ctx = _make_ctx()
         error = create_tool_error(
             code=ErrorCode.WRITE_OPERATION_DENIED,
@@ -302,14 +301,14 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
-        assert "INSERT" in parsed["message"]
-        assert parsed["tool_name"] == "execute_query"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
+        assert "INSERT" in result["message"]
+        assert result["tool_name"] == "execute_query"
 
     @pytest.mark.anyio
     async def test_query_timeout_error(self) -> None:
-        """Test execute_query returns error JSON for timeout."""
+        """Test execute_query returns error dict for timeout."""
         ctx = _make_ctx()
         error = create_tool_error(
             code=ErrorCode.QUERY_TIMEOUT,
@@ -326,13 +325,13 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "QUERY_TIMEOUT"
-        assert "suggestion" in parsed
+        assert isinstance(result, dict)
+        assert result["code"] == "QUERY_TIMEOUT"
+        assert "suggestion" in result
 
     @pytest.mark.anyio
     async def test_invalid_sql_error(self) -> None:
-        """Test execute_query returns error JSON for invalid SQL."""
+        """Test execute_query returns error dict for invalid SQL."""
         ctx = _make_ctx()
         error = create_tool_error(
             code=ErrorCode.INVALID_SQL,
@@ -349,21 +348,21 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "INVALID_SQL"
+        assert isinstance(result, dict)
+        assert result["code"] == "INVALID_SQL"
 
     @pytest.mark.anyio
     async def test_no_context_returns_error(self) -> None:
-        """Test execute_query returns error JSON when ctx is None."""
+        """Test execute_query returns error dict when ctx is None."""
         result = await execute_query(sql="SELECT 1 FROM DUMMY", ctx=None)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "CONNECTION_ERROR"
-        assert "context" in parsed["message"].lower()
+        assert isinstance(result, dict)
+        assert result["code"] == "CONNECTION_ERROR"
+        assert "context" in result["message"].lower()
 
     @pytest.mark.anyio
     async def test_truncated_result(self) -> None:
-        """Test execute_query serializes truncated results correctly."""
+        """Test execute_query returns truncated results correctly."""
         ctx = _make_ctx()
         expected = _make_execute_output(
             truncated=True,
@@ -380,9 +379,9 @@ class TestExecuteQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["result"]["truncated"] is True
-        assert "truncated" in parsed["result"]["warning"].lower()
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result.truncated is True
+        assert "truncated" in result.result.warning.lower()
 
     @pytest.mark.anyio
     async def test_service_created_with_pool_and_timeout(self) -> None:
@@ -408,7 +407,7 @@ class TestExplainQueryTool:
 
     @pytest.mark.anyio
     async def test_successful_explain(self) -> None:
-        """Test explain_query returns JSON-serialized ExplainQueryOutput."""
+        """Test explain_query returns ExplainQueryOutput model."""
         ctx = _make_ctx()
         expected = _make_explain_output()
 
@@ -421,11 +420,11 @@ class TestExplainQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["plan_type"] == "HANA EXPLAIN PLAN"
-        assert parsed["total_cost"] == 10.5
-        assert len(parsed["nodes"]) == 1
-        assert parsed["nodes"][0]["operator"] == "TABLE SCAN"
+        assert isinstance(result, ExplainQueryOutput)
+        assert result.plan_type == "HANA EXPLAIN PLAN"
+        assert result.total_cost == 10.5
+        assert len(result.nodes) == 1
+        assert result.nodes[0].operator == "TABLE SCAN"
 
     @pytest.mark.anyio
     async def test_text_format(self) -> None:
@@ -535,7 +534,7 @@ class TestExplainQueryTool:
 
     @pytest.mark.anyio
     async def test_write_operation_denied(self) -> None:
-        """Test explain_query returns error JSON for write attempts."""
+        """Test explain_query returns error dict for write attempts."""
         ctx = _make_ctx()
         error = create_tool_error(
             code=ErrorCode.WRITE_OPERATION_DENIED,
@@ -552,13 +551,13 @@ class TestExplainQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
-        assert "DELETE" in parsed["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
+        assert "DELETE" in result["message"]
 
     @pytest.mark.anyio
     async def test_invalid_sql_error(self) -> None:
-        """Test explain_query returns error JSON for invalid SQL."""
+        """Test explain_query returns error dict for invalid SQL."""
         ctx = _make_ctx()
         error = create_tool_error(
             code=ErrorCode.INVALID_SQL,
@@ -575,17 +574,17 @@ class TestExplainQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "INVALID_SQL"
+        assert isinstance(result, dict)
+        assert result["code"] == "INVALID_SQL"
 
     @pytest.mark.anyio
     async def test_no_context_returns_error(self) -> None:
-        """Test explain_query returns error JSON when ctx is None."""
+        """Test explain_query returns error dict when ctx is None."""
         result = await explain_query(sql="SELECT 1 FROM DUMMY", ctx=None)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "CONNECTION_ERROR"
-        assert "context" in parsed["message"].lower()
+        assert isinstance(result, dict)
+        assert result["code"] == "CONNECTION_ERROR"
+        assert "context" in result["message"].lower()
 
     @pytest.mark.anyio
     async def test_service_created_with_pool_and_timeout(self) -> None:
@@ -607,7 +606,7 @@ class TestExplainQueryTool:
 
     @pytest.mark.anyio
     async def test_multiple_plan_nodes(self) -> None:
-        """Test explain_query serializes multiple plan nodes correctly."""
+        """Test explain_query returns multiple plan nodes correctly."""
         ctx = _make_ctx()
         nodes = [
             ExplainPlanNode(
@@ -640,11 +639,11 @@ class TestExplainQueryTool:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert len(parsed["nodes"]) == 2
-        assert parsed["nodes"][0]["operator"] == "COLUMN TABLE"
-        assert parsed["nodes"][1]["operator"] == "INDEX SCAN"
-        assert parsed["total_cost"] == 25.0
+        assert isinstance(result, ExplainQueryOutput)
+        assert len(result.nodes) == 2
+        assert result.nodes[0].operator == "COLUMN TABLE"
+        assert result.nodes[1].operator == "INDEX SCAN"
+        assert result.total_cost == 25.0
 
 
 class TestToolRegistration:
@@ -709,8 +708,8 @@ class TestQueryValidationComprehensive:
                     ctx=ctx,
                 )
 
-            parsed = json.loads(result)
-            assert parsed["code"] in (
+            assert isinstance(result, dict)
+            assert result["code"] in (
                 "WRITE_OPERATION_DENIED",
                 "INVALID_SQL",
             ), f"Keyword '{keyword}' was not properly rejected"
@@ -730,8 +729,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="INSERT INTO t VALUES (1)", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_update_blocked(self) -> None:
@@ -748,8 +747,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="UPDATE t SET x=1", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_delete_blocked(self) -> None:
@@ -766,8 +765,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="DELETE FROM t", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_drop_blocked(self) -> None:
@@ -784,8 +783,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="DROP TABLE t", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_create_blocked(self) -> None:
@@ -802,8 +801,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="CREATE TABLE t (id INT)", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_truncate_blocked(self) -> None:
@@ -820,8 +819,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="TRUNCATE TABLE t", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_grant_blocked(self) -> None:
@@ -838,8 +837,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="GRANT SELECT ON t TO public", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_valid_select_passes(self) -> None:
@@ -853,9 +852,8 @@ class TestQueryValidationComprehensive:
 
             result = await execute_query(sql="SELECT * FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert "result" in parsed
-        assert parsed["result"]["columns"] == ["id", "name"]
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result.columns == ["id", "name"]
 
     @pytest.mark.anyio
     async def test_valid_with_query_passes(self) -> None:
@@ -872,8 +870,8 @@ class TestQueryValidationComprehensive:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert "result" in parsed
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result is not None
 
 
 class TestAutoLimitBehavior:
@@ -1034,15 +1032,15 @@ class TestExplainPlanLifecycle:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["plan_type"] == "HANA EXPLAIN PLAN"
-        assert parsed["total_cost"] == 25.0
-        assert len(parsed["nodes"]) == 2
-        assert parsed["nodes"][0]["operator"] == "COLUMN TABLE"
-        assert parsed["nodes"][0]["cost"] == 25.0
-        assert parsed["nodes"][0]["cardinality"] == 1000.0
-        assert parsed["nodes"][1]["operator"] == "INDEX SCAN"
-        assert parsed["original_query"] == (
+        assert isinstance(result, ExplainQueryOutput)
+        assert result.plan_type == "HANA EXPLAIN PLAN"
+        assert result.total_cost == 25.0
+        assert len(result.nodes) == 2
+        assert result.nodes[0].operator == "COLUMN TABLE"
+        assert result.nodes[0].cost == 25.0
+        assert result.nodes[0].cardinality == 1000.0
+        assert result.nodes[1].operator == "INDEX SCAN"
+        assert result.original_query == (
             "SELECT o.* FROM ORDERS o JOIN CUSTOMERS c ON o.cid = c.id"
         )
 
@@ -1061,9 +1059,9 @@ class TestExplainPlanLifecycle:
 
             result = await explain_query(sql="SELECT 1 FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["nodes"] == []
-        assert parsed["total_cost"] is None
+        assert isinstance(result, ExplainQueryOutput)
+        assert result.nodes == []
+        assert result.total_cost is None
 
     @pytest.mark.anyio
     async def test_explain_with_params(self) -> None:
@@ -1103,8 +1101,8 @@ class TestExplainPlanLifecycle:
 
             result = await explain_query(sql="INSERT INTO t VALUES (1)", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "WRITE_OPERATION_DENIED"
+        assert isinstance(result, dict)
+        assert result["code"] == "WRITE_OPERATION_DENIED"
 
     @pytest.mark.anyio
     async def test_explain_plan_table_error(self) -> None:
@@ -1122,9 +1120,9 @@ class TestExplainPlanLifecycle:
 
             result = await explain_query(sql="SELECT 1 FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "INVALID_SQL"
-        assert "EXPLAIN_PLAN_TABLE" in parsed["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == "INVALID_SQL"
+        assert "EXPLAIN_PLAN_TABLE" in result["message"]
 
 
 class TestExecuteQueryExtended:
@@ -1142,8 +1140,8 @@ class TestExecuteQueryExtended:
 
             result = await execute_query(sql="SELECT 1 FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["result"]["execution_time_ms"] == 15.3
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result.execution_time_ms == 15.3
 
     @pytest.mark.anyio
     async def test_query_hash_in_output(self) -> None:
@@ -1157,8 +1155,8 @@ class TestExecuteQueryExtended:
 
             result = await execute_query(sql="SELECT 1 FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["query_hash"] == "deadbeef"
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.query_hash == "deadbeef"
 
     @pytest.mark.anyio
     async def test_mixed_params_dict(self) -> None:
@@ -1199,8 +1197,8 @@ class TestExecuteQueryExtended:
 
             result = await execute_query(sql="SELECT 1 FROM DUMMY", ctx=ctx)
 
-        parsed = json.loads(result)
-        assert parsed["code"] == "CONNECTION_ERROR"
+        assert isinstance(result, dict)
+        assert result["code"] == "CONNECTION_ERROR"
 
     @pytest.mark.anyio
     async def test_timeout_with_custom_value(self) -> None:
@@ -1251,6 +1249,6 @@ class TestExecuteQueryExtended:
                 ctx=ctx,
             )
 
-        parsed = json.loads(result)
-        assert parsed["result"]["rows"] == []
-        assert parsed["result"]["row_count"] == 0
+        assert isinstance(result, ExecuteQueryOutput)
+        assert result.result.rows == []
+        assert result.result.row_count == 0

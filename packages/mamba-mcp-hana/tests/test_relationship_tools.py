@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -68,7 +67,7 @@ class TestGetForeignKeys:
 
     @pytest.mark.asyncio
     async def test_returns_outgoing_and_incoming_fks(self) -> None:
-        """Tool returns JSON with outgoing and incoming FK details."""
+        """Tool returns ForeignKeysOutput with outgoing and incoming FK details."""
         outgoing_fk = ForeignKeyInfo(
             constraint_name="FK_ORDER_CUST",
             source_schema="SALES",
@@ -99,19 +98,19 @@ class TestGetForeignKeys:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="ORDERS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["table_name"] == "ORDERS"
-        assert data["schema_name"] == "SALES"
-        assert data["outgoing_count"] == 1
-        assert data["incoming_count"] == 1
-        assert data["outgoing"][0]["constraint_name"] == "FK_ORDER_CUST"
-        assert data["incoming"][0]["constraint_name"] == "FK_ITEM_ORDER"
+        assert isinstance(result, ForeignKeysOutput)
+        assert result.table_name == "ORDERS"
+        assert result.schema_name == "SALES"
+        assert result.outgoing_count == 1
+        assert result.incoming_count == 1
+        assert result.outgoing[0].constraint_name == "FK_ORDER_CUST"
+        assert result.incoming[0].constraint_name == "FK_ITEM_ORDER"
 
     @pytest.mark.asyncio
     async def test_returns_empty_lists_when_no_fks(self) -> None:
@@ -123,21 +122,21 @@ class TestGetForeignKeys:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="ORDERS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["outgoing"] == []
-        assert data["incoming"] == []
-        assert data["outgoing_count"] == 0
-        assert data["incoming_count"] == 0
+        assert isinstance(result, ForeignKeysOutput)
+        assert result.outgoing == []
+        assert result.incoming == []
+        assert result.outgoing_count == 0
+        assert result.incoming_count == 0
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.TABLE_NOT_FOUND,
             message="Table 'ORDERS' not found in schema 'SALES'",
@@ -150,30 +149,30 @@ class TestGetForeignKeys:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=tool_error)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="ORDERS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "not found" in data["message"]
-        assert data["tool_name"] == "get_foreign_keys"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "not found" in result["message"]
+        assert result["tool_name"] == "get_foreign_keys"
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await get_foreign_keys(
+        """Tool returns error dict when no context is provided."""
+        result = await get_foreign_keys(
             table_name="ORDERS",
             schema_name="SALES",
             ctx=None,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "get_foreign_keys"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "get_foreign_keys"
 
     @pytest.mark.asyncio
     async def test_passes_correct_params_to_service(self) -> None:
@@ -230,7 +229,7 @@ class TestFindJoinPath:
 
     @pytest.mark.asyncio
     async def test_returns_paths_with_sql_examples(self) -> None:
-        """Tool returns JSON with join paths and SQL examples."""
+        """Tool returns FindJoinPathOutput with join paths and SQL examples."""
         step = JoinStep(
             from_schema="SALES",
             from_table="ORDER_ITEMS",
@@ -254,18 +253,18 @@ class TestFindJoinPath:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDER_ITEMS",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["path_count"] == 1
-        assert len(data["paths"]) == 1
-        assert data["paths"][0]["length"] == 1
-        assert "sql_example" in data["paths"][0]
+        assert isinstance(result, FindJoinPathOutput)
+        assert result.path_count == 1
+        assert len(result.paths) == 1
+        assert result.paths[0].length == 1
+        assert result.paths[0].sql_example is not None
 
     @pytest.mark.asyncio
     async def test_to_schema_defaults_to_from_schema(self) -> None:
@@ -384,7 +383,7 @@ class TestFindJoinPath:
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.TABLE_NOT_FOUND,
             message="Table 'MISSING' not found in schema 'SALES'",
@@ -402,31 +401,31 @@ class TestFindJoinPath:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=tool_error)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="MISSING",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "not found" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "not found" in result["message"]
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await find_join_path(
+        """Tool returns error dict when no context is provided."""
+        result = await find_join_path(
             from_table="A",
             to_table="B",
             from_schema="S",
             ctx=None,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "find_join_path"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "find_join_path"
 
     @pytest.mark.asyncio
     async def test_returns_empty_paths_when_no_path_found(self) -> None:
@@ -438,16 +437,16 @@ class TestFindJoinPath:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDER_ITEMS",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["path_count"] == 0
-        assert data["paths"] == []
+        assert isinstance(result, FindJoinPathOutput)
+        assert result.path_count == 0
+        assert result.paths == []
 
     @pytest.mark.asyncio
     async def test_service_instantiated_with_pool(self) -> None:
@@ -514,18 +513,18 @@ class TestFindJoinPath:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="A",
                 to_table="B",
                 from_schema="S",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["path_count"] == 2
-        assert len(data["paths"]) == 2
-        assert data["paths"][0]["length"] == 1
-        assert data["paths"][1]["length"] == 2
+        assert isinstance(result, FindJoinPathOutput)
+        assert result.path_count == 2
+        assert len(result.paths) == 2
+        assert result.paths[0].length == 1
+        assert result.paths[1].length == 2
 
 
 # ---------------------------------------------------------------------------
@@ -586,17 +585,17 @@ class TestGetForeignKeysExtended:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="SHIPMENTS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        fk = data["outgoing"][0]
-        assert fk["source_columns"] == ["COUNTRY_CODE", "POSTAL_CODE"]
-        assert fk["target_columns"] == ["COUNTRY", "POSTAL"]
-        assert fk["delete_rule"] == "RESTRICT"
+        assert isinstance(result, ForeignKeysOutput)
+        fk = result.outgoing[0]
+        assert fk.source_columns == ["COUNTRY_CODE", "POSTAL_CODE"]
+        assert fk.target_columns == ["COUNTRY", "POSTAL"]
+        assert fk.delete_rule == "RESTRICT"
 
     @pytest.mark.asyncio
     async def test_multiple_outgoing_fks(self) -> None:
@@ -630,15 +629,15 @@ class TestGetForeignKeysExtended:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="ORDERS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["outgoing_count"] == 2
-        names = {fk["constraint_name"] for fk in data["outgoing"]}
+        assert isinstance(result, ForeignKeysOutput)
+        assert result.outgoing_count == 2
+        names = {fk.constraint_name for fk in result.outgoing}
         assert names == {"FK_ORDER_CUST", "FK_ORDER_PROD"}
 
     @pytest.mark.asyncio
@@ -683,17 +682,17 @@ class TestGetForeignKeysExtended:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
-            result_json = await get_foreign_keys(
+            result = await get_foreign_keys(
                 table_name="EMPLOYEES",
                 schema_name="HR",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["outgoing_count"] == 1
-        assert data["incoming_count"] == 1
-        assert data["outgoing"][0]["source_table"] == "EMPLOYEES"
-        assert data["outgoing"][0]["target_table"] == "EMPLOYEES"
+        assert isinstance(result, ForeignKeysOutput)
+        assert result.outgoing_count == 1
+        assert result.incoming_count == 1
+        assert result.outgoing[0].source_table == "EMPLOYEES"
+        assert result.outgoing[0].target_table == "EMPLOYEES"
 
 
 class TestFindJoinPathExtended:
@@ -724,7 +723,7 @@ class TestFindJoinPathExtended:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDERS",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
@@ -739,8 +738,8 @@ class TestFindJoinPathExtended:
             to_table="CUSTOMERS",
             max_depth=4,
         )
-        data = json.loads(result_json)
-        assert data["path_count"] == 1
+        assert isinstance(result, FindJoinPathOutput)
+        assert result.path_count == 1
 
     @pytest.mark.asyncio
     async def test_multi_hop_path_with_steps(self) -> None:
@@ -777,22 +776,22 @@ class TestFindJoinPathExtended:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDER_ITEMS",
                 to_table="CUSTOMERS",
                 from_schema="S",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        path_data = data["paths"][0]
-        assert path_data["length"] == 2
-        assert len(path_data["steps"]) == 2
-        assert path_data["steps"][0]["from_table"] == "ORDER_ITEMS"
-        assert path_data["steps"][0]["to_table"] == "ORDERS"
-        assert path_data["steps"][0]["direction"] == "outgoing"
-        assert path_data["steps"][1]["from_table"] == "ORDERS"
-        assert path_data["steps"][1]["to_table"] == "CUSTOMERS"
+        assert isinstance(result, FindJoinPathOutput)
+        path_data = result.paths[0]
+        assert path_data.length == 2
+        assert len(path_data.steps) == 2
+        assert path_data.steps[0].from_table == "ORDER_ITEMS"
+        assert path_data.steps[0].to_table == "ORDERS"
+        assert path_data.steps[0].direction == "outgoing"
+        assert path_data.steps[1].from_table == "ORDERS"
+        assert path_data.steps[1].to_table == "CUSTOMERS"
 
     @pytest.mark.asyncio
     async def test_max_depth_negative_clamped(self) -> None:
@@ -841,16 +840,16 @@ class TestFindJoinPathExtended:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDERS",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert "SELECT *" in data["paths"][0]["sql_example"]
-        assert "JOIN" in data["paths"][0]["sql_example"]
+        assert isinstance(result, FindJoinPathOutput)
+        assert "SELECT *" in result.paths[0].sql_example
+        assert "JOIN" in result.paths[0].sql_example
 
     @pytest.mark.asyncio
     async def test_table_not_found_error(self) -> None:
@@ -871,13 +870,13 @@ class TestFindJoinPathExtended:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=tool_error)
 
-            result_json = await find_join_path(
+            result = await find_join_path(
                 from_table="ORDRS",
                 to_table="CUSTOMERS",
                 from_schema="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "ORDERS" in data["suggestion"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "ORDERS" in result["suggestion"]
