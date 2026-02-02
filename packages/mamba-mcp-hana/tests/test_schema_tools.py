@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -108,7 +107,7 @@ class TestListSchemas:
 
     @pytest.mark.asyncio
     async def test_returns_schemas_json(self) -> None:
-        """Tool returns JSON with schema information."""
+        """Tool returns ListSchemasOutput with schema information."""
         output = _make_list_schemas_output(
             schemas=[
                 SchemaInfo(name="MY_SCHEMA", owner="ADMIN", table_count=10, is_system=False),
@@ -121,13 +120,13 @@ class TestListSchemas:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
-            result_json = await list_schemas(include_system=False, ctx=ctx)
+            result = await list_schemas(include_system=False, ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["count"] == 2
-        assert len(data["schemas"]) == 2
-        assert data["schemas"][0]["name"] == "MY_SCHEMA"
-        assert data["schemas"][1]["name"] == "SALES"
+        assert isinstance(result, ListSchemasOutput)
+        assert result.count == 2
+        assert len(result.schemas) == 2
+        assert result.schemas[0].name == "MY_SCHEMA"
+        assert result.schemas[1].name == "SALES"
 
     @pytest.mark.asyncio
     async def test_include_system_passed_to_service(self) -> None:
@@ -145,7 +144,7 @@ class TestListSchemas:
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="Failed to query schemas",
@@ -158,21 +157,21 @@ class TestListSchemas:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=tool_error)
 
-            result_json = await list_schemas(include_system=False, ctx=ctx)
+            result = await list_schemas(include_system=False, ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert data["tool_name"] == "list_schemas"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert result["tool_name"] == "list_schemas"
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await list_schemas(ctx=None)
+        """Tool returns error dict when no context is provided."""
+        result = await list_schemas(ctx=None)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "list_schemas"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "list_schemas"
 
     @pytest.mark.asyncio
     async def test_service_instantiated_with_pool(self) -> None:
@@ -192,22 +191,22 @@ class TestListSchemas:
 
     @pytest.mark.asyncio
     async def test_service_exception_wrapped_in_error(self) -> None:
-        """Tool catches unexpected exceptions and returns error JSON."""
+        """Tool catches unexpected exceptions and returns error dict."""
         ctx = _make_mock_ctx()
         with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(side_effect=RuntimeError("Unexpected failure"))
 
-            result_json = await list_schemas(ctx=ctx)
+            result = await list_schemas(ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "Unexpected failure" in data["message"]
-        assert data["tool_name"] == "list_schemas"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "Unexpected failure" in result["message"]
+        assert result["tool_name"] == "list_schemas"
 
     @pytest.mark.asyncio
     async def test_returns_empty_schemas_list(self) -> None:
-        """Tool returns valid JSON for empty schema list."""
+        """Tool returns valid output for empty schema list."""
         output = _make_list_schemas_output(schemas=[])
 
         ctx = _make_mock_ctx()
@@ -215,11 +214,11 @@ class TestListSchemas:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
-            result_json = await list_schemas(ctx=ctx)
+            result = await list_schemas(ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["count"] == 0
-        assert data["schemas"] == []
+        assert isinstance(result, ListSchemasOutput)
+        assert result.count == 0
+        assert result.schemas == []
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +231,7 @@ class TestListTables:
 
     @pytest.mark.asyncio
     async def test_returns_tables_json(self) -> None:
-        """Tool returns JSON with table information."""
+        """Tool returns ListTablesOutput with table information."""
         output = _make_list_tables_output(
             tables=[
                 TableInfo(
@@ -260,14 +259,14 @@ class TestListTables:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
-            result_json = await list_tables(schema_name="SALES", ctx=ctx)
+            result = await list_tables(schema_name="SALES", ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["count"] == 2
-        assert data["schema_name"] == "SALES"
-        assert data["tables"][0]["name"] == "ORDERS"
-        assert data["tables"][0]["type"] == "TABLE"
-        assert data["tables"][1]["type"] == "VIEW"
+        assert isinstance(result, ListTablesOutput)
+        assert result.count == 2
+        assert result.schema_name == "SALES"
+        assert result.tables[0].name == "ORDERS"
+        assert result.tables[0].type == "TABLE"
+        assert result.tables[1].type == "VIEW"
 
     @pytest.mark.asyncio
     async def test_passes_all_params_to_service(self) -> None:
@@ -294,7 +293,7 @@ class TestListTables:
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.SCHEMA_NOT_FOUND,
             message="Schema 'BAD_SCHEMA' not found",
@@ -307,21 +306,21 @@ class TestListTables:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=tool_error)
 
-            result_json = await list_tables(schema_name="BAD_SCHEMA", ctx=ctx)
+            result = await list_tables(schema_name="BAD_SCHEMA", ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.SCHEMA_NOT_FOUND
-        assert "not found" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.SCHEMA_NOT_FOUND
+        assert "not found" in result["message"]
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await list_tables(schema_name="SALES", ctx=None)
+        """Tool returns error dict when no context is provided."""
+        result = await list_tables(schema_name="SALES", ctx=None)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "list_tables"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "list_tables"
 
     @pytest.mark.asyncio
     async def test_service_instantiated_with_pool(self) -> None:
@@ -341,17 +340,17 @@ class TestListTables:
 
     @pytest.mark.asyncio
     async def test_service_exception_wrapped_in_error(self) -> None:
-        """Tool catches unexpected exceptions and returns error JSON."""
+        """Tool catches unexpected exceptions and returns error dict."""
         ctx = _make_mock_ctx()
         with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(side_effect=RuntimeError("Connection reset"))
 
-            result_json = await list_tables(schema_name="SALES", ctx=ctx)
+            result = await list_tables(schema_name="SALES", ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "Connection reset" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "Connection reset" in result["message"]
 
 
 # ---------------------------------------------------------------------------
@@ -364,7 +363,7 @@ class TestDescribeTable:
 
     @pytest.mark.asyncio
     async def test_returns_table_structure_json(self) -> None:
-        """Tool returns JSON with columns, indexes, and constraints."""
+        """Tool returns DescribeTableOutput with columns, indexes, and constraints."""
         output = _make_describe_table_output(
             columns=[
                 ColumnInfo(
@@ -403,20 +402,20 @@ class TestDescribeTable:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["table_name"] == "USERS"
-        assert data["schema_name"] == "MY_SCHEMA"
-        assert len(data["columns"]) == 2
-        assert data["columns"][0]["name"] == "ID"
-        assert len(data["indexes"]) == 1
-        assert len(data["constraints"]) == 1
-        assert data["is_view"] is False
+        assert isinstance(result, DescribeTableOutput)
+        assert result.table_name == "USERS"
+        assert result.schema_name == "MY_SCHEMA"
+        assert len(result.columns) == 2
+        assert result.columns[0].name == "ID"
+        assert len(result.indexes) == 1
+        assert len(result.constraints) == 1
+        assert result.is_view is False
 
     @pytest.mark.asyncio
     async def test_passes_all_params_to_service(self) -> None:
@@ -445,7 +444,7 @@ class TestDescribeTable:
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.TABLE_NOT_FOUND,
             message="Table 'MISSING' not found in schema 'MY_SCHEMA'",
@@ -458,29 +457,29 @@ class TestDescribeTable:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=tool_error)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="MISSING",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "not found" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "not found" in result["message"]
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await describe_table(
+        """Tool returns error dict when no context is provided."""
+        result = await describe_table(
             table_name="USERS",
             schema_name="MY_SCHEMA",
             ctx=None,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "describe_table"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "describe_table"
 
     @pytest.mark.asyncio
     async def test_service_instantiated_with_pool(self) -> None:
@@ -504,21 +503,21 @@ class TestDescribeTable:
 
     @pytest.mark.asyncio
     async def test_service_exception_wrapped_in_error(self) -> None:
-        """Tool catches unexpected exceptions and returns error JSON."""
+        """Tool catches unexpected exceptions and returns error dict."""
         ctx = _make_mock_ctx()
         with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(side_effect=RuntimeError("Database error"))
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "Database error" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "Database error" in result["message"]
 
     @pytest.mark.asyncio
     async def test_view_returns_is_view_true(self) -> None:
@@ -533,14 +532,14 @@ class TestDescribeTable:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="USERS_VIEW",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["is_view"] is True
+        assert isinstance(result, DescribeTableOutput)
+        assert result.is_view is True
 
 
 # ---------------------------------------------------------------------------
@@ -553,7 +552,7 @@ class TestGetSampleRows:
 
     @pytest.mark.asyncio
     async def test_returns_sample_rows_json(self) -> None:
-        """Tool returns JSON with sample rows and metadata."""
+        """Tool returns SampleRowsOutput with sample rows and metadata."""
         output = _make_sample_rows_output(
             columns=["ID", "NAME", "EMAIL"],
             rows=[
@@ -568,20 +567,20 @@ class TestGetSampleRows:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 limit=10,
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["table_name"] == "USERS"
-        assert data["schema_name"] == "MY_SCHEMA"
-        assert data["row_count"] == 2
-        assert data["total_count"] == 500
-        assert len(data["columns"]) == 3
-        assert len(data["rows"]) == 2
+        assert isinstance(result, SampleRowsOutput)
+        assert result.table_name == "USERS"
+        assert result.schema_name == "MY_SCHEMA"
+        assert result.row_count == 2
+        assert result.total_count == 500
+        assert len(result.columns) == 3
+        assert len(result.rows) == 2
 
     @pytest.mark.asyncio
     async def test_passes_all_params_to_service(self) -> None:
@@ -614,7 +613,7 @@ class TestGetSampleRows:
 
     @pytest.mark.asyncio
     async def test_handles_service_tool_error(self) -> None:
-        """Tool returns JSON error when service returns ToolError."""
+        """Tool returns error dict when service returns ToolError."""
         tool_error = create_tool_error(
             code=ErrorCode.TABLE_NOT_FOUND,
             message="Table 'MISSING' not found in schema 'MY_SCHEMA'",
@@ -627,29 +626,29 @@ class TestGetSampleRows:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=tool_error)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="MISSING",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "not found" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "not found" in result["message"]
 
     @pytest.mark.asyncio
     async def test_no_context_returns_error(self) -> None:
-        """Tool returns error JSON when no context is provided."""
-        result_json = await get_sample_rows(
+        """Tool returns error dict when no context is provided."""
+        result = await get_sample_rows(
             table_name="USERS",
             schema_name="MY_SCHEMA",
             ctx=None,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "context" in data["message"].lower()
-        assert data["tool_name"] == "get_sample_rows"
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "context" in result["message"].lower()
+        assert result["tool_name"] == "get_sample_rows"
 
     @pytest.mark.asyncio
     async def test_service_instantiated_with_pool(self) -> None:
@@ -673,51 +672,51 @@ class TestGetSampleRows:
 
     @pytest.mark.asyncio
     async def test_service_exception_wrapped_in_error(self) -> None:
-        """Tool catches unexpected exceptions and returns error JSON."""
+        """Tool catches unexpected exceptions and returns error dict."""
         ctx = _make_mock_ctx()
         with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(side_effect=RuntimeError("Timeout"))
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.CONNECTION_ERROR
-        assert "Timeout" in data["message"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.CONNECTION_ERROR
+        assert "Timeout" in result["message"]
 
     @pytest.mark.asyncio
     async def test_limit_below_range_returns_error(self) -> None:
         """Tool returns PARAMETER_ERROR when limit < 1."""
         ctx = _make_mock_ctx()
-        result_json = await get_sample_rows(
+        result = await get_sample_rows(
             table_name="USERS",
             schema_name="MY_SCHEMA",
             limit=0,
             ctx=ctx,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.PARAMETER_ERROR
-        assert "limit" in data["message"].lower()
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.PARAMETER_ERROR
+        assert "limit" in result["message"].lower()
 
     @pytest.mark.asyncio
     async def test_limit_above_range_returns_error(self) -> None:
         """Tool returns PARAMETER_ERROR when limit > 100."""
         ctx = _make_mock_ctx()
-        result_json = await get_sample_rows(
+        result = await get_sample_rows(
             table_name="USERS",
             schema_name="MY_SCHEMA",
             limit=101,
             ctx=ctx,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.PARAMETER_ERROR
-        assert "limit" in data["message"].lower()
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.PARAMETER_ERROR
+        assert "limit" in result["message"].lower()
 
     @pytest.mark.asyncio
     async def test_limit_at_boundaries_accepted(self) -> None:
@@ -730,24 +729,22 @@ class TestGetSampleRows:
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
             # Test limit=1
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 limit=1,
                 ctx=ctx,
             )
-            data = json.loads(result_json)
-            assert "code" not in data  # Not an error
+            assert isinstance(result, SampleRowsOutput)
 
             # Test limit=100
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 limit=100,
                 ctx=ctx,
             )
-            data = json.loads(result_json)
-            assert "code" not in data  # Not an error
+            assert isinstance(result, SampleRowsOutput)
 
     @pytest.mark.asyncio
     async def test_empty_table_returns_empty_rows(self) -> None:
@@ -763,16 +760,16 @@ class TestGetSampleRows:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="EMPTY_TABLE",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["row_count"] == 0
-        assert data["rows"] == []
-        assert data["total_count"] == 0
+        assert isinstance(result, SampleRowsOutput)
+        assert result.row_count == 0
+        assert result.rows == []
+        assert result.total_count == 0
 
 
 # ---------------------------------------------------------------------------
@@ -827,11 +824,11 @@ class TestListSchemasExtended:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
-            result_json = await list_schemas(include_system=True, ctx=ctx)
+            result = await list_schemas(include_system=True, ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["count"] == 3
-        names = [s["name"] for s in data["schemas"]]
+        assert isinstance(result, ListSchemasOutput)
+        assert result.count == 3
+        names = [s.name for s in result.schemas]
         assert "SYS" in names
         assert "_SYS_BIC" in names
         assert "MY_SCHEMA" in names
@@ -849,12 +846,12 @@ class TestListSchemasExtended:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
-            result_json = await list_schemas(ctx=ctx)
+            result = await list_schemas(ctx=ctx)
 
         mock_service.list_schemas.assert_awaited_once_with(include_system=False)
-        data = json.loads(result_json)
-        assert data["count"] == 1
-        assert data["schemas"][0]["name"] == "MY_SCHEMA"
+        assert isinstance(result, ListSchemasOutput)
+        assert result.count == 1
+        assert result.schemas[0].name == "MY_SCHEMA"
 
     @pytest.mark.asyncio
     async def test_is_system_flag_in_output(self) -> None:
@@ -870,12 +867,12 @@ class TestListSchemasExtended:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
-            result_json = await list_schemas(include_system=True, ctx=ctx)
+            result = await list_schemas(include_system=True, ctx=ctx)
 
-        data = json.loads(result_json)
-        schema_map = {s["name"]: s for s in data["schemas"]}
-        assert schema_map["SYS"]["is_system"] is True
-        assert schema_map["APP"]["is_system"] is False
+        assert isinstance(result, ListSchemasOutput)
+        schema_map = {s.name: s for s in result.schemas}
+        assert schema_map["SYS"].is_system is True
+        assert schema_map["APP"].is_system is False
 
 
 class TestListTablesExtended:
@@ -901,7 +898,7 @@ class TestListTablesExtended:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
-            result_json = await list_tables(
+            result = await list_tables(
                 schema_name="SALES",
                 include_views=False,
                 ctx=ctx,
@@ -912,9 +909,9 @@ class TestListTablesExtended:
             include_views=False,
             name_pattern=None,
         )
-        data = json.loads(result_json)
-        assert data["count"] == 1
-        assert all(t["type"] == "TABLE" for t in data["tables"])
+        assert isinstance(result, ListTablesOutput)
+        assert result.count == 1
+        assert all(t.type == "TABLE" for t in result.tables)
 
     @pytest.mark.asyncio
     async def test_name_pattern_filter_passed(self) -> None:
@@ -936,7 +933,7 @@ class TestListTablesExtended:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
-            result_json = await list_tables(
+            result = await list_tables(
                 schema_name="MY_SCHEMA",
                 name_pattern="USER%",
                 ctx=ctx,
@@ -947,9 +944,9 @@ class TestListTablesExtended:
             include_views=True,
             name_pattern="USER%",
         )
-        data = json.loads(result_json)
-        assert data["count"] == 1
-        assert data["tables"][0]["name"] == "USER_ROLES"
+        assert isinstance(result, ListTablesOutput)
+        assert result.count == 1
+        assert result.tables[0].name == "USER_ROLES"
 
     @pytest.mark.asyncio
     async def test_schema_not_found_fuzzy_suggestion(self) -> None:
@@ -967,11 +964,11 @@ class TestListTablesExtended:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=tool_error)
 
-            result_json = await list_tables(schema_name="PRODCTN", ctx=ctx)
+            result = await list_tables(schema_name="PRODCTN", ctx=ctx)
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.SCHEMA_NOT_FOUND
-        assert "PRODUCTION" in data["suggestion"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.SCHEMA_NOT_FOUND
+        assert "PRODUCTION" in result["suggestion"]
 
     @pytest.mark.asyncio
     async def test_store_type_in_output(self) -> None:
@@ -1009,15 +1006,15 @@ class TestListTablesExtended:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
-            result_json = await list_tables(schema_name="MY_SCHEMA", ctx=ctx)
+            result = await list_tables(schema_name="MY_SCHEMA", ctx=ctx)
 
-        data = json.loads(result_json)
-        tbl_map = {t["name"]: t for t in data["tables"]}
-        assert tbl_map["COL_TABLE"]["store_type"] == "COLUMN"
-        assert tbl_map["COL_TABLE"]["is_column_table"] is True
-        assert tbl_map["ROW_TABLE"]["store_type"] == "ROW"
-        assert tbl_map["ROW_TABLE"]["is_column_table"] is False
-        assert tbl_map["MY_VIEW"]["store_type"] is None
+        assert isinstance(result, ListTablesOutput)
+        tbl_map = {t.name: t for t in result.tables}
+        assert tbl_map["COL_TABLE"].store_type == "COLUMN"
+        assert tbl_map["COL_TABLE"].is_column_table is True
+        assert tbl_map["ROW_TABLE"].store_type == "ROW"
+        assert tbl_map["ROW_TABLE"].is_column_table is False
+        assert tbl_map["MY_VIEW"].store_type is None
 
 
 class TestDescribeTableExtended:
@@ -1042,17 +1039,17 @@ class TestDescribeTableExtended:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="ACTIVE_USERS",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["is_view"] is True
-        assert data["indexes"] == []
-        assert data["constraints"] == []
-        assert len(data["columns"]) == 2
+        assert isinstance(result, DescribeTableOutput)
+        assert result.is_view is True
+        assert result.indexes == []
+        assert result.constraints == []
+        assert len(result.columns) == 2
 
     @pytest.mark.asyncio
     async def test_multi_column_index_in_output(self) -> None:
@@ -1074,18 +1071,18 @@ class TestDescribeTableExtended:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="ORDERS",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert len(data["indexes"]) == 1
-        idx = data["indexes"][0]
-        assert idx["name"] == "IDX_USER_STATUS"
-        assert idx["columns"] == ["USER_ID", "STATUS"]
-        assert idx["is_unique"] is False
+        assert isinstance(result, DescribeTableOutput)
+        assert len(result.indexes) == 1
+        idx = result.indexes[0]
+        assert idx.name == "IDX_USER_STATUS"
+        assert idx.columns == ["USER_ID", "STATUS"]
+        assert idx.is_unique is False
 
     @pytest.mark.asyncio
     async def test_table_not_found_fuzzy_suggestion(self) -> None:
@@ -1103,15 +1100,15 @@ class TestDescribeTableExtended:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=tool_error)
 
-            result_json = await describe_table(
+            result = await describe_table(
                 table_name="CUSTMERS",
                 schema_name="SALES",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "CUSTOMERS" in data["suggestion"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "CUSTOMERS" in result["suggestion"]
 
     @pytest.mark.asyncio
     async def test_include_indexes_false_skips_indexes(self) -> None:
@@ -1156,7 +1153,7 @@ class TestGetSampleRowsExtended:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 columns=["ID", "EMAIL"],
@@ -1171,8 +1168,8 @@ class TestGetSampleRowsExtended:
             where_clause=None,
             randomize=False,
         )
-        data = json.loads(result_json)
-        assert data["columns"] == ["ID", "EMAIL"]
+        assert isinstance(result, SampleRowsOutput)
+        assert result.columns == ["ID", "EMAIL"]
 
     @pytest.mark.asyncio
     async def test_where_clause_passed_to_service(self) -> None:
@@ -1187,7 +1184,7 @@ class TestGetSampleRowsExtended:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USERS",
                 schema_name="MY_SCHEMA",
                 where_clause="STATUS = 'ACTIVE'",
@@ -1196,8 +1193,8 @@ class TestGetSampleRowsExtended:
 
         call_kwargs = mock_service.get_sample_rows.call_args.kwargs
         assert call_kwargs["where_clause"] == "STATUS = 'ACTIVE'"
-        data = json.loads(result_json)
-        assert data["row_count"] == 1
+        assert isinstance(result, SampleRowsOutput)
+        assert result.row_count == 1
 
     @pytest.mark.asyncio
     async def test_randomize_passed_to_service(self) -> None:
@@ -1235,30 +1232,30 @@ class TestGetSampleRowsExtended:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=tool_error)
 
-            result_json = await get_sample_rows(
+            result = await get_sample_rows(
                 table_name="USRES",
                 schema_name="MY_SCHEMA",
                 ctx=ctx,
             )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.TABLE_NOT_FOUND
-        assert "USERS" in data["suggestion"]
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.TABLE_NOT_FOUND
+        assert "USERS" in result["suggestion"]
 
     @pytest.mark.asyncio
     async def test_negative_limit_returns_error(self) -> None:
         """Tool returns PARAMETER_ERROR when limit is negative."""
         ctx = _make_mock_ctx()
-        result_json = await get_sample_rows(
+        result = await get_sample_rows(
             table_name="USERS",
             schema_name="MY_SCHEMA",
             limit=-5,
             ctx=ctx,
         )
 
-        data = json.loads(result_json)
-        assert data["code"] == ErrorCode.PARAMETER_ERROR
-        assert "limit" in data["message"].lower()
+        assert isinstance(result, dict)
+        assert result["code"] == ErrorCode.PARAMETER_ERROR
+        assert "limit" in result["message"].lower()
 
     @pytest.mark.asyncio
     async def test_combined_options(self) -> None:

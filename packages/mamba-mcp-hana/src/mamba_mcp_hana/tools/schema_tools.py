@@ -2,7 +2,7 @@
 
 Registers 4 MCP tools for schema discovery operations with the FastMCP
 server instance. Each tool extracts the connection pool from the server
-context, delegates to SchemaService, and returns JSON-serialized output.
+context, delegates to SchemaService, and returns typed output models.
 
 Based on Spec Section 5.1, 9.2.
 """
@@ -18,6 +18,12 @@ from mcp.types import ToolAnnotations
 
 from mamba_mcp_hana.database.schema_service import SchemaService
 from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.schema import (
+    DescribeTableOutput,
+    ListSchemasOutput,
+    ListTablesOutput,
+    SampleRowsOutput,
+)
 from mamba_mcp_hana.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
@@ -34,7 +40,7 @@ logger = logging.getLogger(__name__)
 async def list_schemas(
     include_system: bool = False,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ListSchemasOutput | dict[str, Any]:
     """List all database schemas in the SAP HANA instance.
 
     Enumerates available schemas with their names, owners, and table counts.
@@ -45,7 +51,7 @@ async def list_schemas(
         include_system: Include system schemas in the listing. Default: False
 
     Returns:
-        JSON string with schema information including names, owners, and table counts.
+        Schema information including names, owners, and table counts.
 
     Example:
         list_schemas() -> {"schemas": [{"name": "MY_SCHEMA", ...}], "count": 1}
@@ -54,12 +60,11 @@ async def list_schemas(
 
     if ctx is None:
         logger.error("list_schemas: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="list_schemas",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = SchemaService(app_ctx.pool)
@@ -68,18 +73,17 @@ async def list_schemas(
         result = await service.list_schemas(include_system=include_system)
     except Exception as exc:
         logger.error("list_schemas failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to list schemas: {exc}",
             tool_name="list_schemas",
             input_received={"include_system": include_system},
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool(
@@ -95,7 +99,7 @@ async def list_tables(
     include_views: bool = True,
     name_pattern: str | None = None,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> ListTablesOutput | dict[str, Any]:
     """List all tables and views in a specific SAP HANA schema.
 
     Returns tables and optionally views with metadata including record counts,
@@ -108,7 +112,7 @@ async def list_tables(
         name_pattern: Optional SQL LIKE pattern to filter table names (e.g., 'USER%').
 
     Returns:
-        JSON string with table information including names, types, and record counts.
+        Table information including names, types, and record counts.
 
     Example:
         list_tables(schema_name="MY_SCHEMA") -> {"tables": [...], "count": 15}
@@ -122,12 +126,11 @@ async def list_tables(
 
     if ctx is None:
         logger.error("list_tables: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="list_tables",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = SchemaService(app_ctx.pool)
@@ -140,7 +143,7 @@ async def list_tables(
         )
     except Exception as exc:
         logger.error("list_tables failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to list tables: {exc}",
             tool_name="list_tables",
@@ -149,13 +152,12 @@ async def list_tables(
                 "include_views": include_views,
                 "name_pattern": name_pattern,
             },
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool(
@@ -172,7 +174,7 @@ async def describe_table(
     include_indexes: bool = True,
     include_constraints: bool = True,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> DescribeTableOutput | dict[str, Any]:
     """Get detailed structure of a SAP HANA table or view.
 
     Returns comprehensive table information including columns with data types,
@@ -186,7 +188,7 @@ async def describe_table(
         include_constraints: Include constraint information. Default: True
 
     Returns:
-        JSON string with columns, indexes, and constraints.
+        Table structure with columns, indexes, and constraints.
 
     Example:
         describe_table(table_name="USERS", schema_name="MY_SCHEMA")
@@ -202,12 +204,11 @@ async def describe_table(
 
     if ctx is None:
         logger.error("describe_table: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="describe_table",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = SchemaService(app_ctx.pool)
@@ -221,7 +222,7 @@ async def describe_table(
         )
     except Exception as exc:
         logger.error("describe_table failed: %s", exc)
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to describe table: {exc}",
             tool_name="describe_table",
@@ -231,13 +232,12 @@ async def describe_table(
                 "include_indexes": include_indexes,
                 "include_constraints": include_constraints,
             },
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
 
 
 @mcp.tool(
@@ -256,7 +256,7 @@ async def get_sample_rows(
     where_clause: str | None = None,
     randomize: bool = False,
     ctx: Context[ServerSession, AppContext] | None = None,
-) -> str:
+) -> SampleRowsOutput | dict[str, Any]:
     """Get sample rows from a SAP HANA table.
 
     Retrieves example rows to understand data patterns, formats, and values.
@@ -272,7 +272,7 @@ async def get_sample_rows(
         randomize: Randomize row selection (slower on large tables). Default: False
 
     Returns:
-        JSON string with sample rows, column names, and total row count.
+        Sample rows with column names and total row count.
 
     Example:
         get_sample_rows(table_name="ORDERS", schema_name="MY_SCHEMA", limit=5)
@@ -287,22 +287,20 @@ async def get_sample_rows(
 
     if ctx is None:
         logger.error("get_sample_rows: No context available")
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message="No server context available",
             tool_name="get_sample_rows",
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     # Validate limit range before calling service
     if limit < 1 or limit > 100:
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.PARAMETER_ERROR,
             message=f"limit must be between 1 and 100, got {limit}",
             tool_name="get_sample_rows",
             input_received={"table_name": table_name, "schema_name": schema_name, "limit": limit},
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     app_ctx = ctx.request_context.lifespan_context
     service = SchemaService(app_ctx.pool)
@@ -330,15 +328,14 @@ async def get_sample_rows(
         if randomize:
             input_received["randomize"] = randomize
 
-        error = create_tool_error(
+        return create_tool_error(
             code=ErrorCode.CONNECTION_ERROR,
             message=f"Failed to get sample rows: {exc}",
             tool_name="get_sample_rows",
             input_received=input_received,
-        )
-        return error.model_dump_json()
+        ).model_dump()
 
     if isinstance(result, ToolError):
-        return result.model_dump_json()
+        return result.model_dump()
 
-    return result.model_dump_json()
+    return result
