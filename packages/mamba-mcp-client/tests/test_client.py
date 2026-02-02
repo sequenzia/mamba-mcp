@@ -1,7 +1,6 @@
 """Tests for the MCPTestClient."""
 
 import pytest
-
 from mamba_mcp_client.client import MCPTestClient, ServerCapabilities, ServerInfo
 from mamba_mcp_client.config import (
     ClientConfig,

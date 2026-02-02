@@ -44,9 +44,7 @@ class TestAppContext:
 class TestAppLifespan:
     """Tests for the app_lifespan async context manager."""
 
-    async def test_creates_engine_and_yields_context(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_creates_engine_and_yields_context(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test that lifespan creates engine and yields AppContext on success."""
         monkeypatch.setenv("MAMBA_MCP_PG_DB_NAME", "testdb")
         monkeypatch.setenv("MAMBA_MCP_PG_DB_USER", "testuser")
@@ -69,9 +67,7 @@ class TestAppLifespan:
 
             mock_dispose.assert_called_once_with(mock_engine)
 
-    async def test_disposes_engine_on_exit(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_disposes_engine_on_exit(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test that engine is disposed when context manager exits normally."""
         monkeypatch.setenv("MAMBA_MCP_PG_DB_NAME", "testdb")
         monkeypatch.setenv("MAMBA_MCP_PG_DB_USER", "testuser")

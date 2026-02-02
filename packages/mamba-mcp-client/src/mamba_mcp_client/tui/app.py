@@ -36,13 +36,13 @@ class ServerInfoPanel(Static):
             info = client.server_info
             text = f"""[bold]Server:[/] {info.name} v{info.version}
 [bold]Protocol:[/] {info.protocol_version}
-[bold]Instructions:[/] {info.instructions or 'None'}
+[bold]Instructions:[/] {info.instructions or "None"}
 
 [bold]Capabilities:[/]
-  Tools: {'Yes' if info.capabilities and info.capabilities.tools else 'No'}
-  Resources: {'Yes' if info.capabilities and info.capabilities.resources else 'No'}
-  Prompts: {'Yes' if info.capabilities and info.capabilities.prompts else 'No'}
-  Logging: {'Yes' if info.capabilities and info.capabilities.logging else 'No'}"""
+  Tools: {"Yes" if info.capabilities and info.capabilities.tools else "No"}
+  Resources: {"Yes" if info.capabilities and info.capabilities.resources else "No"}
+  Prompts: {"Yes" if info.capabilities and info.capabilities.prompts else "No"}
+  Logging: {"Yes" if info.capabilities and info.capabilities.logging else "No"}"""
             self.update(text)
         else:
             self.update("[dim]Not connected[/]")
@@ -407,9 +407,7 @@ class MCPTestApp(App[None]):
                 info_panel = self.query_one("#server-info", ServerInfoPanel)
                 info_panel.update_info(self.client)
 
-                server_name = (
-                    self.client.server_info.name if self.client.server_info else "server"
-                )
+                server_name = self.client.server_info.name if self.client.server_info else "server"
                 result_panel.write_info(f"Connected to {server_name}")
 
                 # Load capabilities

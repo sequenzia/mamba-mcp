@@ -193,7 +193,8 @@ class MCPLogger:
             MessageDirection.NOTIFICATION: "yellow",
         }
 
-        title = f"[{direction_color[entry.direction]}]{entry.direction.value.upper()}[/] - {entry.method}"
+        color = direction_color[entry.direction]
+        title = f"[{color}]{entry.direction.value.upper()}[/] - {entry.method}"
         if entry.duration_ms:
             title += f" ({entry.duration_ms:.2f}ms)"
 

@@ -92,7 +92,7 @@ async def list_buckets(
         # Access the underlying botocore client to list buckets.
         # s3fs wraps botocore and exposes it via .s3 attribute on the
         # S3FileSystem instance. The S3Backend exposes this via .fs property.
-        raw_response = s3_backend.fs.s3.list_buckets()
+        raw_response = s3_backend.fs.s3.list_buckets()  # type: ignore[attr-defined]
 
         raw_buckets = raw_response.get("Buckets", [])
         region = app_ctx.settings.s3.region
@@ -253,7 +253,7 @@ async def get_presigned_url(
 
         # Generate the presigned URL via the botocore client
         # s3fs exposes the botocore client via .s3 attribute
-        botocore_client = s3_backend.fs.s3
+        botocore_client = s3_backend.fs.s3  # type: ignore[attr-defined]
 
         if operation == "download":
             client_method = "get_object"
@@ -412,7 +412,7 @@ async def get_object_metadata(
             )
 
         # Access the botocore client via s3fs
-        botocore_client = s3_backend.fs.s3
+        botocore_client = s3_backend.fs.s3  # type: ignore[attr-defined]
 
         # 1. HeadObject for core metadata
         try:

@@ -6,7 +6,7 @@ import shlex
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from dotenv import load_dotenv
@@ -51,25 +51,26 @@ class LogLevel(str, Enum):
 
 # Type aliases for reusable options
 StdioOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
-        "--stdio", "-s",
+        "--stdio",
+        "-s",
         help="Connect via stdio: 'command arg1 arg2...' (quote the entire command)",
     ),
 ]
 
 SseOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option("--sse", help="Connect via SSE to URL"),
 ]
 
 HttpOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option("--http", help="Connect via Streamable HTTP to URL"),
 ]
 
 UvOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--uv",
         help="Connect to UV-installed MCP server (e.g., 'mcp-server-filesystem')",
@@ -77,7 +78,7 @@ UvOpt = Annotated[
 ]
 
 UvLocalPathOpt = Annotated[
-    Optional[Path],
+    Path | None,
     typer.Option(
         "--uv-local-path",
         help="Project path for local UV-based MCP server",
@@ -85,7 +86,7 @@ UvLocalPathOpt = Annotated[
 ]
 
 UvLocalNameOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--uv-local-name",
         help="Server name for local UV-based MCP server",
@@ -93,12 +94,12 @@ UvLocalNameOpt = Annotated[
 ]
 
 PythonOpt = Annotated[
-    Optional[str],
+    str | None,
     typer.Option("--python", help="Python version for UV modes (e.g., '3.11')"),
 ]
 
 WithOpt = Annotated[
-    Optional[list[str]],
+    list[str] | None,
     typer.Option("--with", help="Additional packages for UV modes (repeatable)"),
 ]
 
@@ -119,12 +120,12 @@ OutputOpt = Annotated[
 
 
 def validate_connection_options(
-    stdio: Optional[str],
-    sse: Optional[str],
-    http: Optional[str],
-    uv: Optional[str],
-    uv_local_path: Optional[Path],
-    uv_local_name: Optional[str],
+    stdio: str | None,
+    sse: str | None,
+    http: str | None,
+    uv: str | None,
+    uv_local_path: Path | None,
+    uv_local_name: str | None,
 ) -> None:
     """Ensure exactly one connection method is specified."""
     # Count connection methods
@@ -139,32 +140,32 @@ def validate_connection_options(
 
     if count == 0:
         raise typer.BadParameter(
-            "Must specify a connection method: --stdio, --sse, --http, --uv, or --uv-local-path/--uv-local-name"
+            "Must specify a connection method: --stdio, --sse, --http, --uv,"
+            " or --uv-local-path/--uv-local-name"
         )
 
     if count > 1:
         raise typer.BadParameter(
-            "Only one connection method allowed: --stdio, --sse, --http, --uv, or --uv-local-path/--uv-local-name"
+            "Only one connection method allowed: --stdio, --sse, --http, --uv,"
+            " or --uv-local-path/--uv-local-name"
         )
 
     # Check uv-local-path and uv-local-name are used together
     if (uv_local_path is not None) != (uv_local_name is not None):
-        raise typer.BadParameter(
-            "--uv-local-path and --uv-local-name must be used together"
-        )
+        raise typer.BadParameter("--uv-local-path and --uv-local-name must be used together")
 
 
 def build_config(
-    stdio: Optional[str],
-    sse: Optional[str],
-    http: Optional[str],
-    uv: Optional[str],
-    uv_local_path: Optional[Path],
-    uv_local_name: Optional[str],
-    python_version: Optional[str],
-    with_packages: Optional[list[str]],
+    stdio: str | None,
+    sse: str | None,
+    http: str | None,
+    uv: str | None,
+    uv_local_path: Path | None,
+    uv_local_name: str | None,
+    python_version: str | None,
+    with_packages: list[str] | None,
     timeout: float,
-    extra_args: Optional[list[str]] = None,
+    extra_args: list[str] | None = None,
 ) -> ClientConfig:
     """Build a ClientConfig from parsed options."""
     if stdio:
@@ -214,8 +215,10 @@ def main_callback(
         ),
     ] = False,
     env: Annotated[
-        Optional[Path],
-        typer.Option("--env-file", "-e", help="Path to env file (default: ./mamba.env or ~/mamba.env)"),
+        Path | None,
+        typer.Option(
+            "--env-file", "-e", help="Path to env file (default: ./mamba.env or ~/mamba.env)"
+        ),
     ] = None,
 ) -> None:
     """MCP Client for testing and debugging MCP Servers."""
@@ -243,7 +246,15 @@ def tui(
     """Launch the interactive TUI."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     app_tui = MCPTestApp(config)
@@ -268,7 +279,15 @@ def connect(
     """Connect and inspect server."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_connect(config, output))
@@ -347,7 +366,15 @@ def tools(
     """List available tools."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_tools(config, output))
@@ -393,7 +420,15 @@ def resources(
     """List available resources."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_resources(config, output))
@@ -445,7 +480,15 @@ def prompts(
     """List available prompts."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_prompts(config, output))
@@ -493,15 +536,21 @@ def call(
     """Call a tool."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_call(config, output, tool_name, args))
 
 
-async def _cmd_call(
-    config: ClientConfig, output: OutputFormat, tool_name: str, args: str
-) -> None:
+async def _cmd_call(config: ClientConfig, output: OutputFormat, tool_name: str, args: str) -> None:
     """Call a tool."""
     client = MCPTestClient(config)
 
@@ -556,7 +605,15 @@ def read(
     """Read a resource."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_read(config, output, uri))
@@ -595,12 +652,22 @@ def prompt(
     timeout: TimeoutOpt = 30.0,
     log_level: LogLevelOpt = LogLevel.INFO,
     output: OutputOpt = OutputFormat.rich,
-    args: Annotated[str, typer.Option("--args", "-a", help="Prompt arguments as JSON string")] = "{}",
+    args: Annotated[
+        str, typer.Option("--args", "-a", help="Prompt arguments as JSON string")
+    ] = "{}",
 ) -> None:
     """Get a prompt."""
     validate_connection_options(stdio, sse, http, uv, uv_local_path, uv_local_name)
     config = build_config(
-        stdio, sse, http, uv, uv_local_path, uv_local_name, python, with_packages, timeout,
+        stdio,
+        sse,
+        http,
+        uv,
+        uv_local_path,
+        uv_local_name,
+        python,
+        with_packages,
+        timeout,
         extra_args=ctx.args,
     )
     asyncio.run(_cmd_prompt(config, output, prompt_name, args))

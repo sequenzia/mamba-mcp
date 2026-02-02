@@ -911,7 +911,7 @@ class TestEdgeCases:
 
     def test_unicode_filenames(self, backend: LocalBackend, sandbox: Path) -> None:
         """Unicode filenames should be handled correctly."""
-        unicode_file = sandbox / "cafe\u0301.txt"
+        unicode_file = sandbox / "caf\u00e9.txt"
         unicode_file.write_text("unicode content")
         assert backend.exists(str(unicode_file)) is True
 

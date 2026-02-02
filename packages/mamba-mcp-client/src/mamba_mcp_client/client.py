@@ -1,8 +1,9 @@
 """Core MCP test client implementation wrapping FastMCP Client."""
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator
+from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from fastmcp import Client
@@ -11,7 +12,7 @@ from mcp import types as mcp_types
 from pydantic import AnyUrl
 
 from mamba_mcp_client.config import ClientConfig, TransportType
-from mamba_mcp_client.logging import MCPLogger
+from mamba_mcp_client.logging import MCPLogEntry, MCPLogger
 
 
 @dataclass
@@ -53,7 +54,7 @@ class ServerInfo:
         return cls(
             name=result.serverInfo.name,
             version=result.serverInfo.version,
-            protocol_version=result.protocolVersion,
+            protocol_version=str(result.protocolVersion),
             instructions=result.instructions,
             capabilities=ServerCapabilities.from_init_result(result),
         )
@@ -183,16 +184,16 @@ class MCPTestClient:
                 raise ValueError("UV-local configuration required for uv_local transport")
             from fastmcp.client.transports import UvxStdioTransport
 
-            cfg = self.config.uv_local
+            uv_local_cfg = self.config.uv_local
             # Combine config args with extra_args
-            combined_args = list(cfg.args) + extra_args
+            combined_args = list(uv_local_cfg.args) + extra_args
             return UvxStdioTransport(
-                tool_name=cfg.server_name,
+                tool_name=uv_local_cfg.server_name,
                 tool_args=combined_args or None,
-                from_package=cfg.project_path,
-                python_version=cfg.python_version,
-                with_packages=cfg.with_packages or None,
-                env_vars=cfg.env or None,
+                from_package=uv_local_cfg.project_path,
+                python_version=uv_local_cfg.python_version,
+                with_packages=uv_local_cfg.with_packages or None,
+                env_vars=uv_local_cfg.env or None,
             )
         elif self.config.transport_type in (TransportType.SSE, TransportType.HTTP):
             if not self.config.http:
@@ -279,9 +280,7 @@ class MCPTestClient:
 
         try:
             await client.unsubscribe_resource(AnyUrl(uri))
-            self.logger.log_response(
-                "resources/unsubscribe", {"unsubscribed": True}, request_entry
-            )
+            self.logger.log_response("resources/unsubscribe", {"unsubscribed": True}, request_entry)
         except Exception as e:
             self.logger.log_response("resources/unsubscribe", {}, request_entry, error=str(e))
             raise
@@ -333,9 +332,7 @@ class MCPTestClient:
             self.logger.log_response("tools/list", {}, request_entry, error=str(e))
             raise
 
-    async def call_tool(
-        self, name: str, arguments: dict[str, Any] | None = None
-    ) -> ToolCallResult:
+    async def call_tool(self, name: str, arguments: dict[str, Any] | None = None) -> ToolCallResult:
         """Call a tool with the given arguments."""
         client = self._ensure_connected()
         args = arguments or {}
@@ -438,7 +435,7 @@ class MCPTestClient:
 
     # ==================== Logging ====================
 
-    def get_log_entries(self) -> list:
+    def get_log_entries(self) -> list[MCPLogEntry]:
         """Get all MCP protocol log entries."""
         return self.logger.get_entries()
 

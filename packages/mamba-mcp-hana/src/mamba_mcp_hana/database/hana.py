@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 import fnmatch
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from mamba_mcp_hana.database.connection import HanaConnectionPool
 from mamba_mcp_hana.errors import (
@@ -464,7 +464,7 @@ class HanaService:
                 else bool(is_preload_raw)
             )
 
-            store_type = "COLUMN" if is_column else "ROW"
+            store_type: Literal["COLUMN", "ROW"] = "COLUMN" if is_column else "ROW"
             implications = COLUMN_STORE_IMPLICATIONS if is_column else ROW_STORE_IMPLICATIONS
 
             # Get partition count if partitioned
@@ -575,7 +575,7 @@ class HanaService:
                         (schema_name, proc_name),
                     )
                     for param_row in param_rows:
-                        param_direction = param_row[2] or "IN"
+                        param_direction: Literal["IN", "OUT", "INOUT"] = param_row[2] or "IN"
                         parameters.append(
                             ProcedureParameterInfo(
                                 name=param_row[0],

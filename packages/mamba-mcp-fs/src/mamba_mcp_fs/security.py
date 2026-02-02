@@ -133,6 +133,7 @@ class SecurityValidator:
         self._s3 = s3_settings
 
         # Pre-compute the resolved base path for local backend
+        self._resolved_base: Path | None
         if local_settings is not None and local_settings.base_path:
             self._resolved_base = Path(local_settings.base_path).resolve()
         else:
@@ -250,8 +251,7 @@ class SecurityValidator:
         if self._denied_extensions is not None:
             if ext in self._denied_extensions:
                 raise PermissionDeniedError(
-                    f"Extension '{ext}' is in the denied list: "
-                    f"{sorted(self._denied_extensions)}"
+                    f"Extension '{ext}' is in the denied list: {sorted(self._denied_extensions)}"
                 )
 
     def check_file_size(self, size: int, backend: str) -> None:
@@ -277,9 +277,7 @@ class SecurityValidator:
                 f"File size {size} bytes exceeds maximum {max_size} bytes for {backend} backend"
             )
 
-    def filter_hidden(
-        self, entries: list[str], include_hidden: bool | None = None
-    ) -> list[str]:
+    def filter_hidden(self, entries: list[str], include_hidden: bool | None = None) -> list[str]:
         """Filter hidden files from a list of file/directory names.
 
         Uses the local backend's ``show_hidden`` setting as the default.

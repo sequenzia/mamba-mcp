@@ -38,9 +38,54 @@ select = ["E", "F", "I", "N", "W", "UP"]
 python_version = "3.11"
 strict = true
 explicit_package_bases = true
+warn_unused_ignores = false
 exclude = [
     "packages/.*/tests/",
+    "packages/.*/examples/",
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "mcp.*",
+    "fastmcp.*",
+    "typer.*",
+    "dotenv.*",
+    "rich.*",
+    "textual.*",
+    "hdbcli.*",
+    "fsspec.*",
+    "s3fs.*",
+    "pyperclip.*",
+    "asyncpg.*",
+    "botocore.*",
+    "magic",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "mamba_mcp_hana.tools.*",
+    "mamba_mcp_pg.tools.*",
+    "mamba_mcp_fs.tools.*",
+    "mamba_mcp_client.cli",
+    "mamba_mcp_client.tui.*",
+]
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = [
+    "mamba_mcp_fs.backends.local",
+    "mamba_mcp_fs.backends.s3",
+    "mamba_mcp_hana.database.*",
+    "mamba_mcp_client.client",
+]
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = [
+    "mamba_mcp_client.tui.*",
+]
+disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

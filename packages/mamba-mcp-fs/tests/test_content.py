@@ -157,9 +157,7 @@ class TestDetectMimeTypeMagicFallback:
 
     def test_magic_exception_handled_gracefully(self) -> None:
         """If python-magic raises, detection falls back gracefully."""
-        with patch(
-            "mamba_mcp_fs.content._try_magic_detect", return_value=None
-        ):
+        with patch("mamba_mcp_fs.content._try_magic_detect", return_value=None):
             result = detect_mime_type("unknown_file", content=b"text content here")
             assert result == "text/plain"
 

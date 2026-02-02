@@ -16,7 +16,7 @@ import os
 import re
 import time
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
 from mcp.server.fastmcp import Context
 from mcp.server.session import ServerSession
@@ -365,7 +365,7 @@ def _encode_content(
     text_encoding: str,
     force_text: bool,
     force_base64: bool,
-) -> tuple[str, str]:
+) -> tuple[str, Literal["text", "base64"]]:
     """Encode raw file content based on smart content detection.
 
     Smart detection flow:

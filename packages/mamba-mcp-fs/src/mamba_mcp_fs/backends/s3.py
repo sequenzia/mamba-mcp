@@ -17,7 +17,7 @@ import s3fs
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from mamba_mcp_fs.config import S3Settings
-from mamba_mcp_fs.errors import BackendError, PathNotFoundError
+from mamba_mcp_fs.errors import BackendError, FSError, PathNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ def _to_s3_path(bucket: str, key: str) -> str:
     return bucket
 
 
-def _map_s3_error(exc: ClientError, path: str) -> BackendError:
+def _map_s3_error(exc: ClientError, path: str) -> FSError:
     """Map an S3 ClientError to the appropriate FSError subclass.
 
     Args:

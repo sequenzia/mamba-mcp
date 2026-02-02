@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -19,16 +20,22 @@ from typer.testing import CliRunner
 runner = CliRunner()
 
 
+def strip_ansi(text: str) -> str:
+    """Strip ANSI escape codes from text."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
+
+
 class TestCLI:
     """Tests for CLI using typer's CliRunner."""
 
     def test_cli_help(self) -> None:
         """Test that --help displays help and includes key options."""
         result = runner.invoke(app, ["--help"])
+        output = strip_ansi(result.output)
         assert result.exit_code == 0
-        assert "--env-file" in result.output
-        assert "--transport" in result.output
-        assert "Filesystem MCP Server" in result.output
+        assert "--env-file" in output
+        assert "--transport" in output
+        assert "Filesystem MCP Server" in output
 
     def test_cli_with_env_file_missing(self, tmp_path: Path) -> None:
         """Test CLI with missing env file shows error."""

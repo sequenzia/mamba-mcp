@@ -5,7 +5,7 @@ This script shows how to use the Python API for testing MCP servers.
 
 import asyncio
 
-from mamba_mcp_client import MCPTestClient, ClientConfig
+from mamba_mcp_client import ClientConfig, MCPTestClient
 
 
 async def main() -> None:

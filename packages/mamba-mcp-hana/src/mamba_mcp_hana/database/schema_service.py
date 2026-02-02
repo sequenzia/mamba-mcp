@@ -12,7 +12,7 @@ from __future__ import annotations
 import asyncio
 import fnmatch
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from mamba_mcp_hana.database.connection import HanaConnectionPool
 from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error, suggest_similar
@@ -365,7 +365,7 @@ class SchemaService:
                 record_count = row[2]
                 column_count = row[3]
                 is_column = (row[5] == "TRUE") if isinstance(row[5], str) else bool(row[5])
-                store_type = "COLUMN" if is_column else "ROW"
+                store_type: Literal["COLUMN", "ROW"] = "COLUMN" if is_column else "ROW"
 
                 tables.append(
                     TableInfo(

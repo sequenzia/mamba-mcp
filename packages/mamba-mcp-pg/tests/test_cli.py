@@ -1,5 +1,6 @@
 """Tests for CLI argument parsing and env file handling."""
 
+import re
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -12,16 +13,22 @@ from typer.testing import CliRunner
 runner = CliRunner()
 
 
+def strip_ansi(text: str) -> str:
+    """Strip ANSI escape codes from text."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
+
+
 class TestCLI:
     """Tests for CLI using typer's CliRunner."""
 
     def test_cli_help(self) -> None:
         """Test that --help displays help and includes --env-file option."""
         result = runner.invoke(app, ["--help"])
+        output = strip_ansi(result.output)
         assert result.exit_code == 0
-        assert "--env-file" in result.output
-        assert "PATH" in result.output
-        assert "PostgreSQL MCP Server" in result.output
+        assert "--env-file" in output
+        assert "PATH" in output
+        assert "PostgreSQL MCP Server" in output
 
     def test_cli_with_env_file_missing(self, tmp_path: Path) -> None:
         """Test CLI with missing env file shows error."""
