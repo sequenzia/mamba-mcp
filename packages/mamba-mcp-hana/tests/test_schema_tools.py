@@ -7,8 +7,8 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.errors import ErrorCode, create_tool_error
-from mamba_mcp_sap_hana.models.schema import (
+from mamba_mcp_hana.errors import ErrorCode, create_tool_error
+from mamba_mcp_hana.models.schema import (
     ColumnInfo,
     ConstraintInfo,
     DescribeTableOutput,
@@ -19,7 +19,7 @@ from mamba_mcp_sap_hana.models.schema import (
     SchemaInfo,
     TableInfo,
 )
-from mamba_mcp_sap_hana.tools.schema_tools import (
+from mamba_mcp_hana.tools.schema_tools import (
     describe_table,
     get_sample_rows,
     list_schemas,
@@ -117,7 +117,7 @@ class TestListSchemas:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -135,7 +135,7 @@ class TestListSchemas:
         output = _make_list_schemas_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -154,7 +154,7 @@ class TestListSchemas:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=tool_error)
 
@@ -180,7 +180,7 @@ class TestListSchemas:
         output = _make_list_schemas_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -194,7 +194,7 @@ class TestListSchemas:
     async def test_service_exception_wrapped_in_error(self) -> None:
         """Tool catches unexpected exceptions and returns error JSON."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(side_effect=RuntimeError("Unexpected failure"))
 
@@ -211,7 +211,7 @@ class TestListSchemas:
         output = _make_list_schemas_output(schemas=[])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -256,7 +256,7 @@ class TestListTables:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -275,7 +275,7 @@ class TestListTables:
         output = _make_list_tables_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -303,7 +303,7 @@ class TestListTables:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=tool_error)
 
@@ -329,7 +329,7 @@ class TestListTables:
         output = _make_list_tables_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -343,7 +343,7 @@ class TestListTables:
     async def test_service_exception_wrapped_in_error(self) -> None:
         """Tool catches unexpected exceptions and returns error JSON."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(side_effect=RuntimeError("Connection reset"))
 
@@ -399,7 +399,7 @@ class TestDescribeTable:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -424,7 +424,7 @@ class TestDescribeTable:
         output = _make_describe_table_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -454,7 +454,7 @@ class TestDescribeTable:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=tool_error)
 
@@ -488,7 +488,7 @@ class TestDescribeTable:
         output = _make_describe_table_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -506,7 +506,7 @@ class TestDescribeTable:
     async def test_service_exception_wrapped_in_error(self) -> None:
         """Tool catches unexpected exceptions and returns error JSON."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(side_effect=RuntimeError("Database error"))
 
@@ -529,7 +529,7 @@ class TestDescribeTable:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -564,7 +564,7 @@ class TestGetSampleRows:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -589,7 +589,7 @@ class TestGetSampleRows:
         output = _make_sample_rows_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -623,7 +623,7 @@ class TestGetSampleRows:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=tool_error)
 
@@ -657,7 +657,7 @@ class TestGetSampleRows:
         output = _make_sample_rows_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -675,7 +675,7 @@ class TestGetSampleRows:
     async def test_service_exception_wrapped_in_error(self) -> None:
         """Tool catches unexpected exceptions and returns error JSON."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(side_effect=RuntimeError("Timeout"))
 
@@ -725,7 +725,7 @@ class TestGetSampleRows:
         output = _make_sample_rows_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -759,7 +759,7 @@ class TestGetSampleRows:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -785,7 +785,7 @@ class TestToolRegistration:
 
     def test_schema_tools_are_registered_on_mcp(self) -> None:
         """All 4 schema tools are registered on the mcp server instance."""
-        from mamba_mcp_sap_hana.server import mcp as server
+        from mamba_mcp_hana.server import mcp as server
 
         tool_names = []
         for tool in server._tool_manager._tools.values():
@@ -823,7 +823,7 @@ class TestListSchemasExtended:
         output = _make_list_schemas_output(schemas=system_schemas)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -845,7 +845,7 @@ class TestListSchemasExtended:
         output = _make_list_schemas_output(schemas=user_schemas)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -866,7 +866,7 @@ class TestListSchemasExtended:
         output = _make_list_schemas_output(schemas=schemas)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_schemas = AsyncMock(return_value=output)
 
@@ -897,7 +897,7 @@ class TestListTablesExtended:
         output = _make_list_tables_output(tables=tables_only)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -932,7 +932,7 @@ class TestListTablesExtended:
         output = _make_list_tables_output(tables=filtered)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -963,7 +963,7 @@ class TestListTablesExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=tool_error)
 
@@ -1005,7 +1005,7 @@ class TestListTablesExtended:
         output = _make_list_tables_output(tables=tables)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_tables = AsyncMock(return_value=output)
 
@@ -1038,7 +1038,7 @@ class TestDescribeTableExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -1070,7 +1070,7 @@ class TestDescribeTableExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -1099,7 +1099,7 @@ class TestDescribeTableExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=tool_error)
 
@@ -1119,7 +1119,7 @@ class TestDescribeTableExtended:
         output = _make_describe_table_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.describe_table = AsyncMock(return_value=output)
 
@@ -1152,7 +1152,7 @@ class TestGetSampleRowsExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -1183,7 +1183,7 @@ class TestGetSampleRowsExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -1205,7 +1205,7 @@ class TestGetSampleRowsExtended:
         output = _make_sample_rows_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 
@@ -1231,7 +1231,7 @@ class TestGetSampleRowsExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=tool_error)
 
@@ -1270,7 +1270,7 @@ class TestGetSampleRowsExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.schema_tools.SchemaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.schema_tools.SchemaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_sample_rows = AsyncMock(return_value=output)
 

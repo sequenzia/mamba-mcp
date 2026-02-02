@@ -9,9 +9,9 @@ from typing import Annotated
 
 import typer
 
-from mamba_mcp_sap_hana.config import get_settings, set_env_file_path
-from mamba_mcp_sap_hana.database.connection import create_pool
-from mamba_mcp_sap_hana.server import mcp
+from mamba_mcp_hana.config import get_settings, set_env_file_path
+from mamba_mcp_hana.database.connection import create_pool
+from mamba_mcp_hana.server import mcp
 
 app = typer.Typer(
     name="mamba-mcp-hana",

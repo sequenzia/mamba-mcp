@@ -7,10 +7,10 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.database.hana import HanaService
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError
-from mamba_mcp_sap_hana.models.hana import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.database.hana import HanaService
+from mamba_mcp_hana.errors import ErrorCode, ToolError
+from mamba_mcp_hana.models.hana import (
     GetTableStoreTypeOutput,
     ListCalcViewsOutput,
     ListProceduresOutput,
@@ -98,7 +98,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -152,7 +152,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -190,7 +190,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -217,7 +217,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -251,7 +251,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -288,7 +288,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -307,7 +307,7 @@ class TestHanaServiceListCalcViews:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = HanaService(pool)
@@ -327,7 +327,7 @@ class TestHanaServiceListCalcViews:
         cursor.execute.side_effect = Exception("insufficient privilege")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -375,7 +375,7 @@ class TestHanaServiceListCalcViews:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -426,7 +426,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -471,7 +471,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -513,7 +513,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -541,7 +541,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -583,7 +583,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -601,7 +601,7 @@ class TestHanaServiceGetTableStoreType:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = HanaService(pool)
@@ -621,7 +621,7 @@ class TestHanaServiceGetTableStoreType:
         cursor.execute.side_effect = Exception("insufficient privilege")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -650,7 +650,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -686,7 +686,7 @@ class TestHanaServiceGetTableStoreType:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -727,7 +727,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -778,7 +778,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -817,7 +817,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -844,7 +844,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -878,7 +878,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -913,7 +913,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -949,7 +949,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -966,7 +966,7 @@ class TestHanaServiceListProcedures:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = HanaService(pool)
@@ -986,7 +986,7 @@ class TestHanaServiceListProcedures:
         cursor.execute.side_effect = Exception("insufficient privilege")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1025,7 +1025,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1072,7 +1072,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1116,7 +1116,7 @@ class TestHanaServiceListProcedures:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1149,7 +1149,7 @@ class TestHanaServiceConnectionRelease:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1172,7 +1172,7 @@ class TestHanaServiceConnectionRelease:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1195,7 +1195,7 @@ class TestHanaServiceConnectionRelease:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1213,7 +1213,7 @@ class TestHanaServiceConnectionRelease:
         cursor.execute.side_effect = Exception("SQL error")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1245,11 +1245,11 @@ class TestHanaServiceAsyncToThread:
 
         with (
             patch(
-                "mamba_mcp_sap_hana.database.connection._create_connection",
+                "mamba_mcp_hana.database.connection._create_connection",
                 return_value=mock_conn,
             ),
             patch(
-                "mamba_mcp_sap_hana.database.hana.asyncio.to_thread",
+                "mamba_mcp_hana.database.hana.asyncio.to_thread",
                 wraps=asyncio.to_thread,
             ) as mock_to_thread,
         ):
@@ -1275,11 +1275,11 @@ class TestHanaServiceAsyncToThread:
 
         with (
             patch(
-                "mamba_mcp_sap_hana.database.connection._create_connection",
+                "mamba_mcp_hana.database.connection._create_connection",
                 return_value=mock_conn,
             ),
             patch(
-                "mamba_mcp_sap_hana.database.hana.asyncio.to_thread",
+                "mamba_mcp_hana.database.hana.asyncio.to_thread",
                 wraps=asyncio.to_thread,
             ) as mock_to_thread,
         ):
@@ -1305,11 +1305,11 @@ class TestHanaServiceAsyncToThread:
 
         with (
             patch(
-                "mamba_mcp_sap_hana.database.connection._create_connection",
+                "mamba_mcp_hana.database.connection._create_connection",
                 return_value=mock_conn,
             ),
             patch(
-                "mamba_mcp_sap_hana.database.hana.asyncio.to_thread",
+                "mamba_mcp_hana.database.hana.asyncio.to_thread",
                 wraps=asyncio.to_thread,
             ) as mock_to_thread,
         ):

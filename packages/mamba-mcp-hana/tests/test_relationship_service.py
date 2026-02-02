@@ -6,8 +6,8 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.database.relationship_service import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.database.relationship_service import (
     RelationshipService,
     _bfs_find_paths,
     _build_fk_graph,
@@ -15,8 +15,8 @@ from mamba_mcp_sap_hana.database.relationship_service import (
     _group_fk_rows,
     _path_to_join_steps,
 )
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError
-from mamba_mcp_sap_hana.models.relationships import (
+from mamba_mcp_hana.errors import ErrorCode, ToolError
+from mamba_mcp_hana.models.relationships import (
     FindJoinPathOutput,
     ForeignKeysOutput,
     JoinPath,
@@ -581,7 +581,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -611,7 +611,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -642,7 +642,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -669,7 +669,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -699,7 +699,7 @@ class TestGetForeignKeys:
         cursor.fetchall.side_effect = fetchall_side_effect
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -724,7 +724,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -752,7 +752,7 @@ class TestGetForeignKeys:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -789,7 +789,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -818,7 +818,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -844,7 +844,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -870,7 +870,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -899,7 +899,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -926,7 +926,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -951,7 +951,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -976,7 +976,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -1011,7 +1011,7 @@ class TestFindJoinPath:
         cursor.fetchall.side_effect = fetchall_side_effect
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)
@@ -1036,7 +1036,7 @@ class TestFindJoinPath:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = RelationshipService(pool)

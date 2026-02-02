@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from mamba_mcp_sap_hana.config import (
+from mamba_mcp_hana.config import (
     DatabaseSettings,
     ServerSettings,
     get_env_file_path,

@@ -17,9 +17,9 @@ from dataclasses import dataclass
 
 from mcp.server.fastmcp import FastMCP
 
-from mamba_mcp_sap_hana import __version__
-from mamba_mcp_sap_hana.config import Settings, get_settings
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool, create_pool
+from mamba_mcp_hana import __version__
+from mamba_mcp_hana.config import Settings, get_settings
+from mamba_mcp_hana.database.connection import HanaConnectionPool, create_pool
 
 logger = logging.getLogger(__name__)
 

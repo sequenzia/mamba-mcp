@@ -14,9 +14,9 @@ import fnmatch
 import logging
 from typing import Any
 
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError, create_tool_error, suggest_similar
-from mamba_mcp_sap_hana.models.schema import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error, suggest_similar
+from mamba_mcp_hana.models.schema import (
     ColumnInfo,
     ConstraintInfo,
     DescribeTableOutput,

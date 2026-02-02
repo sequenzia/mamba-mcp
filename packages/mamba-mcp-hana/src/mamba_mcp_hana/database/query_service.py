@@ -17,9 +17,9 @@ import time
 import uuid
 from typing import Any
 
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError, create_tool_error
-from mamba_mcp_sap_hana.models.query import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.query import (
     ExecuteQueryOutput,
     ExplainPlanNode,
     ExplainQueryOutput,

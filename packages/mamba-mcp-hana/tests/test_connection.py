@@ -7,8 +7,8 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.config import DatabaseSettings
-from mamba_mcp_sap_hana.database.connection import (
+from mamba_mcp_hana.config import DatabaseSettings
+from mamba_mcp_hana.database.connection import (
     HanaConnectionPool,
     _check_connection_health,
     _close_connection,
@@ -197,7 +197,7 @@ class TestHanaConnectionPoolAcquireRelease:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             conn = await pool.acquire()
@@ -212,7 +212,7 @@ class TestHanaConnectionPoolAcquireRelease:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             conn = await pool.acquire()
@@ -228,7 +228,7 @@ class TestHanaConnectionPoolAcquireRelease:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ) as mock_create:
             conn1 = await pool.acquire()
@@ -249,7 +249,7 @@ class TestHanaConnectionPoolAcquireRelease:
         mock_conns = [_make_mock_connection() for _ in range(3)]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=mock_conns,
         ):
             for _ in range(3):
@@ -271,7 +271,7 @@ class TestHanaConnectionPoolSizeLimit:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             # Acquire the only connection
@@ -291,7 +291,7 @@ class TestHanaConnectionPoolSizeLimit:
         mock_conns = [_make_mock_connection() for _ in range(2)]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=mock_conns,
         ):
             conn1 = await pool.acquire()
@@ -323,7 +323,7 @@ class TestHanaConnectionPoolHealthCheck:
         fresh_conn = _make_mock_connection(healthy=True)
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=[stale_conn, fresh_conn],
         ):
             # First acquire creates stale_conn
@@ -354,7 +354,7 @@ class TestHanaConnectionPoolClose:
         mock_conns = [_make_mock_connection() for _ in range(3)]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=mock_conns,
         ):
             conns = [await pool.acquire() for _ in range(3)]
@@ -389,7 +389,7 @@ class TestHanaConnectionPoolClose:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             conn = await pool.acquire()
@@ -420,7 +420,7 @@ class TestHanaConnectionPoolConnectionError:
         pool = _make_pool(pool_size=3)
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError(
                 "Failed to connect to SAP HANA at localhost:30015: timeout"
             ),
@@ -437,7 +437,7 @@ class TestHanaConnectionPoolConnectionError:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             await pool.test_connection()
@@ -451,7 +451,7 @@ class TestHanaConnectionPoolConnectionError:
         pool = _make_pool(pool_size=1)
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Failed to connect"),
         ):
             with pytest.raises(ConnectionError):
@@ -510,7 +510,7 @@ class TestModuleLevelFunctions:
     def test_create_connection_wraps_exception(self) -> None:
         """Test _create_connection wraps hdbcli errors in ConnectionError."""
         with patch(
-            "mamba_mcp_sap_hana.database.connection.dbapi.connect",
+            "mamba_mcp_hana.database.connection.dbapi.connect",
             side_effect=Exception("Cannot connect"),
         ):
             with pytest.raises(ConnectionError) as exc_info:
@@ -523,7 +523,7 @@ class TestModuleLevelFunctions:
         """Test _create_connection returns connection on success."""
         mock_conn = MagicMock()
         with patch(
-            "mamba_mcp_sap_hana.database.connection.dbapi.connect",
+            "mamba_mcp_hana.database.connection.dbapi.connect",
             return_value=mock_conn,
         ):
             result = _create_connection({"address": "localhost", "port": 30015})
@@ -533,7 +533,7 @@ class TestModuleLevelFunctions:
     def test_create_connection_unknown_address(self) -> None:
         """Test _create_connection handles missing address/port gracefully."""
         with patch(
-            "mamba_mcp_sap_hana.database.connection.dbapi.connect",
+            "mamba_mcp_hana.database.connection.dbapi.connect",
             side_effect=Exception("timeout"),
         ):
             with pytest.raises(ConnectionError) as exc_info:
@@ -601,7 +601,7 @@ class TestPoolDeadConnectionRecovery:
         fresh = _make_mock_connection(healthy=True)
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=[stale1, stale2, fresh],
         ):
             # Acquire and release two stale connections
@@ -627,7 +627,7 @@ class TestPoolDeadConnectionRecovery:
         fresh = _make_mock_connection(healthy=True)
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=[stale, fresh],
         ):
             # Acquire the only connection (stale, but we don't know yet)
@@ -659,7 +659,7 @@ class TestPoolDeadConnectionRecovery:
         conns = [_make_mock_connection() for _ in range(2)]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=conns,
         ):
             await pool.acquire()
@@ -679,7 +679,7 @@ class TestPoolDeadConnectionRecovery:
         mock_conns = [_make_mock_connection() for _ in range(2)]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=mock_conns,
         ):
             conn1 = await pool.acquire()

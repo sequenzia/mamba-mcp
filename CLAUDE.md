@@ -9,6 +9,7 @@ Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) pac
 - **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
 - **mamba-mcp-pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
 - **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
+- **mamba-mcp-hana** - SAP HANA MCP Server with layered schema discovery (11 tools across 4 layers)
 
 ## Development Commands
 
@@ -83,17 +84,30 @@ mamba-mcp/
 │   │   │   ├── models/         # Pydantic I/O models
 │   │   │   └── tools/          # MCP tool definitions (8 tools)
 │   │   └── tests/
-│   └── mamba-mcp-fs/
+│   ├── mamba-mcp-fs/
+│   │   ├── pyproject.toml
+│   │   ├── src/mamba_mcp_fs/
+│   │   │   ├── __main__.py     # Typer CLI (test, serve)
+│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
+│   │   │   ├── content.py      # MIME detection & text/binary classification
+│   │   │   ├── errors.py       # Error codes & fuzzy matching
+│   │   │   ├── security.py     # Sandbox & path traversal enforcement
+│   │   │   ├── rate_limit.py   # Sliding window rate limiter
+│   │   │   ├── server.py       # FastMCP server & lifespan
+│   │   │   ├── backends/       # LocalBackend, S3Backend, BackendManager
+│   │   │   ├── models/         # Pydantic I/O models
+│   │   │   └── tools/          # MCP tool definitions (12 tools)
+│   │   └── tests/
+│   └── mamba-mcp-hana/
 │       ├── pyproject.toml
-│       ├── src/mamba_mcp_fs/
+│       ├── src/mamba_mcp_hana/
 │       │   ├── __main__.py     # Typer CLI (test, serve)
-│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
-│       │   ├── security.py     # Sandbox & path traversal enforcement
-│       │   ├── rate_limit.py   # Sliding window rate limiter
+│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
+│       │   ├── errors.py       # Error codes & fuzzy matching
 │       │   ├── server.py       # FastMCP server & lifespan
-│       │   ├── backends/       # LocalBackend, S3Backend, BackendManager
+│       │   ├── database/       # hdbcli async services
 │       │   ├── models/         # Pydantic I/O models
-│       │   └── tools/          # MCP tool definitions (12 tools)
+│       │   └── tools/          # MCP tool definitions (11 tools)
 │       └── tests/
 └── internal/                   # Specs & images
 ```
@@ -129,6 +143,79 @@ mamba-mcp/
 - Config via `MAMBA_MCP_FS_*` env vars or `mamba.env` file, auto-detected from cwd
 - CLI: `mamba-mcp-fs --env-file mamba.env test` / `mamba-mcp-fs` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `fsspec`, `s3fs`, `pydantic-settings`
+
+## Architecture (mamba-mcp-hana)
+
+- 4-layer MCP tool architecture:
+  - **Layer 1 (Schema Discovery):** `list_schemas`, `list_tables`, `describe_table`, `get_sample_rows`
+  - **Layer 2 (Relationships):** `get_foreign_keys`, `find_join_path` (BFS pathfinding)
+  - **Layer 3 (Query Execution):** `execute_query`, `explain_query` (read-only, parameterized)
+  - **HANA-Specific:** `list_calculation_views`, `get_table_store_type`, `list_procedures`
+- Database services in `database/` module (HanaConnectionPool, SchemaService, RelationshipService, QueryService, HanaService)
+- Connection pool: async queue-based wrapper around synchronous hdbcli driver (`asyncio.to_thread()`)
+- Query security: blocked keyword validation, SELECT/WITH-only enforcement
+- Config via `MAMBA_MCP_HANA_*` env vars or `mamba.env` file, auto-detected from cwd
+- Auth: user/password or hdbuserstore key; TLS auto-enabled for port 443 (HANA Cloud)
+- CLI: `mamba-mcp-hana --env-file mamba.env test` / `mamba-mcp-hana` (serve)
+- Uses `mcp>=1.0.0` (FastMCP), `hdbcli`, `pydantic-settings`
+
+## Key Patterns to Follow
+
+### Server Package Pattern (pg, fs, hana)
+
+When creating or modifying MCP server packages, follow these established patterns:
+
+1. **AppContext via Lifespan** — All servers use `@dataclass class AppContext` yielded from an `app_lifespan()` async context manager. Tools access it via `ctx.request_context.lifespan_context`. Resources (engines, pools, backends) init at startup, cleanup on shutdown.
+
+2. **Tool Handler Skeleton** — Every `@mcp.tool()` function follows: timing (`time.perf_counter()`) → null-check `ctx` → extract `app_ctx` → open connection/acquire pool → delegate to service → convert to Pydantic output → catch exceptions → return structured error with elapsed time logging.
+
+3. **Error Handling Triad** — Each server's `errors.py` contains: (a) `ErrorCode` class with string constants, (b) `ERROR_SUGGESTIONS` dict mapping codes to user-facing messages, (c) `create_tool_error()` factory function + Levenshtein-based fuzzy matching (`find_similar_names()` / `suggest_similar()`).
+
+4. **Module-level Config State** — A global `_env_file_path` variable set by `set_env_file_path()` bridges CLI arg parsing (`__main__.py`) to config loading (`config.py`). Tests must use autouse fixtures to reset this state.
+
+5. **Nested Pydantic Settings** — Root `Settings` uses `@model_validator(mode="before")` to instantiate nested settings classes (`DatabaseSettings`, `ServerSettings`) with the `_env_file` parameter. Each nested class has its own `env_prefix`.
+
+6. **CLI Entry Point** — Typer app with `invoke_without_command=True` callback. Running bare starts the server; `test` subcommand validates connectivity. Uses `validate_env_file()` callback and `resolve_default_env_file()` for auto-discovery.
+
+7. **Tool Registration via Import Side-Effects** — Tool modules import the module-level `mcp` instance from `server.py` and register via `@mcp.tool()` decorators. `__main__.py` triggers this with `from package.tools import ... # noqa: F401`.
+
+### Layered Tool Architecture
+
+- **Layer 1 (Discovery):** Always registered, read-only. Schema listing, table description, file browsing.
+- **Layer 2 (Relationships/Extras):** Foreign keys, join paths (DB servers); S3-specific tools (FS server). May be conditional.
+- **Layer 3 (Execution/Mutation):** Query execution (DB); file write/delete/move (FS). Conditional on `read_only` config.
+- **Layer 4 (Platform-Specific):** HANA only — calculation views, store types, procedures.
+
+### Pydantic Model Conventions
+
+- Input/Output pairs per tool: `ListSchemasInput` + `ListSchemasOutput`
+- All fields use `Field(description="...")` for MCP tool parameter documentation
+- Validation via `Field(ge=1, le=100)`, `pattern=`, `min_length`/`max_length`
+- Computed fields with `@computed_field` decorator for derived data
+- Type hints: `str | None` (not `Optional[str]`)
+- Centralized exports in `models/__init__.py` with `__all__`
+
+## Testing Conventions
+
+- **Class-based organization:** `class TestFeatureName:` groups related tests
+- **Descriptive names:** `test_for_stdio()`, `test_unknown_extension_no_content()`
+- **One-line docstrings:** Every test has a docstring explaining what it tests
+- **File naming:** `test_<module>.py` mirrors source structure
+- **Parametrize:** Use `@pytest.mark.parametrize` for 3+ similar test cases
+- **Autouse fixtures:** Reset module-level state (`set_env_file_path(None)`) to prevent leakage
+- **Mock helpers:** `create_mock_result()` in conftest.py for SQLAlchemy row mocking
+- **Async tests:** `asyncio_mode = "auto"` in root pyproject.toml — no need for `@pytest.mark.asyncio`
+- **Coverage target:** Security-critical modules target 100% coverage
+
+## Known Inconsistencies
+
+These exist across packages and should be standardized when touching related code:
+
+- **Error return types:** `mamba-mcp-pg` `create_tool_error()` returns `dict[str, Any]`, `mamba-mcp-hana` returns `ToolError` model instance, `mamba-mcp-fs` uses custom exception hierarchy (`FSError` base)
+- **Tool return types:** PG tools return `OutputModel | dict[str, Any]`, HANA tools return `str` (always `.model_dump_json()`)
+- **Fuzzy matching thresholds:** PG uses fixed threshold 3, HANA uses scaled `max(2, min(len/2, 5))`
+- **Transport naming:** PG/HANA config accepts `"http"`, FS accepts `"streamable-http"` directly
+- **Module name:** ~~Resolved~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages)
 
 ## Code Standards
 

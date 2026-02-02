@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import typer
-from mamba_mcp_sap_hana.__main__ import (
+from mamba_mcp_hana.__main__ import (
     app,
     resolve_default_env_file,
     setup_logging,
     validate_env_file,
 )
-from mamba_mcp_sap_hana.config import get_env_file_path, set_env_file_path
+from mamba_mcp_hana.config import get_env_file_path, set_env_file_path
 from typer.testing import CliRunner
 
 runner = CliRunner()
@@ -55,7 +55,7 @@ class TestCLI:
 
         monkeypatch.chdir(tmp_path)
 
-        with patch("mamba_mcp_sap_hana.__main__.create_pool") as mock_create:
+        with patch("mamba_mcp_hana.__main__.create_pool") as mock_create:
             mock_pool = AsyncMock()
             mock_pool.test_connection = AsyncMock()
             mock_pool.close = AsyncMock()
@@ -77,7 +77,7 @@ class TestCLI:
         monkeypatch.setenv("MAMBA_MCP_HANA_DB_USER", "testuser")
         monkeypatch.setenv("MAMBA_MCP_HANA_DB_PASSWORD", "testpass")
 
-        with patch("mamba_mcp_sap_hana.__main__.create_pool") as mock_create:
+        with patch("mamba_mcp_hana.__main__.create_pool") as mock_create:
             mock_pool = AsyncMock()
             mock_pool.test_connection = AsyncMock()
             mock_pool.close = AsyncMock()
@@ -261,7 +261,7 @@ class TestTestCommand:
             "MAMBA_MCP_HANA_DB_PASSWORD=testpass\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.create_pool") as mock_create:
+        with patch("mamba_mcp_hana.__main__.create_pool") as mock_create:
             mock_pool = AsyncMock()
             mock_pool.test_connection = AsyncMock()
             mock_pool.close = AsyncMock()
@@ -285,7 +285,7 @@ class TestTestCommand:
             "MAMBA_MCP_HANA_DB_PASSWORD=testpass\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.create_pool") as mock_create:
+        with patch("mamba_mcp_hana.__main__.create_pool") as mock_create:
             mock_pool = AsyncMock()
             mock_pool.test_connection = AsyncMock(side_effect=ConnectionError("Connection refused"))
             mock_pool.close = AsyncMock()
@@ -307,7 +307,7 @@ class TestTestCommand:
             "MAMBA_MCP_HANA_DB_PASSWORD=custom_pass\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.create_pool") as mock_create:
+        with patch("mamba_mcp_hana.__main__.create_pool") as mock_create:
             mock_pool = AsyncMock()
             mock_pool.test_connection = AsyncMock()
             mock_pool.close = AsyncMock()
@@ -355,7 +355,7 @@ class TestDefaultServeCommand:
             "MAMBA_MCP_HANA_TRANSPORT=stdio\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.mcp") as mock_mcp:
+        with patch("mamba_mcp_hana.__main__.mcp") as mock_mcp:
             result = runner.invoke(app, ["--env-file", str(env_file)])
 
             assert result.exit_code == 0
@@ -372,7 +372,7 @@ class TestDefaultServeCommand:
             "MAMBA_MCP_HANA_TRANSPORT=http\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.mcp") as mock_mcp:
+        with patch("mamba_mcp_hana.__main__.mcp") as mock_mcp:
             result = runner.invoke(app, ["--env-file", str(env_file)])
 
             assert result.exit_code == 0
@@ -384,7 +384,7 @@ class TestSetupLogging:
 
     def test_json_format(self) -> None:
         """Test logging configured with JSON format."""
-        with patch("mamba_mcp_sap_hana.__main__.logging.basicConfig") as mock_config:
+        with patch("mamba_mcp_hana.__main__.logging.basicConfig") as mock_config:
             setup_logging("INFO", "json")
 
             mock_config.assert_called_once()
@@ -394,7 +394,7 @@ class TestSetupLogging:
 
     def test_text_format(self) -> None:
         """Test logging configured with text format."""
-        with patch("mamba_mcp_sap_hana.__main__.logging.basicConfig") as mock_config:
+        with patch("mamba_mcp_hana.__main__.logging.basicConfig") as mock_config:
             setup_logging("DEBUG", "text")
 
             mock_config.assert_called_once()
@@ -405,7 +405,7 @@ class TestSetupLogging:
 
     def test_level_uppercased(self) -> None:
         """Test logging level is uppercased."""
-        with patch("mamba_mcp_sap_hana.__main__.logging.basicConfig") as mock_config:
+        with patch("mamba_mcp_hana.__main__.logging.basicConfig") as mock_config:
             setup_logging("warning", "json")
 
             call_kwargs = mock_config.call_args[1]
@@ -427,7 +427,7 @@ class TestDefaultServeTextLogging:
             "MAMBA_MCP_HANA_LOG_FORMAT=text\n"
         )
 
-        with patch("mamba_mcp_sap_hana.__main__.mcp") as mock_mcp:
+        with patch("mamba_mcp_hana.__main__.mcp") as mock_mcp:
             result = runner.invoke(app, ["--env-file", str(env_file)])
 
             assert result.exit_code == 0
@@ -450,7 +450,7 @@ class TestSettingsWithEnvFile:
 
         set_env_file_path(str(env_file))
 
-        from mamba_mcp_sap_hana.config import get_settings
+        from mamba_mcp_hana.config import get_settings
 
         settings = get_settings()
 

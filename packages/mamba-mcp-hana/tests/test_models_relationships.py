@@ -3,7 +3,7 @@
 import json
 
 import pytest
-from mamba_mcp_sap_hana.models.relationships import (
+from mamba_mcp_hana.models.relationships import (
     FindJoinPathInput,
     FindJoinPathOutput,
     ForeignKeyInfo,

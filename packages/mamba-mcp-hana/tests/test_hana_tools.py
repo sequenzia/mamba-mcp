@@ -7,15 +7,15 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.database.hana import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.database.hana import (
     CALC_VIEW_PRIVILEGE_NOTE,
     COLUMN_STORE_IMPLICATIONS,
     ROW_STORE_IMPLICATIONS,
     HanaService,
 )
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError, create_tool_error
-from mamba_mcp_sap_hana.models.hana import (
+from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.models.hana import (
     CalcViewColumnInfo,
     CalcViewInfo,
     GetTableStoreTypeOutput,
@@ -25,7 +25,7 @@ from mamba_mcp_sap_hana.models.hana import (
     ProcedureParameterInfo,
     StoreTypeInfo,
 )
-from mamba_mcp_sap_hana.tools.hana_tools import (
+from mamba_mcp_hana.tools.hana_tools import (
     get_table_store_type,
     list_calculation_views,
     list_procedures,
@@ -103,7 +103,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=[view])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -138,7 +138,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=[view])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -159,7 +159,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=[])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -183,7 +183,7 @@ class TestListCalculationViews:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=tool_error)
 
@@ -201,7 +201,7 @@ class TestListCalculationViews:
     async def test_handles_unexpected_exception(self) -> None:
         """Tool wraps unexpected exceptions in CONNECTION_ERROR."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(
                 side_effect=RuntimeError("DB connection lost")
@@ -236,7 +236,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -257,7 +257,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -306,7 +306,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=views)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -339,7 +339,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=[view])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -358,7 +358,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -396,7 +396,7 @@ class TestListCalculationViews:
         output = _make_calc_views_output(views=[view])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_calculation_views = AsyncMock(return_value=output)
 
@@ -436,7 +436,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -465,7 +465,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -490,7 +490,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=tool_error)
 
@@ -515,7 +515,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=tool_error)
 
@@ -533,7 +533,7 @@ class TestGetTableStoreType:
     async def test_handles_unexpected_exception(self) -> None:
         """Tool wraps unexpected exceptions in CONNECTION_ERROR."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(
                 side_effect=RuntimeError("Connection timeout")
@@ -570,7 +570,7 @@ class TestGetTableStoreType:
         output = _make_store_type_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -591,7 +591,7 @@ class TestGetTableStoreType:
         output = _make_store_type_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -614,7 +614,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -643,7 +643,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -678,7 +678,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -712,7 +712,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=output)
 
@@ -750,7 +750,7 @@ class TestGetTableStoreType:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_table_store_type = AsyncMock(return_value=tool_error)
 
@@ -787,7 +787,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=[proc])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -823,7 +823,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=[proc])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -845,7 +845,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=[])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -869,7 +869,7 @@ class TestListProcedures:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=tool_error)
 
@@ -887,7 +887,7 @@ class TestListProcedures:
     async def test_handles_unexpected_exception(self) -> None:
         """Tool wraps unexpected exceptions in CONNECTION_ERROR."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(side_effect=RuntimeError("Network failure"))
 
@@ -920,7 +920,7 @@ class TestListProcedures:
         output = _make_procedures_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -941,7 +941,7 @@ class TestListProcedures:
         output = _make_procedures_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -968,7 +968,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=[proc])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1011,7 +1011,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=procs)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1061,7 +1061,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=[proc])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1085,7 +1085,7 @@ class TestListProcedures:
         output = _make_procedures_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1146,7 +1146,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=procs)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1186,7 +1186,7 @@ class TestListProcedures:
         output = _make_procedures_output(procedures=procs)
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.hana_tools.HanaService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.hana_tools.HanaService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.list_procedures = AsyncMock(return_value=output)
 
@@ -1297,7 +1297,7 @@ class TestCalcViewsServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1325,7 +1325,7 @@ class TestCalcViewsServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1364,7 +1364,7 @@ class TestCalcViewsServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1403,7 +1403,7 @@ class TestStoreTypeServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1438,7 +1438,7 @@ class TestStoreTypeServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1468,7 +1468,7 @@ class TestStoreTypeServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1506,7 +1506,7 @@ class TestStoreTypeServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1545,7 +1545,7 @@ class TestProcedureServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1575,7 +1575,7 @@ class TestProcedureServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1607,7 +1607,7 @@ class TestProcedureServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1647,7 +1647,7 @@ class TestProcedureServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1684,7 +1684,7 @@ class TestProcedureServiceIntegration:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = HanaService(pool)
@@ -1705,7 +1705,7 @@ class TestToolRegistration:
 
     def test_hana_tools_are_registered_on_mcp(self) -> None:
         """All 3 HANA-specific tools are registered on the mcp server."""
-        from mamba_mcp_sap_hana.server import mcp as server
+        from mamba_mcp_hana.server import mcp as server
 
         tool_names = []
         for tool in server._tool_manager._tools.values():
@@ -1717,7 +1717,7 @@ class TestToolRegistration:
 
     def test_total_tool_count_is_eleven(self) -> None:
         """Server has 11 total tools (8 core + 3 HANA)."""
-        from mamba_mcp_sap_hana.server import mcp as server
+        from mamba_mcp_hana.server import mcp as server
 
         tool_count = len(server._tool_manager._tools)
         assert tool_count == 11
