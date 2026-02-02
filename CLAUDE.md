@@ -21,9 +21,12 @@ uv sync --group dev
 # Run CLI
 uv run --package mamba-mcp-client mamba-mcp --help
 
-# Run tests
-pytest packages/
-pytest packages/mamba-mcp-client/tests/test_client.py::TestClientConfig
+# Run tests (per-package to avoid cross-package import conflicts)
+uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/
+uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
+uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
+uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
+uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
 
 # Type check
 mypy packages/
@@ -219,13 +222,17 @@ When creating or modifying MCP server packages, follow these established pattern
 
 ## Known Inconsistencies
 
-These exist across packages and should be standardized when touching related code:
+- **Error return types:** `mamba-mcp-pg` `create_tool_error()` returns `dict[str, Any]`, `mamba-mcp-hana` returns `ToolError` model instance, `mamba-mcp-fs` uses custom exception hierarchy (`FSError` base). All share the core `ToolError` model via `mamba-mcp-core`; the wrapper functions preserve each server's existing return type contract.
+- **FS error architecture:** FS intentionally keeps its custom exception hierarchy (`FSError` base + 9 subclasses) for internal backend flow control — a pattern the DB servers don't need.
 
-- **Error return types:** `mamba-mcp-pg` `create_tool_error()` returns `dict[str, Any]`, `mamba-mcp-hana` returns `ToolError` model instance, `mamba-mcp-fs` uses custom exception hierarchy (`FSError` base)
-- **Tool return types:** PG tools return `OutputModel | dict[str, Any]`, HANA tools return `str` (always `.model_dump_json()`)
-- **Fuzzy matching thresholds:** PG uses fixed threshold 3, HANA uses scaled `max(2, min(len/2, 5))`
-- **Transport naming:** PG/HANA config accepts `"http"`, FS accepts `"streamable-http"` directly
-- **Module name:** ~~Resolved~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages)
+### Resolved Inconsistencies
+
+The following have been standardized:
+- ~~Module name~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages)
+- ~~Tool return types~~ — All servers now return `OutputModel | dict[str, Any]` (HANA migrated from `str`)
+- ~~Fuzzy matching thresholds~~ — All servers use `mamba-mcp-core`'s scaled threshold: `max(2, min(len//2, 5))`
+- ~~Transport naming~~ — All servers accept both `"http"` and `"streamable-http"`, normalized via core
+- ~~Code duplication~~ — CLI helpers, config state, errors, and fuzzy matching consolidated in `mamba-mcp-core`
 
 ## Code Standards
 
