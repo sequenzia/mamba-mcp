@@ -6,10 +6,11 @@ A Python monorepo of MCP (Model Context Protocol) tools — a testing client and
 
 | Package | Description |
 |---------|-------------|
+| [mamba-mcp-core](packages/mamba-mcp-core/) | Shared utilities (error models, fuzzy matching, CLI helpers, transport normalization) |
 | [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
-| [mamba-mcp-pg](packages/mamba-mcp-pg/) | PostgreSQL MCP server with layered schema discovery |
-| [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backend support |
-| [mamba-mcp-hana](packages/mamba-mcp-hana/) | SAP HANA MCP server with layered schema discovery |
+| [mamba-mcp-pg](packages/mamba-mcp-pg/) | PostgreSQL MCP server — 8 tools across 3 layers |
+| [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backends — 12 tools across 3 layers |
+| [mamba-mcp-hana](packages/mamba-mcp-hana/) | SAP HANA MCP server — 11 tools across 4 layers |
 
 ### mamba-mcp-client
 
@@ -105,7 +106,7 @@ __main__.py (Typer CLI)
 
 **Tech stack:** Python 3.11+, FastMCP, Pydantic, Typer, Textual, SQLAlchemy+asyncpg, hdbcli, fsspec+s3fs
 
-Each package is self-contained with no cross-package runtime dependencies — patterns are shared by convention rather than a shared library.
+The three server packages share `mamba-mcp-core` for common utilities (error models, fuzzy matching, CLI helpers, transport normalization). The client package is fully independent.
 
 ## Configuration
 
@@ -120,8 +121,12 @@ All packages use `mamba.env` for environment-based configuration. Default file l
 # Install all packages
 uv sync --group dev
 
-# Run tests
-pytest packages/
+# Run tests (per-package to avoid cross-package import conflicts)
+uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
+uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/
+uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
+uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
+uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
 
 # Type check
 mypy packages/
@@ -138,16 +143,20 @@ mamba-mcp/
 ├── pyproject.toml              # Workspace configuration
 ├── uv.lock                     # Shared lockfile
 ├── packages/
+│   ├── mamba-mcp-core/         # Shared utilities
+│   │   ├── src/mamba_mcp_core/
+│   │   └── tests/
 │   ├── mamba-mcp-client/       # MCP testing client
 │   │   ├── src/mamba_mcp_client/
+│   │   ├── tests/
 │   │   └── examples/
-│   ├── mamba-mcp-pg/     # PostgreSQL MCP server
+│   ├── mamba-mcp-pg/           # PostgreSQL MCP server
 │   │   ├── src/mamba_mcp_pg/
 │   │   └── tests/
 │   ├── mamba-mcp-fs/           # Filesystem MCP server
 │   │   ├── src/mamba_mcp_fs/
 │   │   └── tests/
-│   └── mamba-mcp-hana/          # SAP HANA MCP server
+│   └── mamba-mcp-hana/         # SAP HANA MCP server
 │       ├── src/mamba_mcp_hana/
 │       └── tests/
 └── internal/                   # Specs & images

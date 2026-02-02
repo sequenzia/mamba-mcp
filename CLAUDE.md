@@ -172,6 +172,48 @@ mamba-mcp/
 - CLI: `mamba-mcp-hana --env-file mamba.env test` / `mamba-mcp-hana` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `hdbcli`, `pydantic-settings`
 
+## Dependency Graph
+
+```
+mamba-mcp-core (shared library, no CLI)
+  ↑ depended on by all 3 servers
+  ├── mamba-mcp-pg   (asyncpg, sqlalchemy[asyncio])
+  ├── mamba-mcp-fs   (fsspec, s3fs)
+  └── mamba-mcp-hana (hdbcli)
+
+mamba-mcp-client (fully independent — no dependency on core or any server)
+  └── fastmcp, textual, httpx
+```
+
+- **Client is independent**: It does not import from `mamba-mcp-core` or any server package
+- **Servers all depend on core**: Shared CLI helpers, error model, fuzzy matching, transport normalization
+- **No cross-server dependencies**: PG, FS, and HANA are completely independent of each other
+- **Total MCP tools**: 31 across all servers (PG: 8, FS: 12, HANA: 11)
+
+## Critical Files for Onboarding
+
+When getting familiar with this codebase, read these files in order:
+
+1. `packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py` — The reference server implementation (HANA and FS were modeled from this)
+2. `packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py` — Canonical tool handler pattern used by all 31 tools
+3. `packages/mamba-mcp-core/src/mamba_mcp_core/errors.py` — Shared `ToolError` model with dependency-injected suggestions
+4. `packages/mamba-mcp-fs/src/mamba_mcp_fs/security.py` — Most security-critical file, defense-in-depth path validation
+5. `packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py` — `BackendProtocol` + `BackendManager` routing pattern
+6. `packages/mamba-mcp-client/src/mamba_mcp_client/client.py` — `MCPTestClient` async context manager
+
+## Creating a New MCP Server Package
+
+Use `mamba-mcp-pg` as the template. A new server package needs:
+
+1. `__main__.py` — Copy PG's pattern: Typer app with `invoke_without_command=True`, bare command starts server, `test` subcommand validates connectivity
+2. `server.py` — `@dataclass AppContext` + `app_lifespan()` + `mcp = FastMCP(name, lifespan=...)`
+3. `config.py` — Nested Pydantic BaseSettings with `@model_validator(mode="before")` for env file bridging
+4. `errors.py` — `ErrorCode` class + `ERROR_SUGGESTIONS` dict + `create_tool_error()` wrapper
+5. `models/` — Input/Output model pairs with `Field(description="...")`
+6. `database/` or `backends/` — Service layer classes
+7. `tools/` — `@mcp.tool()` handlers following the 7-step skeleton
+8. `tests/` — Class-based tests, autouse fixtures for config state reset
+
 ## Key Patterns to Follow
 
 ### Server Package Pattern (pg, fs, hana)
@@ -233,6 +275,13 @@ The following have been standardized:
 - ~~Fuzzy matching thresholds~~ — All servers use `mamba-mcp-core`'s scaled threshold: `max(2, min(len//2, 5))`
 - ~~Transport naming~~ — All servers accept both `"http"` and `"streamable-http"`, normalized via core
 - ~~Code duplication~~ — CLI helpers, config state, errors, and fuzzy matching consolidated in `mamba-mcp-core`
+
+## CI/CD Notes
+
+- **Pipeline**: `.github/workflows/ci.yml` runs lint, type-check, and test jobs in parallel
+- **Test matrix**: Per-package isolation via `uv run --package` (core, pg, fs, hana)
+- **Known gap**: `mamba-mcp-client` is not in the CI test matrix — client tests only run locally
+- **Client test coverage**: Minimal — only `test_client.py` exists; CLI commands and TUI lack tests
 
 ## Code Standards
 

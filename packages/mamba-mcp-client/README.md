@@ -4,7 +4,7 @@ A Python-based MCP (Model Context Protocol) Client for testing and debugging MCP
 
 Testing MCP servers is difficult—debugging is painful, and there are few good tools to inspect MCP communication in detail. Mamba MCP Client provides both an interactive terminal UI and a programmatic Python API for comprehensive MCP server testing.
 
-![Claude Task Manager](../../internal/images/mcp-client-01.png)
+![Mamba MCP Client TUI](../../internal/images/mcp-client-01.png)
 
 **See more screenshots [screenshots](#screenshots) below**
 
@@ -37,26 +37,40 @@ Launch the interactive terminal UI to explore your MCP server:
 
 ```bash
 # Connect via stdio (quote the entire command)
-mamba-mcp tui --stdio "python path/to/server.py"
+mamba-mcp-client tui --stdio "python path/to/server.py"
 
 # Connect via SSE
-mamba-mcp tui --sse http://localhost:8000/sse
+mamba-mcp-client tui --sse http://localhost:8000/sse
 
 # Connect via HTTP
-mamba-mcp tui --http http://localhost:8000/mcp
+mamba-mcp-client tui --http http://localhost:8000/mcp
 
 # Connect to UV-installed MCP server
-mamba-mcp tui --uv @modelcontextprotocol/server-sqlite
+mamba-mcp-client tui --uv @modelcontextprotocol/server-sqlite
 
 # Connect to local UV-based project
-mamba-mcp tui --uv-local-path ./my-mcp-server --uv-local-name server
+mamba-mcp-client tui --uv-local-path ./my-mcp-server --uv-local-name server
 ```
 
 The TUI provides:
 - Tree view of tools, resources, and prompts
-- Interactive tool calling with argument input
+- Interactive tool calling with type-aware argument input
 - Request/response log viewer
-- Keyboard shortcuts: `q` quit, `r` refresh, `l` logs, `p` ping, `c` clear
+- Clipboard support for copying results
+
+**Keyboard shortcuts:**
+
+| Key | Action |
+|-----|--------|
+| `q` | Quit |
+| `r` | Refresh capabilities |
+| `l` | Show logs |
+| `p` | Ping server |
+| `x` | Clear results |
+| `t` / `Enter` | Call selected tool |
+| `y` | Copy result to clipboard |
+| `/` | Command palette |
+| `Escape` | Close dialog |
 
 ### CLI Commands
 
@@ -64,25 +78,25 @@ Quick inspection without the full TUI:
 
 ```bash
 # View server info and capabilities
-mamba-mcp connect --stdio "python server.py"
+mamba-mcp-client connect --stdio "python server.py"
 
 # List available tools
-mamba-mcp tools --stdio "python server.py"
+mamba-mcp-client tools --stdio "python server.py"
 
 # List resources
-mamba-mcp resources --sse http://localhost:8000/sse
+mamba-mcp-client resources --sse http://localhost:8000/sse
 
 # List prompts
-mamba-mcp prompts --stdio "python server.py"
+mamba-mcp-client prompts --stdio "python server.py"
 
 # Call a tool with arguments
-mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
+mamba-mcp-client call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 
 # Read a resource
-mamba-mcp read "config://version" --stdio "python server.py"
+mamba-mcp-client read "config://version" --stdio "python server.py"
 
 # Get a prompt
-mamba-mcp prompt code_review --args '{"language": "python"}' --stdio "python server.py"
+mamba-mcp-client prompt code_review --args '{"language": "python"}' --stdio "python server.py"
 ```
 
 ### Python API
@@ -137,38 +151,38 @@ if __name__ == "__main__":
 **Stdio** - Spawn a subprocess and communicate via stdin/stdout:
 ```bash
 # Quote the entire command string
-mamba-mcp connect --stdio "python server.py arg1 arg2"
+mamba-mcp-client connect --stdio "python server.py arg1 arg2"
 
 # Short form
-mamba-mcp connect -s "python server.py"
+mamba-mcp-client connect -s "python server.py"
 ```
 
 **SSE** - Connect to an SSE endpoint:
 ```bash
-mamba-mcp connect --sse http://localhost:8000/sse
+mamba-mcp-client connect --sse http://localhost:8000/sse
 ```
 
 **HTTP** - Connect via Streamable HTTP:
 ```bash
-mamba-mcp connect --http http://localhost:8000/mcp
+mamba-mcp-client connect --http http://localhost:8000/mcp
 ```
 
 **UV-installed** - Connect to MCP servers installed via UV:
 ```bash
 # Connect to a UV-installed server
-mamba-mcp connect --uv @modelcontextprotocol/server-sqlite
+mamba-mcp-client connect --uv @modelcontextprotocol/server-sqlite
 
 # Specify Python version and additional packages
-mamba-mcp connect --uv my-mcp-server --python 3.11 --with requests --with pandas
+mamba-mcp-client connect --uv my-mcp-server --python 3.11 --with requests --with pandas
 ```
 
 **UV-local** - Connect to local UV-based projects (requires both path and name):
 ```bash
 # Connect to a local UV project
-mamba-mcp connect --uv-local-path ./my-mcp-server --uv-local-name server
+mamba-mcp-client connect --uv-local-path ./my-mcp-server --uv-local-name server
 
 # With additional options
-mamba-mcp connect --uv-local-path /path/to/project --uv-local-name myserver --python 3.12
+mamba-mcp-client connect --uv-local-path /path/to/project --uv-local-name myserver --python 3.12
 ```
 
 ### Extra Server Arguments
@@ -177,15 +191,15 @@ Pass additional arguments to MCP servers using the `--` separator:
 
 ```bash
 # For stdio/UV: extra args become command-line arguments
-mamba-mcp connect --stdio "python server.py" -- --verbose --port 8080
-mamba-mcp connect --uv mcp-server-fs -- --root /home/user
+mamba-mcp-client connect --stdio "python server.py" -- --verbose --port 8080
+mamba-mcp-client connect --uv mcp-server-fs -- --root /home/user
 
 # For SSE/HTTP: extra args become query parameters
-mamba-mcp tui --sse http://localhost:8000/sse -- env=prod debug=true
+mamba-mcp-client tui --sse http://localhost:8000/sse -- env=prod debug=true
 # Results in: http://localhost:8000/sse?env=prod&debug=true
 
 # Bare args (without =) become arg=true
-mamba-mcp connect --http http://localhost:8000/mcp -- debug verbose
+mamba-mcp-client connect --http http://localhost:8000/mcp -- debug verbose
 # Results in: http://localhost:8000/mcp?debug=true&verbose=true
 ```
 
@@ -216,7 +230,7 @@ export MAMBA_MCP_CLIENT_LOGGING__ENABLED=true
 Or use a `mamba.env` file (auto-detected from `./mamba.env` or `~/mamba.env`):
 
 ```bash
-mamba-mcp --env-file /path/to/mamba.env connect --stdio "python server.py"
+mamba-mcp-client --env-file /path/to/mamba.env connect --stdio "python server.py"
 ```
 
 ### Programmatic Configuration
@@ -272,6 +286,12 @@ config = ClientConfig.for_uv_local(
 
 The main client class providing async methods for all MCP operations.
 
+**Properties:**
+- `connected` - Whether the client is currently connected
+- `server_info` - `ServerInfo` instance (available after connect)
+- `config` - The `ClientConfig` used to create the client
+- `logger` - The `MCPLogger` instance for protocol logging
+
 **Connection:**
 - `connect()` - Async context manager for connection lifecycle
 - `ping()` - Send a ping to verify connection
@@ -280,7 +300,7 @@ The main client class providing async methods for all MCP operations.
 
 **Tools:**
 - `list_tools()` - List available tools
-- `call_tool(name, arguments)` - Call a tool with arguments
+- `call_tool(name, arguments)` - Call a tool, returns `ToolCallResult`
 
 **Resources:**
 - `list_resources()` - List available resources
@@ -292,23 +312,45 @@ The main client class providing async methods for all MCP operations.
 - `list_prompts()` - List available prompts
 - `get_prompt(name, arguments)` - Get a prompt with arguments
 
+**Roots:**
+- `list_roots()` - List root directories (if supported by server)
+
+**Sampling:**
+- `create_message(messages, max_tokens, **kwargs)` - Request server-initiated sampling (experimental)
+
 **Logging:**
 - `get_log_entries()` - Get all log entries
 - `print_log_summary()` - Print formatted log table
-- `export_logs(path)` - Export logs to JSON file
+- `export_logs()` - Export logs as JSON string
 - `clear_logs()` - Clear log entries
+
+### Data Classes
+
+```python
+ServerInfo(name, version, protocol_version, instructions, capabilities)
+ServerCapabilities(tools, resources, prompts, logging, experimental)
+ToolCallResult(tool_name, arguments, content, is_error, raw_result)
+```
+
+`ToolCallResult` provides convenience properties:
+- `.text` - First text content from the result (or `None`)
+- `.data` - Data from the raw result (or `None`)
 
 ### ClientConfig
 
 Configuration class with factory methods for each transport type.
 
 ```python
+from mamba_mcp_client import ClientConfig, TransportType
+
 ClientConfig.for_stdio(command, args=None, env=None, extra_args=None)
 ClientConfig.for_sse(url, headers=None, timeout=30.0, extra_args=None)
 ClientConfig.for_http(url, headers=None, timeout=30.0, extra_args=None)
 ClientConfig.for_uv_installed(server_name, args=None, python_version=None, with_packages=None, env=None, extra_args=None)
 ClientConfig.for_uv_local(project_path, server_name, args=None, python_version=None, with_packages=None, env=None, extra_args=None)
 ```
+
+**Transport types:** `STDIO`, `SSE`, `HTTP`, `UV_INSTALLED`, `UV_LOCAL`
 
 **extra_args behavior:**
 - For stdio/UV transports: appended to command-line arguments
@@ -324,7 +366,7 @@ The `examples/` directory contains:
 Run the sample server with the TUI:
 
 ```bash
-mamba-mcp tui --stdio "python examples/sample_server.py"
+mamba-mcp-client tui --stdio "python examples/sample_server.py"
 ```
 
 ## Screenshots

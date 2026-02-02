@@ -32,12 +32,13 @@ uv sync --group dev
 ### As a standalone package
 
 ```bash
-uv add mamba-mcp-hana
+pip install mamba-mcp-hana
 ```
 
 ### Dependencies
 
 - `hdbcli` -- SAP's official Python driver for HANA
+- `mamba-mcp-core` -- Shared utilities (error models, fuzzy matching, CLI helpers)
 - `mcp>=1.0.0` -- Model Context Protocol (FastMCP)
 - `pydantic>=2.0.0` / `pydantic-settings>=2.0.0` -- Configuration and validation
 - `typer>=0.12.0` -- CLI framework
@@ -66,7 +67,7 @@ Default file locations (checked in order):
 | `MAMBA_MCP_HANA_POOL_TIMEOUT` | float | `30.0` | Pool connection acquire timeout in seconds |
 | `MAMBA_MCP_HANA_STATEMENT_TIMEOUT` | int | `30000` | Query timeout in milliseconds |
 | `MAMBA_MCP_HANA_DEFAULT_SCHEMA` | str | -- | Default schema for tool queries |
-| `MAMBA_MCP_HANA_TRANSPORT` | str | `stdio` | Server transport (`stdio` or `http`) |
+| `MAMBA_MCP_HANA_TRANSPORT` | str | `stdio` | Server transport (`stdio`, `http`, or `streamable-http`) |
 | `MAMBA_MCP_HANA_SERVER_HOST` | str | `0.0.0.0` | HTTP server bind host |
 | `MAMBA_MCP_HANA_SERVER_PORT` | int | `8080` | HTTP server bind port |
 | `MAMBA_MCP_HANA_LOG_LEVEL` | str | `INFO` | Logging level |
@@ -464,7 +465,8 @@ Returns store type with partitioning information, compression status, and implic
     "table_name": "ORDERS",
     "schema_name": "SALES",
     "store_type": "COLUMN",
-    "is_partitioned": true,
+    "is_column_table": true,
+    "has_partitions": true,
     "partition_count": 4,
     "is_compressed": true,
     "implications": "Column store: Optimized for analytical queries, aggregations, and large scans. Supports foreign key constraints. Data is compressed by default."

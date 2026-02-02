@@ -22,15 +22,15 @@ Provides a secure, sandboxed interface for AI assistants to browse, read, search
 | **Layer 2: S3 Extras** | `list_buckets`, `get_presigned_url`, `get_object_metadata` | When S3 enabled |
 | **Layer 3: Mutation** | `write_file`, `delete_file`, `move_file`, `copy_file`, `create_directory` | When `read_only=false` |
 
-## Quick Start
+## Installation
 
-### Installation
-
-Within the mamba-mcp monorepo:
+Requires Python 3.11+.
 
 ```bash
-uv sync --group dev
+pip install mamba-mcp-fs
 ```
+
+## Quick Start
 
 ### Basic Usage (Local Filesystem)
 
