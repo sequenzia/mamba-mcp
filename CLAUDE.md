@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) packages:
 
+- **mamba-mcp-core** - Shared utilities (CLI helpers, error models, fuzzy matching, transport normalization)
 - **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
 - **mamba-mcp-pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
 - **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
@@ -63,6 +64,15 @@ mamba-mcp/
 ├── pyproject.toml              # Workspace configuration
 ├── uv.lock                     # Shared lockfile
 ├── packages/
+│   ├── mamba-mcp-core/
+│   │   ├── pyproject.toml
+│   │   ├── src/mamba_mcp_core/
+│   │   │   ├── cli.py          # validate_env_file, resolve_default_env_file, setup_logging
+│   │   │   ├── config.py       # _env_file_path state management
+│   │   │   ├── errors.py       # ToolError model & create_tool_error factory
+│   │   │   ├── fuzzy.py        # Levenshtein distance & find_similar_names
+│   │   │   └── transport.py    # normalize_transport
+│   │   └── tests/
 │   ├── mamba-mcp-client/
 │   │   ├── pyproject.toml
 │   │   ├── src/mamba_mcp_client/

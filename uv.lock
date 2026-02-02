@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 members = [
     "mamba-mcp",
     "mamba-mcp-client",
+    "mamba-mcp-core",
     "mamba-mcp-fs",
     "mamba-mcp-hana",
     "mamba-mcp-pg",
@@ -1322,6 +1323,21 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "textual", specifier = ">=0.50.0" },
+    { name = "typer", specifier = ">=0.12.0" },
+]
+
+[[package]]
+name = "mamba-mcp-core"
+version = "0.1.0"
+source = { editable = "packages/mamba-mcp-core" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "typer" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.0.0" },
     { name = "typer", specifier = ">=0.12.0" },
 ]
 
