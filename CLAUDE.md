@@ -100,7 +100,7 @@ mamba-mcp/
 │   │   └── tests/
 │   └── mamba-mcp-hana/
 │       ├── pyproject.toml
-│       ├── src/mamba_mcp_sap_hana/
+│       ├── src/mamba_mcp_hana/
 │       │   ├── __main__.py     # Typer CLI (test, serve)
 │       │   ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
 │       │   ├── errors.py       # Error codes & fuzzy matching
@@ -215,7 +215,7 @@ These exist across packages and should be standardized when touching related cod
 - **Tool return types:** PG tools return `OutputModel | dict[str, Any]`, HANA tools return `str` (always `.model_dump_json()`)
 - **Fuzzy matching thresholds:** PG uses fixed threshold 3, HANA uses scaled `max(2, min(len/2, 5))`
 - **Transport naming:** PG/HANA config accepts `"http"`, FS accepts `"streamable-http"` directly
-- **Module name:** `mamba-mcp-hana` maps to `mamba_mcp_sap_hana` (adds `sap_` prefix), others have 1:1 mapping
+- **Module name:** ~~Resolved~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages)
 
 ## Code Standards
 

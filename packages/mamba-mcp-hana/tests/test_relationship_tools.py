@@ -6,15 +6,15 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.errors import ErrorCode, create_tool_error
-from mamba_mcp_sap_hana.models.relationships import (
+from mamba_mcp_hana.errors import ErrorCode, create_tool_error
+from mamba_mcp_hana.models.relationships import (
     FindJoinPathOutput,
     ForeignKeyInfo,
     ForeignKeysOutput,
     JoinPath,
     JoinStep,
 )
-from mamba_mcp_sap_hana.tools.relationship_tools import find_join_path, get_foreign_keys
+from mamba_mcp_hana.tools.relationship_tools import find_join_path, get_foreign_keys
 
 
 def _make_mock_ctx() -> MagicMock:
@@ -95,7 +95,7 @@ class TestGetForeignKeys:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -119,7 +119,7 @@ class TestGetForeignKeys:
         output = _make_fk_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -146,7 +146,7 @@ class TestGetForeignKeys:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=tool_error)
 
@@ -184,7 +184,7 @@ class TestGetForeignKeys:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -205,7 +205,7 @@ class TestGetForeignKeys:
         output = _make_fk_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -250,7 +250,7 @@ class TestFindJoinPath:
         output = _make_join_path_output(paths=[path])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -273,7 +273,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -299,7 +299,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -325,7 +325,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -346,7 +346,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -367,7 +367,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -398,7 +398,7 @@ class TestFindJoinPath:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=tool_error)
 
@@ -434,7 +434,7 @@ class TestFindJoinPath:
         output = _make_join_path_output(paths=[])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -455,7 +455,7 @@ class TestFindJoinPath:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -510,7 +510,7 @@ class TestFindJoinPath:
         output = _make_join_path_output(paths=[path1, path2])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -538,7 +538,7 @@ class TestToolRegistration:
 
     def test_tools_are_registered_on_mcp(self) -> None:
         """Both relationship tools are registered on the mcp server instance."""
-        from mamba_mcp_sap_hana.server import mcp as server
+        from mamba_mcp_hana.server import mcp as server
 
         # Collect registered tool names
         tool_names = []
@@ -582,7 +582,7 @@ class TestGetForeignKeysExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -626,7 +626,7 @@ class TestGetForeignKeysExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -645,7 +645,7 @@ class TestGetForeignKeysExtended:
     async def test_service_exception_wrapped_in_error(self) -> None:
         """Tool catches unexpected exceptions from service calls."""
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(side_effect=RuntimeError("Network timeout"))
 
@@ -679,7 +679,7 @@ class TestGetForeignKeysExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.get_foreign_keys = AsyncMock(return_value=output)
 
@@ -720,7 +720,7 @@ class TestFindJoinPathExtended:
         output = _make_join_path_output(paths=[path])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -773,7 +773,7 @@ class TestFindJoinPathExtended:
         output = _make_join_path_output(paths=[path])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -800,7 +800,7 @@ class TestFindJoinPathExtended:
         output = _make_join_path_output()
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -837,7 +837,7 @@ class TestFindJoinPathExtended:
         output = _make_join_path_output(paths=[path])
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=output)
 
@@ -867,7 +867,7 @@ class TestFindJoinPathExtended:
         )
 
         ctx = _make_mock_ctx()
-        with patch("mamba_mcp_sap_hana.tools.relationship_tools.RelationshipService") as mock_cls:
+        with patch("mamba_mcp_hana.tools.relationship_tools.RelationshipService") as mock_cls:
             mock_service = mock_cls.return_value
             mock_service.find_join_path = AsyncMock(return_value=tool_error)
 

@@ -14,7 +14,7 @@ from typing import Any
 
 from hdbcli import dbapi  # type: ignore[import-untyped]
 
-from mamba_mcp_sap_hana.config import DatabaseSettings
+from mamba_mcp_hana.config import DatabaseSettings
 
 logger = logging.getLogger(__name__)
 

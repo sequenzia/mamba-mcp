@@ -148,7 +148,7 @@ mamba-mcp/
 │   │   ├── src/mamba_mcp_fs/
 │   │   └── tests/
 │   └── mamba-mcp-hana/          # SAP HANA MCP server
-│       ├── src/mamba_mcp_sap_hana/
+│       ├── src/mamba_mcp_hana/
 │       └── tests/
 └── internal/                   # Specs & images
 ```

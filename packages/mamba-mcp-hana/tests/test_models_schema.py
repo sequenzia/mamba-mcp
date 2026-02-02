@@ -3,7 +3,7 @@
 import json
 
 import pytest
-from mamba_mcp_sap_hana.models.schema import (
+from mamba_mcp_hana.models.schema import (
     ColumnInfo,
     ConstraintInfo,
     DescribeTableInput,
@@ -778,7 +778,7 @@ class TestModelImports:
 
     def test_schema_models_importable_from_package(self) -> None:
         """All Layer 1 models should be importable from models package."""
-        from mamba_mcp_sap_hana.models import (  # noqa: F401
+        from mamba_mcp_hana.models import (  # noqa: F401
             ColumnInfo,
             ConstraintInfo,
             DescribeTableInput,
@@ -796,7 +796,7 @@ class TestModelImports:
 
     def test_all_exports_in_package(self) -> None:
         """All Layer 1 models should be in the models __all__."""
-        from mamba_mcp_sap_hana import models
+        from mamba_mcp_hana import models
 
         expected = [
             "ListSchemasInput",

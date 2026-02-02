@@ -1,6 +1,6 @@
 """Pydantic models for MCP tool inputs and outputs."""
 
-from mamba_mcp_sap_hana.models.hana import (
+from mamba_mcp_hana.models.hana import (
     CalcViewColumnInfo,
     CalcViewInfo,
     DescribeCalcViewInput,
@@ -17,7 +17,7 @@ from mamba_mcp_sap_hana.models.hana import (
     ProcedureParameterInfo,
     StoreTypeInfo,
 )
-from mamba_mcp_sap_hana.models.query import (
+from mamba_mcp_hana.models.query import (
     ExecuteQueryInput,
     ExecuteQueryOutput,
     ExplainPlanNode,
@@ -25,7 +25,7 @@ from mamba_mcp_sap_hana.models.query import (
     ExplainQueryOutput,
     QueryResult,
 )
-from mamba_mcp_sap_hana.models.relationships import (
+from mamba_mcp_hana.models.relationships import (
     FindJoinPathInput,
     FindJoinPathOutput,
     ForeignKeyInfo,
@@ -34,7 +34,7 @@ from mamba_mcp_sap_hana.models.relationships import (
     JoinPath,
     JoinStep,
 )
-from mamba_mcp_sap_hana.models.schema import (
+from mamba_mcp_hana.models.schema import (
     ColumnInfo,
     ConstraintInfo,
     DescribeTableInput,

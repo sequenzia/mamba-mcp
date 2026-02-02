@@ -7,8 +7,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from mamba_mcp_sap_hana.config import DatabaseSettings, set_env_file_path
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.config import DatabaseSettings, set_env_file_path
+from mamba_mcp_hana.database.connection import HanaConnectionPool
 
 
 @pytest.fixture(autouse=True)

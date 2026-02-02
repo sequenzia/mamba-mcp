@@ -6,8 +6,8 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.database.query_service import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.database.query_service import (
     BLOCKED_KEYWORDS,
     MAX_SQL_LENGTH,
     QueryService,
@@ -15,8 +15,8 @@ from mamba_mcp_sap_hana.database.query_service import (
     _strip_comments_and_strings,
     _validate_sql_readonly,
 )
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError
-from mamba_mcp_sap_hana.models.query import (
+from mamba_mcp_hana.errors import ErrorCode, ToolError
+from mamba_mcp_hana.models.query import (
     ExecuteQueryOutput,
     ExplainQueryOutput,
 )
@@ -361,7 +361,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -388,7 +388,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -427,7 +427,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -451,7 +451,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -474,7 +474,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -499,7 +499,7 @@ class TestExecuteQuery:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -519,7 +519,7 @@ class TestExecuteQuery:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -538,7 +538,7 @@ class TestExecuteQuery:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -553,7 +553,7 @@ class TestExecuteQuery:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Failed to connect to SAP HANA"),
         ):
             service = _make_service(pool=pool)
@@ -576,7 +576,7 @@ class TestExecuteQuery:
         ]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -594,7 +594,7 @@ class TestExecuteQuery:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -612,7 +612,7 @@ class TestExecuteQuery:
         cursor.execute.side_effect = Exception("generic error")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -636,11 +636,11 @@ class TestExecuteQuery:
 
         with (
             patch(
-                "mamba_mcp_sap_hana.database.connection._create_connection",
+                "mamba_mcp_hana.database.connection._create_connection",
                 return_value=mock_conn,
             ),
             patch(
-                "mamba_mcp_sap_hana.database.query_service._execute_query_sync",
+                "mamba_mcp_hana.database.query_service._execute_query_sync",
                 side_effect=lambda *a, **k: __import__("time").sleep(10),
             ),
         ):
@@ -660,7 +660,7 @@ class TestExecuteQuery:
         mock_conn = _make_mock_connection()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool, statement_timeout=30000)
@@ -721,7 +721,7 @@ class TestExplainQuery:
         ]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -760,7 +760,7 @@ class TestExplainQuery:
         explain_cursor.fetchall.return_value = []
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -782,7 +782,7 @@ class TestExplainQuery:
         explain_cursor.fetchall.return_value = []
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -796,7 +796,7 @@ class TestExplainQuery:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Failed to connect"),
         ):
             service = _make_service(pool=pool)
@@ -815,7 +815,7 @@ class TestExplainQuery:
         explain_cursor.execute.side_effect = Exception("Could not find table EXPLAIN_PLAN_TABLE")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -851,7 +851,7 @@ class TestExplainQuery:
         ]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -892,7 +892,7 @@ class TestExplainQuery:
         ]
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = _make_service(pool=pool)
@@ -910,7 +910,7 @@ class TestExecuteQuerySync:
 
     def test_no_params_execution(self) -> None:
         """Execute without params calls cursor.execute(sql) only."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = _make_mock_connection(
             columns=[("ID",)],
@@ -925,7 +925,7 @@ class TestExecuteQuerySync:
 
     def test_list_params_execution(self) -> None:
         """Execute with list params calls cursor.execute(sql, params)."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = _make_mock_connection(
             columns=[("NAME",)],
@@ -941,7 +941,7 @@ class TestExecuteQuerySync:
 
     def test_dict_params_execution(self) -> None:
         """Execute with dict params calls cursor.execute(sql, params)."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = _make_mock_connection(
             columns=[("NAME",)],
@@ -957,7 +957,7 @@ class TestExecuteQuerySync:
 
     def test_truncation_detection(self) -> None:
         """Fetching max_rows + 1 rows triggers truncation flag."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = _make_mock_connection(
             columns=[("ID",)],
@@ -971,7 +971,7 @@ class TestExecuteQuerySync:
 
     def test_cursor_closed_on_success(self) -> None:
         """Cursor is closed after successful execution."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = _make_mock_connection()
         _execute_query_sync(conn, "SELECT 1", None, 100, 30000)
@@ -979,7 +979,7 @@ class TestExecuteQuerySync:
 
     def test_cursor_closed_on_error(self) -> None:
         """Cursor is closed even when execution fails."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()
@@ -994,7 +994,7 @@ class TestExecuteQuerySync:
 
     def test_empty_description_returns_empty_columns(self) -> None:
         """Cursor with no description returns empty column list."""
-        from mamba_mcp_sap_hana.database.query_service import _execute_query_sync
+        from mamba_mcp_hana.database.query_service import _execute_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()
@@ -1017,7 +1017,7 @@ class TestExplainQuerySync:
 
     def test_explain_executes_correct_sql(self) -> None:
         """Explain generates correct EXPLAIN PLAN SQL."""
-        from mamba_mcp_sap_hana.database.query_service import _explain_query_sync
+        from mamba_mcp_hana.database.query_service import _explain_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()
@@ -1034,7 +1034,7 @@ class TestExplainQuerySync:
 
     def test_explain_reads_from_explain_plan_table(self) -> None:
         """Explain reads results from EXPLAIN_PLAN_TABLE."""
-        from mamba_mcp_sap_hana.database.query_service import _explain_query_sync
+        from mamba_mcp_hana.database.query_service import _explain_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()
@@ -1064,7 +1064,7 @@ class TestExplainQuerySync:
 
     def test_explain_cleanup_attempted(self) -> None:
         """Cleanup cursor attempts DELETE from EXPLAIN_PLAN_TABLE."""
-        from mamba_mcp_sap_hana.database.query_service import _explain_query_sync
+        from mamba_mcp_hana.database.query_service import _explain_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()
@@ -1082,7 +1082,7 @@ class TestExplainQuerySync:
 
     def test_explain_cleanup_failure_does_not_raise(self) -> None:
         """Cleanup failure is logged but does not raise."""
-        from mamba_mcp_sap_hana.database.query_service import _explain_query_sync
+        from mamba_mcp_hana.database.query_service import _explain_query_sync
 
         conn = MagicMock()
         cursor = MagicMock()

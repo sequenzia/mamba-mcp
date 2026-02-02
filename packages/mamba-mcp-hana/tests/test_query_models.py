@@ -3,7 +3,7 @@
 import json
 
 import pytest
-from mamba_mcp_sap_hana.models.query import (
+from mamba_mcp_hana.models.query import (
     MAX_SQL_LENGTH,
     ExecuteQueryInput,
     ExecuteQueryOutput,
@@ -613,7 +613,7 @@ class TestModelsImportFromPackage:
 
     def test_import_from_models_package(self) -> None:
         """All Layer 3 models should be importable from the models package."""
-        from mamba_mcp_sap_hana.models import (
+        from mamba_mcp_hana.models import (
             ExecuteQueryInput,
             ExecuteQueryOutput,
             ExplainPlanNode,

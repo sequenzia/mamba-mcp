@@ -1,7 +1,7 @@
 """Tests for error handling system with fuzzy matching."""
 
 import pytest
-from mamba_mcp_sap_hana.errors import (
+from mamba_mcp_hana.errors import (
     ERROR_SUGGESTIONS,
     ErrorCode,
     ToolError,

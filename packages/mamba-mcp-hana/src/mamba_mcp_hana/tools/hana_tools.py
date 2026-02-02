@@ -14,9 +14,9 @@ import logging
 from mcp.server.fastmcp import Context
 from mcp.server.session import ServerSession
 
-from mamba_mcp_sap_hana.database.hana import HanaService
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError, create_tool_error
-from mamba_mcp_sap_hana.server import AppContext, mcp
+from mamba_mcp_hana.database.hana import HanaService
+from mamba_mcp_hana.errors import ErrorCode, ToolError, create_tool_error
+from mamba_mcp_hana.server import AppContext, mcp
 
 logger = logging.getLogger(__name__)
 

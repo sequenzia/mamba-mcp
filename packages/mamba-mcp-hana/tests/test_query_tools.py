@@ -12,14 +12,14 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.errors import ErrorCode, create_tool_error
-from mamba_mcp_sap_hana.models.query import (
+from mamba_mcp_hana.errors import ErrorCode, create_tool_error
+from mamba_mcp_hana.models.query import (
     ExecuteQueryOutput,
     ExplainPlanNode,
     ExplainQueryOutput,
     QueryResult,
 )
-from mamba_mcp_sap_hana.tools.query_tools import execute_query, explain_query
+from mamba_mcp_hana.tools.query_tools import execute_query, explain_query
 
 
 def _make_app_context(statement_timeout: int = 30000) -> MagicMock:
@@ -96,7 +96,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -116,7 +116,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -143,7 +143,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -169,7 +169,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -188,7 +188,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -207,7 +207,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -226,7 +226,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx(_make_app_context(statement_timeout=60000))
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -251,7 +251,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -270,7 +270,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -293,7 +293,7 @@ class TestExecuteQueryTool:
             tool_name="execute_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -317,7 +317,7 @@ class TestExecuteQueryTool:
             tool_name="execute_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -340,7 +340,7 @@ class TestExecuteQueryTool:
             tool_name="execute_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -370,7 +370,7 @@ class TestExecuteQueryTool:
             warning="Result set truncated to 100 rows.",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -391,7 +391,7 @@ class TestExecuteQueryTool:
         ctx = _make_ctx(app_ctx)
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -412,7 +412,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -433,7 +433,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -455,7 +455,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -477,7 +477,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -499,7 +499,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -521,7 +521,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -543,7 +543,7 @@ class TestExplainQueryTool:
             tool_name="explain_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=error)
 
@@ -566,7 +566,7 @@ class TestExplainQueryTool:
             tool_name="explain_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=error)
 
@@ -594,7 +594,7 @@ class TestExplainQueryTool:
         ctx = _make_ctx(app_ctx)
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -631,7 +631,7 @@ class TestExplainQueryTool:
             original_query="SELECT o.* FROM ORDERS o JOIN CUSTOMERS c ON o.cid = c.id",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -660,7 +660,7 @@ class TestToolRegistration:
 
     def test_tools_registered_with_mcp(self) -> None:
         """Test both tools are registered with the FastMCP server."""
-        from mamba_mcp_sap_hana.server import mcp as server
+        from mamba_mcp_hana.server import mcp as server
 
         # FastMCP registers tools internally; verify by checking tool list
         # The tools should be registered when the module is imported
@@ -689,7 +689,7 @@ class TestQueryValidationComprehensive:
     @pytest.mark.anyio
     async def test_all_blocked_keywords_rejected(self) -> None:
         """Every BLOCKED_KEYWORD produces WRITE_OPERATION_DENIED or INVALID_SQL."""
-        from mamba_mcp_sap_hana.database.query_service import BLOCKED_KEYWORDS
+        from mamba_mcp_hana.database.query_service import BLOCKED_KEYWORDS
 
         ctx = _make_ctx()
 
@@ -700,7 +700,7 @@ class TestQueryValidationComprehensive:
                 tool_name="execute_query",
             )
 
-            with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+            with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
                 mock_service = mock_service_cls.return_value
                 mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -724,7 +724,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: INSERT",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -742,7 +742,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: UPDATE",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -760,7 +760,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: DELETE",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -778,7 +778,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: DROP",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -796,7 +796,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: CREATE",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -814,7 +814,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: TRUNCATE",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -832,7 +832,7 @@ class TestQueryValidationComprehensive:
             message="Query contains blocked keyword: GRANT",
             tool_name="execute_query",
         )
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -847,7 +847,7 @@ class TestQueryValidationComprehensive:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -863,7 +863,7 @@ class TestQueryValidationComprehensive:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -885,7 +885,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -904,7 +904,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -923,7 +923,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -942,7 +942,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -961,7 +961,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -980,7 +980,7 @@ class TestAutoLimitBehavior:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -1025,7 +1025,7 @@ class TestExplainPlanLifecycle:
             original_query="SELECT o.* FROM ORDERS o JOIN CUSTOMERS c ON o.cid = c.id",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -1055,7 +1055,7 @@ class TestExplainPlanLifecycle:
             total_cost=None,
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -1071,7 +1071,7 @@ class TestExplainPlanLifecycle:
         ctx = _make_ctx()
         expected = _make_explain_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=expected)
 
@@ -1097,7 +1097,7 @@ class TestExplainPlanLifecycle:
             tool_name="explain_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=error)
 
@@ -1116,7 +1116,7 @@ class TestExplainPlanLifecycle:
             tool_name="explain_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.explain_query = AsyncMock(return_value=error)
 
@@ -1136,7 +1136,7 @@ class TestExecuteQueryExtended:
         ctx = _make_ctx()
         expected = _make_execute_output(execution_time_ms=15.3)
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -1151,7 +1151,7 @@ class TestExecuteQueryExtended:
         ctx = _make_ctx()
         expected = _make_execute_output(query_hash="deadbeef")
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -1166,7 +1166,7 @@ class TestExecuteQueryExtended:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -1193,7 +1193,7 @@ class TestExecuteQueryExtended:
             tool_name="execute_query",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=error)
 
@@ -1208,7 +1208,7 @@ class TestExecuteQueryExtended:
         ctx = _make_ctx()
         expected = _make_execute_output()
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 
@@ -1242,7 +1242,7 @@ class TestExecuteQueryExtended:
             query_hash="empty123",
         )
 
-        with patch("mamba_mcp_sap_hana.tools.query_tools.QueryService") as mock_service_cls:
+        with patch("mamba_mcp_hana.tools.query_tools.QueryService") as mock_service_cls:
             mock_service = mock_service_cls.return_value
             mock_service.execute_query = AsyncMock(return_value=expected)
 

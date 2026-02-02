@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.server import SERVER_NAME, AppContext, app_lifespan, mcp
+from mamba_mcp_hana.server import SERVER_NAME, AppContext, app_lifespan, mcp
 
 
 class TestServerInstance:
@@ -55,7 +55,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ) as mock_create:
@@ -83,7 +83,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ):
@@ -109,7 +109,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ):
@@ -127,7 +127,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             side_effect=ConnectionError("Failed to connect to SAP HANA"),
         ):
@@ -150,7 +150,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ):
@@ -177,7 +177,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ):
@@ -203,7 +203,7 @@ class TestAppLifespan:
         mock_server = MagicMock()
 
         with patch(
-            "mamba_mcp_sap_hana.server.create_pool",
+            "mamba_mcp_hana.server.create_pool",
             new_callable=AsyncMock,
             return_value=mock_pool,
         ):

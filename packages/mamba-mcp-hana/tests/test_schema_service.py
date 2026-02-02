@@ -6,10 +6,10 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mamba_mcp_sap_hana.database.connection import HanaConnectionPool
-from mamba_mcp_sap_hana.database.schema_service import SchemaService
-from mamba_mcp_sap_hana.errors import ErrorCode, ToolError
-from mamba_mcp_sap_hana.models.schema import (
+from mamba_mcp_hana.database.connection import HanaConnectionPool
+from mamba_mcp_hana.database.schema_service import SchemaService
+from mamba_mcp_hana.errors import ErrorCode, ToolError
+from mamba_mcp_hana.models.schema import (
     DescribeTableOutput,
     ListSchemasOutput,
     ListTablesOutput,
@@ -102,7 +102,7 @@ class TestSchemaServiceListSchemas:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -139,7 +139,7 @@ class TestSchemaServiceListSchemas:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -173,7 +173,7 @@ class TestSchemaServiceListSchemas:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -199,7 +199,7 @@ class TestSchemaServiceListSchemas:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -215,7 +215,7 @@ class TestSchemaServiceListSchemas:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = SchemaService(pool)
@@ -235,7 +235,7 @@ class TestSchemaServiceListSchemas:
         cursor.execute.side_effect = Exception("SQL error: insufficient privilege")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -279,7 +279,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -315,7 +315,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -349,7 +349,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -385,7 +385,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -421,7 +421,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -450,7 +450,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -482,7 +482,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -511,7 +511,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -531,7 +531,7 @@ class TestSchemaServiceListTables:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = SchemaService(pool)
@@ -568,7 +568,7 @@ class TestSchemaServiceListTables:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -620,7 +620,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -682,7 +682,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -720,7 +720,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -761,7 +761,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -799,7 +799,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -842,7 +842,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -861,7 +861,7 @@ class TestSchemaServiceDescribeTable:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = SchemaService(pool)
@@ -900,7 +900,7 @@ class TestSchemaServiceDescribeTable:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -942,7 +942,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -977,7 +977,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1012,7 +1012,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1042,7 +1042,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1060,7 +1060,7 @@ class TestSchemaServiceGetSampleRows:
         pool = _make_pool()
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             side_effect=ConnectionError("Connection refused"),
         ):
             service = SchemaService(pool)
@@ -1091,7 +1091,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1120,7 +1120,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1156,7 +1156,7 @@ class TestSchemaServiceGetSampleRows:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1193,7 +1193,7 @@ class TestSchemaServiceGetSampleRows:
         cursor.fetchall = MagicMock(return_value=[("USERS",)])
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1228,7 +1228,7 @@ class TestSchemaServiceFuzzyMatching:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1261,7 +1261,7 @@ class TestSchemaServiceFuzzyMatching:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1294,7 +1294,7 @@ class TestSchemaServiceFuzzyMatching:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1323,7 +1323,7 @@ class TestSchemaServiceConnectionRelease:
         )
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)
@@ -1342,7 +1342,7 @@ class TestSchemaServiceConnectionRelease:
         cursor.execute.side_effect = Exception("SQL error")
 
         with patch(
-            "mamba_mcp_sap_hana.database.connection._create_connection",
+            "mamba_mcp_hana.database.connection._create_connection",
             return_value=mock_conn,
         ):
             service = SchemaService(pool)

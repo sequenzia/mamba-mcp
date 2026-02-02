@@ -43,7 +43,7 @@ The monorepo uses **UV workspace mode** with no root package -- all functionalit
 | `packages/mamba-mcp-fs/src/mamba_mcp_fs/server.py` | FastMCP + conditional tool registration via `_register_tools()` | High |
 | `packages/mamba-mcp-fs/src/mamba_mcp_fs/security.py` | SecurityValidator: sandbox, path traversal, symlinks, extensions | High |
 | `packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py` | BackendProtocol + BackendManager routing with security validation | High |
-| `packages/mamba-mcp-hana/src/mamba_mcp_sap_hana/database/connection.py` | HanaConnectionPool: async Queue wrapper around synchronous hdbcli | High |
+| `packages/mamba-mcp-hana/src/mamba_mcp_hana/database/connection.py` | HanaConnectionPool: async Queue wrapper around synchronous hdbcli | High |
 
 ### File Details
 
@@ -90,7 +90,7 @@ The monorepo uses **UV workspace mode** with no root package -- all functionalit
 - `snake_case` for functions/variables/modules, `PascalCase` for classes, `UPPER_SNAKE` for constants
 - Files: `snake_case.py` (e.g., `schema_tools.py`, `test_content.py`)
 - Packages: hyphens in pyproject (`mamba-mcp-fs`), underscores in imports (`mamba_mcp_fs`)
-- Exception: `mamba-mcp-hana` -> `mamba_mcp_sap_hana` (adds `sap_` prefix)
+- All packages use 1:1 name mapping (e.g., `mamba-mcp-hana` -> `mamba_mcp_hana`)
 
 ### Project Structure
 
@@ -157,7 +157,7 @@ pyproject.toml (root) --> ALL packages (shared dev tooling config)
 | **No CI/CD configuration** | Medium | No GitHub Actions or similar. Automated quality gates would catch regressions across 4 packages. |
 | **Fuzzy matching threshold inconsistency** | Low | PG uses fixed threshold 3; HANA uses scaled threshold. Same typo could get suggestions in one server but not the other. |
 | **Transport naming inconsistency** | Low | PG/HANA config accepts `"http"`, FS accepts `"streamable-http"` directly. |
-| **Module name asymmetry** | Low | `mamba-mcp-hana` -> `mamba_mcp_sap_hana` diverges from other packages' 1:1 name mapping. |
+| **Module name asymmetry** | ~~Resolved~~ | `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages). |
 
 ---
 
