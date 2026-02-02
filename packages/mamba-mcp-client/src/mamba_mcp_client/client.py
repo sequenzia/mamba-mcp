@@ -269,9 +269,7 @@ class MCPTestClient:
         try:
             if hasattr(client, "subscribe_resource"):
                 await client.subscribe_resource(AnyUrl(uri))
-                self.logger.log_response(
-                    "resources/subscribe", {"subscribed": True}, request_entry
-                )
+                self.logger.log_response("resources/subscribe", {"subscribed": True}, request_entry)
             else:
                 raise NotImplementedError(
                     "Resource subscription not supported by this client version"
