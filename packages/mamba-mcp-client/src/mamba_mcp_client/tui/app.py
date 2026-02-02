@@ -48,7 +48,7 @@ class ServerInfoPanel(Static):
             self.update("[dim]Not connected[/]")
 
 
-class CapabilityTree(Tree[dict]):
+class CapabilityTree(Tree[dict[str, Any]]):
     """Tree widget for displaying MCP capabilities."""
 
     def __init__(self, label: str = "Capabilities", **kwargs: Any) -> None:
@@ -456,16 +456,16 @@ class MCPTestApp(App[None]):
             result_panel.write_error(f"Failed to load capabilities: {e}")
 
     @on(Tree.NodeSelected)
-    async def handle_tree_selection(self, event: Tree.NodeSelected[dict]) -> None:
+    async def handle_tree_selection(self, event: Tree.NodeSelected[dict[str, Any]]) -> None:
         """Handle tree node selection."""
-        node: TreeNode[dict] = event.node
+        node: TreeNode[dict[str, Any]] = event.node
         if node.data:
             item_type = node.data.get("type")
             item = node.data.get("item")
 
             result_panel = self.query_one("#result-panel", ResultPanel)
 
-            if item_type == "tool":
+            if item_type == "tool" and item is not None:
                 result_panel.write_json(
                     {
                         "name": item.name,
@@ -480,7 +480,7 @@ class MCPTestApp(App[None]):
                     "schema": item.inputSchema or {},
                 }
 
-            elif item_type == "resource":
+            elif item_type == "resource" and item is not None:
                 result_panel.write_json(
                     {
                         "name": item.name,
@@ -491,9 +491,9 @@ class MCPTestApp(App[None]):
                     title=f"Resource: {item.name}",
                 )
                 # Read the resource
-                await self.read_selected_resource(str(item.uri))
+                self.read_selected_resource(str(item.uri))
 
-            elif item_type == "prompt":
+            elif item_type == "prompt" and item is not None:
                 result_panel.write_json(
                     {
                         "name": item.name,

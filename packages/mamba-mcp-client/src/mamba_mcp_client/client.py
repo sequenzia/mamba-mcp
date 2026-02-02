@@ -68,7 +68,7 @@ class ToolCallResult:
     arguments: dict[str, Any]
     content: list[Any]
     is_error: bool = False
-    raw_result: mcp_types.CallToolResult | None = None
+    raw_result: Any = None
 
     @property
     def text(self) -> str | None:
@@ -104,7 +104,7 @@ class MCPTestClient:
             log_requests=config.logging.log_requests,
             log_responses=config.logging.log_responses,
         )
-        self._client: Client | None = None
+        self._client: Client[Any] | None = None
         self._server_info: ServerInfo | None = None
         self._connected: bool = False
 
@@ -227,7 +227,7 @@ class MCPTestClient:
                 self._client = None
                 self._server_info = None
 
-    def _ensure_connected(self) -> Client:
+    def _ensure_connected(self) -> Client[Any]:
         """Ensure client is connected and return the underlying client."""
         if not self._client or not self._connected:
             raise RuntimeError("Client is not connected. Use 'async with client.connect():'")
@@ -267,8 +267,15 @@ class MCPTestClient:
         request_entry = self.logger.log_request("resources/subscribe", {"uri": uri})
 
         try:
-            await client.subscribe_resource(AnyUrl(uri))
-            self.logger.log_response("resources/subscribe", {"subscribed": True}, request_entry)
+            if hasattr(client, "subscribe_resource"):
+                await client.subscribe_resource(AnyUrl(uri))
+                self.logger.log_response(
+                    "resources/subscribe", {"subscribed": True}, request_entry
+                )
+            else:
+                raise NotImplementedError(
+                    "Resource subscription not supported by this client version"
+                )
         except Exception as e:
             self.logger.log_response("resources/subscribe", {}, request_entry, error=str(e))
             raise
@@ -279,8 +286,15 @@ class MCPTestClient:
         request_entry = self.logger.log_request("resources/unsubscribe", {"uri": uri})
 
         try:
-            await client.unsubscribe_resource(AnyUrl(uri))
-            self.logger.log_response("resources/unsubscribe", {"unsubscribed": True}, request_entry)
+            if hasattr(client, "unsubscribe_resource"):
+                await client.unsubscribe_resource(AnyUrl(uri))
+                self.logger.log_response(
+                    "resources/unsubscribe", {"unsubscribed": True}, request_entry
+                )
+            else:
+                raise NotImplementedError(
+                    "Resource unsubscription not supported by this client version"
+                )
         except Exception as e:
             self.logger.log_response("resources/unsubscribe", {}, request_entry, error=str(e))
             raise
