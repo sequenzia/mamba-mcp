@@ -148,26 +148,33 @@ pyproject.toml (root) --> ALL packages (shared dev tooling config)
 
 ## Challenges & Risks
 
-| Challenge | Severity | Impact |
+| Challenge | Severity | Status |
 |-----------|----------|--------|
-| **Inconsistent error return types** | Medium | `mamba-mcp-pg` returns `dict`, HANA returns `ToolError` model, FS uses custom exceptions. Consuming LLMs see different error JSON shapes per server. |
-| **Inconsistent tool return types** | Medium | PG tools return `OutputModel \| dict`, HANA tools return `str` (always `.model_dump_json()`). Different response formats per server. |
-| **Code duplication across servers** | Medium | Config scaffolding, CLI boilerplate, Levenshtein implementation, error framework -- all copy-pasted. Bug fixes must be applied 3x. |
-| **Missing test coverage (mamba-mcp-pg)** | Medium | PG has ~5 test files vs HANA (16) and FS (13+). No model, config, or error handling tests. |
-| **No CI/CD configuration** | Medium | No GitHub Actions or similar. Automated quality gates would catch regressions across 4 packages. |
-| **Fuzzy matching threshold inconsistency** | Low | PG uses fixed threshold 3; HANA uses scaled threshold. Same typo could get suggestions in one server but not the other. |
-| **Transport naming inconsistency** | Low | PG/HANA config accepts `"http"`, FS accepts `"streamable-http"` directly. |
-| **Module name asymmetry** | ~~Resolved~~ | `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages). |
+| **Inconsistent error return types** | Medium | ✅ Resolved — All servers share core `ToolError` model via `mamba-mcp-core`; wrapper functions preserve each server's return type contract. |
+| **Inconsistent tool return types** | Medium | ✅ Resolved — All servers now return `OutputModel \| dict[str, Any]` (HANA migrated from `str`). |
+| **Code duplication across servers** | Medium | ✅ Resolved — CLI helpers, config state, errors, and fuzzy matching consolidated in `mamba-mcp-core`. |
+| **Missing test coverage (mamba-mcp-pg)** | Medium | ✅ Resolved — PG now has 271 tests (was 66). Added test_config, test_errors, test_server, test_models. |
+| **No CI/CD configuration** | Medium | ✅ Resolved — GitHub Actions CI with lint, type-check, and per-package test matrix. |
+| **Fuzzy matching threshold inconsistency** | Low | ✅ Resolved — All servers use core's scaled threshold: `max(2, min(len//2, 5))`. |
+| **Transport naming inconsistency** | Low | ✅ Resolved — All servers accept both `"http"` and `"streamable-http"`, normalized via core. |
+| **Module name asymmetry** | Low | ✅ Resolved — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages). |
+
+### Remaining Considerations
+
+- **FS error architecture:** FS intentionally keeps its custom exception hierarchy (`FSError` base + 9 subclasses) for internal backend flow control. This is a deliberate design choice, not an inconsistency.
+- **Error return type contracts:** PG returns `dict[str, Any]`, HANA returns `ToolError` model. Both use the shared core model internally. Full unification would be a breaking change.
 
 ---
 
 ## Recommendations
 
-1. **Standardize error/response format across servers** -- Pick one approach (dict or Pydantic model return) and align all three servers.
-2. **Add CI/CD pipeline** -- GitHub Actions running `ruff check`, `mypy`, and `pytest` across all packages.
-3. **Increase mamba-mcp-pg test coverage** -- Add config, model, and error handling tests to match HANA/FS coverage levels.
-4. **Consider a shared utilities package if adding more servers** -- Extract config scaffolding, CLI boilerplate, Levenshtein matching, and error framework.
-5. **Normalize transport naming** -- Accept both `"http"` and `"streamable-http"` consistently across all packages.
+All original recommendations have been addressed:
+
+1. ~~Standardize error/response format~~ — Done via `mamba-mcp-core` shared model.
+2. ~~Add CI/CD pipeline~~ — Done via `.github/workflows/ci.yml`.
+3. ~~Increase mamba-mcp-pg test coverage~~ — Done, PG now at 271 tests.
+4. ~~Shared utilities package~~ — Done, `mamba-mcp-core` created.
+5. ~~Normalize transport naming~~ — Done via `normalize_transport()` in core.
 
 ---
 
