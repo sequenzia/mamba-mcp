@@ -16,6 +16,8 @@ from mamba_mcp_fs.errors import (
     RateLimitedError,
     SymlinkBlockedError,
     create_error_response,
+    create_tool_error,
+    find_similar_names,
 )
 
 # All 10 error codes and their expected constant values
@@ -242,3 +244,168 @@ class TestErrorFrameworkRobustness:
         err = FileTooLargeError(long_msg)
         assert err.message == long_msg
         assert len(str(err)) == 10000
+
+
+class TestCreateToolError:
+    """Tests for the core-aligned create_tool_error function."""
+
+    def test_returns_dict(self) -> None:
+        """create_tool_error returns a plain dict for backward compatibility."""
+        result = create_tool_error(
+            code=ErrorCode.PATH_NOT_FOUND,
+            message="File not found",
+            tool_name="read_file",
+        )
+        assert type(result) is dict
+
+    def test_uses_core_tool_error_fields(self) -> None:
+        """Result contains all core ToolError fields."""
+        result = create_tool_error(
+            code=ErrorCode.BACKEND_ERROR,
+            message="Connection failed",
+            tool_name="list_directory",
+            context={"path": "/data"},
+            input_received={"path": "/data", "backend": "s3"},
+        )
+        assert result["code"] == ErrorCode.BACKEND_ERROR
+        assert result["message"] == "Connection failed"
+        assert result["tool_name"] == "list_directory"
+        assert result["context"] == {"path": "/data"}
+        assert result["input_received"] == {"path": "/data", "backend": "s3"}
+
+    def test_injects_fs_error_suggestions(self) -> None:
+        """FS ERROR_SUGGESTIONS map is used for suggestion lookup."""
+        result = create_tool_error(
+            code=ErrorCode.FILE_TOO_LARGE,
+            message="Too big",
+            tool_name="read_file",
+        )
+        assert result["suggestion"] == ERROR_SUGGESTIONS[ErrorCode.FILE_TOO_LARGE]
+
+    def test_explicit_suggestion_overrides_map(self) -> None:
+        """An explicit suggestion parameter overrides the ERROR_SUGGESTIONS lookup."""
+        result = create_tool_error(
+            code=ErrorCode.PATH_NOT_FOUND,
+            message="Not found",
+            tool_name="read_file",
+            suggestion="Custom suggestion here",
+        )
+        assert result["suggestion"] == "Custom suggestion here"
+
+    def test_unknown_code_returns_none_suggestion(self) -> None:
+        """An unrecognized error code gets None suggestion (no generic fallback)."""
+        result = create_tool_error(
+            code="TOTALLY_UNKNOWN",
+            message="Unknown error",
+            tool_name="test_tool",
+        )
+        assert result["suggestion"] is None
+
+    @pytest.mark.parametrize("expected_value,code", ALL_ERROR_CODES)
+    def test_all_codes_produce_valid_response(self, expected_value: str, code: str) -> None:
+        """create_tool_error produces valid output for every known error code."""
+        result = create_tool_error(
+            code=code,
+            message=f"Test for {code}",
+            tool_name="test_tool",
+        )
+        assert result["code"] == code
+        assert result["message"] == f"Test for {code}"
+        assert result["tool_name"] == "test_tool"
+        assert result["suggestion"] == ERROR_SUGGESTIONS[code]
+
+    def test_context_defaults_to_none(self) -> None:
+        """Context is None when not provided."""
+        result = create_tool_error(
+            code=ErrorCode.RATE_LIMITED,
+            message="Too fast",
+            tool_name="write_file",
+        )
+        assert result["context"] is None
+
+    def test_input_received_defaults_to_none(self) -> None:
+        """Input received is None when not provided."""
+        result = create_tool_error(
+            code=ErrorCode.RATE_LIMITED,
+            message="Too fast",
+            tool_name="write_file",
+        )
+        assert result["input_received"] is None
+
+
+class TestFindSimilarNames:
+    """Tests for find_similar_names re-exported from core."""
+
+    def test_finds_close_match(self) -> None:
+        """find_similar_names returns close matches."""
+        candidates = ["local", "s3"]
+        result = find_similar_names("lcal", candidates)
+        assert "local" in result
+
+    def test_no_match_for_unrelated_input(self) -> None:
+        """find_similar_names returns empty for unrelated strings."""
+        candidates = ["local", "s3"]
+        result = find_similar_names("zzzzzzzzz", candidates)
+        assert result == []
+
+    def test_empty_candidates(self) -> None:
+        """find_similar_names handles empty candidate list."""
+        result = find_similar_names("test", [])
+        assert result == []
+
+    def test_exact_match_included(self) -> None:
+        """find_similar_names includes exact matches."""
+        candidates = ["report.csv", "output.txt", "data.json"]
+        result = find_similar_names("report.csv", candidates)
+        assert "report.csv" in result
+
+
+class TestBackendFuzzyMatching:
+    """Tests for fuzzy matching integration in BackendManager."""
+
+    def test_unknown_backend_suggests_similar(self) -> None:
+        """Typo in backend name produces 'Did you mean?' suggestion."""
+        from unittest.mock import MagicMock
+
+        from mamba_mcp_fs.backends.base import BackendManager
+        from mamba_mcp_fs.errors import BackendNotConfiguredError
+
+        settings = MagicMock()
+        security = MagicMock()
+        manager = BackendManager(settings, security)
+
+        with pytest.raises(BackendNotConfiguredError, match="Did you mean") as exc_info:
+            manager.get_backend("/test/path", backend="locl")
+        assert "local" in str(exc_info.value)
+
+    def test_unknown_backend_no_suggestion_for_unrelated(self) -> None:
+        """Completely unrelated backend name does not suggest alternatives."""
+        from unittest.mock import MagicMock
+
+        from mamba_mcp_fs.backends.base import BackendManager
+        from mamba_mcp_fs.errors import BackendNotConfiguredError
+
+        settings = MagicMock()
+        security = MagicMock()
+        manager = BackendManager(settings, security)
+
+        with pytest.raises(BackendNotConfiguredError) as exc_info:
+            manager.get_backend("/test/path", backend="zzzzzzzzz")
+        assert "Did you mean" not in str(exc_info.value)
+
+    def test_disabled_backend_shows_enabled_alternatives(self) -> None:
+        """Disabled backend error message lists enabled backends."""
+        from unittest.mock import MagicMock
+
+        from mamba_mcp_fs.backends.base import BackendManager
+        from mamba_mcp_fs.errors import BackendNotConfiguredError
+
+        settings = MagicMock()
+        settings.local.enabled = True
+        settings.s3.enabled = False
+        security = MagicMock()
+        manager = BackendManager(settings, security)
+
+        with pytest.raises(BackendNotConfiguredError, match="Enabled backends") as exc_info:
+            manager.get_backend("s3://bucket/key", backend="s3")
+        assert "local" in str(exc_info.value)

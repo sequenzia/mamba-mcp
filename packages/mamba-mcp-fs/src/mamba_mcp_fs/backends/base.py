@@ -13,7 +13,12 @@ from __future__ import annotations
 from typing import Any, Protocol, runtime_checkable
 
 from mamba_mcp_fs.config import Settings
-from mamba_mcp_fs.errors import BackendError, BackendNotConfiguredError, InvalidOperationError
+from mamba_mcp_fs.errors import (
+    BackendError,
+    BackendNotConfiguredError,
+    InvalidOperationError,
+    find_similar_names,
+)
 from mamba_mcp_fs.security import SecurityValidator
 
 # S3 path prefix for auto-detection
@@ -245,8 +250,10 @@ class BackendManager:
 
         # Validate the backend name
         if backend_name not in VALID_BACKENDS:
+            similar = find_similar_names(backend_name, sorted(VALID_BACKENDS))
+            hint = f" Did you mean '{similar[0]}'?" if similar else ""
             raise BackendNotConfiguredError(
-                f"Unknown backend '{backend_name}'. Valid backends: {sorted(VALID_BACKENDS)}"
+                f"Unknown backend '{backend_name}'. Valid backends: {sorted(VALID_BACKENDS)}.{hint}"
             )
 
         # Check for conflicting backend/path combinations
@@ -255,8 +262,10 @@ class BackendManager:
 
         # Check that the backend is enabled in config
         if not self.is_backend_enabled(backend_name):
+            enabled = [b for b in sorted(VALID_BACKENDS) if self.is_backend_enabled(b)]
+            hint = f" Enabled backends: {enabled}." if enabled else ""
             raise BackendNotConfiguredError(
-                f"Backend '{backend_name}' is not enabled. Enable it in server configuration."
+                f"Backend '{backend_name}' is not enabled. Enable it in server configuration.{hint}"
             )
 
         # Check that the backend instance is registered

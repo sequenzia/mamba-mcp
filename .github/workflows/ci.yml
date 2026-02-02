@@ -35,6 +35,7 @@ jobs:
       matrix:
         package:
           - mamba-mcp-core
+          - mamba-mcp-client
           - mamba-mcp-pg
           - mamba-mcp-fs
           - mamba-mcp-hana

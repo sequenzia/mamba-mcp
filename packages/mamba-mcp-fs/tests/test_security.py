@@ -923,6 +923,38 @@ class TestExtensionDenylist:
         validator.check_extension("file.md")
 
 
+class TestExtensionFuzzyMatching:
+    """Tests for fuzzy matching in extension validation error messages."""
+
+    def test_similar_extension_suggested(self, sandbox: Path) -> None:
+        """Close misspelling in extension triggers 'Did you mean?' hint."""
+        server = ServerSettings(allowed_extensions=".py,.txt,.md,.json")
+        local = LocalSettings(base_path=str(sandbox))
+        validator = SecurityValidator(server, local)
+
+        with pytest.raises(PermissionDeniedError, match="Did you mean") as exc_info:
+            validator.check_extension("file.jsn")
+        assert ".json" in str(exc_info.value)
+
+    def test_no_suggestion_for_distant_extension(self, sandbox: Path) -> None:
+        """Very different extension does not trigger a suggestion."""
+        server = ServerSettings(allowed_extensions=".py,.txt")
+        local = LocalSettings(base_path=str(sandbox))
+        validator = SecurityValidator(server, local)
+
+        with pytest.raises(PermissionDeniedError) as exc_info:
+            validator.check_extension("file.xlsx")
+        assert "Did you mean" not in str(exc_info.value)
+
+    def test_exact_match_does_not_raise(self, sandbox: Path) -> None:
+        """Exact extension match passes without error."""
+        server = ServerSettings(allowed_extensions=".py,.txt,.md")
+        local = LocalSettings(base_path=str(sandbox))
+        validator = SecurityValidator(server, local)
+        # Should not raise
+        validator.check_extension("file.txt")
+
+
 # ============================================================================
 # Size Limit Enforcement (REQ-SEC-005)
 # ============================================================================

@@ -21,6 +21,7 @@ from mamba_mcp_fs.errors import (
     PathOutsideSandboxError,
     PermissionDeniedError,
     SymlinkBlockedError,
+    find_similar_names,
 )
 
 
@@ -241,9 +242,11 @@ class SecurityValidator:
         # Allowlist takes precedence if configured
         if self._allowed_extensions is not None:
             if ext not in self._allowed_extensions:
+                similar = find_similar_names(ext, sorted(self._allowed_extensions))
+                hint = f" Did you mean '{similar[0]}'?" if similar else ""
                 raise PermissionDeniedError(
                     f"Extension '{ext}' is not in the allowed list: "
-                    f"{sorted(self._allowed_extensions)}"
+                    f"{sorted(self._allowed_extensions)}.{hint}"
                 )
             return
 
