@@ -12,6 +12,7 @@ license = { text = "MIT" }
 members = ["packages/*"]
 
 [tool.uv.sources]
+mamba-mcp-core = { workspace = true }
 mamba-mcp-client = { workspace = true }
 mamba-mcp-pg = { workspace = true }
 mamba-mcp-fs = { workspace = true }
