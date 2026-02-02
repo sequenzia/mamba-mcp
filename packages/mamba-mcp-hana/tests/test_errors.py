@@ -5,7 +5,6 @@ from mamba_mcp_hana.errors import (
     ERROR_SUGGESTIONS,
     ErrorCode,
     ToolError,
-    _levenshtein_distance,
     create_tool_error,
     suggest_similar,
 )
@@ -168,53 +167,6 @@ class TestCreateToolError:
             tool_name="some_tool",
         )
         assert error.suggestion is None
-
-
-class TestLevenshteinDistance:
-    """Tests for Levenshtein distance calculation."""
-
-    def test_identical_strings(self) -> None:
-        """Identical strings should have distance 0."""
-        assert _levenshtein_distance("kitten", "kitten") == 0
-
-    def test_empty_strings(self) -> None:
-        """Empty strings should have distance equal to the other string's length."""
-        assert _levenshtein_distance("", "") == 0
-        assert _levenshtein_distance("abc", "") == 3
-        assert _levenshtein_distance("", "xyz") == 3
-
-    def test_classic_kitten_sitting(self) -> None:
-        """Classic example: kitten -> sitting = 3."""
-        assert _levenshtein_distance("kitten", "sitting") == 3
-
-    def test_single_insertion(self) -> None:
-        """One character insertion should give distance 1."""
-        assert _levenshtein_distance("cat", "cats") == 1
-
-    def test_single_deletion(self) -> None:
-        """One character deletion should give distance 1."""
-        assert _levenshtein_distance("cats", "cat") == 1
-
-    def test_single_substitution(self) -> None:
-        """One character substitution should give distance 1."""
-        assert _levenshtein_distance("cat", "car") == 1
-
-    def test_completely_different(self) -> None:
-        """Completely different strings should have high distance."""
-        assert _levenshtein_distance("abc", "xyz") == 3
-
-    def test_symmetric(self) -> None:
-        """Distance should be symmetric: d(a,b) == d(b,a)."""
-        assert _levenshtein_distance("abc", "def") == _levenshtein_distance("def", "abc")
-
-    def test_known_pairs(self) -> None:
-        """Known edit distance pairs for common schema names."""
-        # USERS -> USER = 1 (deletion)
-        assert _levenshtein_distance("USERS", "USER") == 1
-        # ORDERS -> ORDER = 1 (deletion)
-        assert _levenshtein_distance("ORDERS", "ORDER") == 1
-        # PUBLIC -> PUBILC = 2 (transposition = 2 in levenshtein)
-        assert _levenshtein_distance("PUBLIC", "PUBILC") == 2
 
 
 class TestSuggestSimilar:

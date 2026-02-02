@@ -1,11 +1,35 @@
 """Structured error handling for MCP tools with fuzzy matching.
 
-Based on Spec Section 5.7.
+Based on Spec Section 5.7. Uses mamba-mcp-core for shared error model
+and fuzzy matching, with a thin wrapper to preserve ToolError return type.
 """
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from mamba_mcp_core.errors import ToolError
+from mamba_mcp_core.errors import create_tool_error as _core_create_tool_error
+from mamba_mcp_core.fuzzy import find_similar_names
+
+
+def suggest_similar(
+    name: str,
+    candidates: list[str],
+    max_suggestions: int = 3,
+) -> list[str]:
+    """Find similar names using Levenshtein distance.
+
+    Backward-compatible wrapper around core's find_similar_names.
+    Maps the legacy `max_suggestions` parameter to core's `max_results`.
+
+    Args:
+        name: The name to match against.
+        candidates: List of candidate names to search.
+        max_suggestions: Maximum number of suggestions to return.
+
+    Returns:
+        List of similar names sorted by edit distance (closest first).
+    """
+    return find_similar_names(name, candidates, max_results=max_suggestions)
 
 
 class ErrorCode:
@@ -42,23 +66,6 @@ ERROR_SUGGESTIONS: dict[str, str] = {
 }
 
 
-class ToolError(BaseModel):
-    """Standard error response for tool failures."""
-
-    code: str = Field(description="Machine-readable error code")
-    message: str = Field(description="Human-readable error message")
-    suggestion: str | None = Field(
-        default=None, description="Actionable suggestion to resolve the error"
-    )
-    context: dict[str, Any] | None = Field(
-        default=None, description="Additional context for debugging"
-    )
-    tool_name: str = Field(description="Name of the tool that generated the error")
-    input_received: dict[str, Any] | None = Field(
-        default=None, description="Input parameters that were received"
-    )
-
-
 def create_tool_error(
     code: str,
     message: str,
@@ -68,6 +75,9 @@ def create_tool_error(
     suggestion: str | None = None,
 ) -> ToolError:
     """Create a structured error response.
+
+    Wraps core create_tool_error to preserve existing HANA tool return
+    type contract (ToolError model instance).
 
     Args:
         code: Machine-readable error code.
@@ -80,76 +90,22 @@ def create_tool_error(
     Returns:
         ToolError model instance.
     """
-    return ToolError(
+    return _core_create_tool_error(
         code=code,
         message=message,
-        suggestion=suggestion or ERROR_SUGGESTIONS.get(code),
-        context=context,
         tool_name=tool_name,
         input_received=input_received,
+        context=context,
+        suggestion=suggestion,
+        suggestions_map=ERROR_SUGGESTIONS,
     )
 
 
-def _levenshtein_distance(s1: str, s2: str) -> int:
-    """Calculate Levenshtein edit distance between two strings.
-
-    Uses the Wagner-Fischer dynamic programming algorithm with
-    two-row optimization for O(min(m,n)) space complexity.
-
-    Args:
-        s1: First string.
-        s2: Second string.
-
-    Returns:
-        Minimum number of single-character edits to transform s1 into s2.
-    """
-    if len(s1) < len(s2):
-        return _levenshtein_distance(s2, s1)
-    if len(s2) == 0:
-        return len(s1)
-
-    prev_row = list(range(len(s2) + 1))
-    for i, c1 in enumerate(s1):
-        curr_row = [i + 1]
-        for j, c2 in enumerate(s2):
-            insertions = prev_row[j + 1] + 1
-            deletions = curr_row[j] + 1
-            substitutions = prev_row[j] + (c1 != c2)
-            curr_row.append(min(insertions, deletions, substitutions))
-        prev_row = curr_row
-    return prev_row[-1]
-
-
-def suggest_similar(
-    name: str,
-    candidates: list[str],
-    max_suggestions: int = 3,
-) -> list[str]:
-    """Find similar names using Levenshtein distance.
-
-    Compares the input name against all candidates (case-insensitive)
-    and returns the closest matches within an edit distance threshold.
-    The threshold scales with the length of the input name.
-
-    Args:
-        name: The name to match against.
-        candidates: List of candidate names to search.
-        max_suggestions: Maximum number of suggestions to return.
-
-    Returns:
-        List of similar names sorted by edit distance (closest first).
-        Returns empty list if no candidates are within the threshold.
-    """
-    if not candidates:
-        return []
-
-    # Threshold scales with name length: min 2, max 5
-    threshold = max(2, min(len(name) // 2, 5))
-
-    scored = [
-        (candidate, _levenshtein_distance(name.lower(), candidate.lower()))
-        for candidate in candidates
-    ]
-    scored.sort(key=lambda x: x[1])
-
-    return [candidate for candidate, distance in scored[:max_suggestions] if distance <= threshold]
+__all__ = [
+    "ErrorCode",
+    "ERROR_SUGGESTIONS",
+    "ToolError",
+    "create_tool_error",
+    "suggest_similar",
+    "find_similar_names",
+]

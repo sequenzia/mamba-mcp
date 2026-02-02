@@ -8,7 +8,6 @@ from mamba_mcp_hana.config import (
     ServerSettings,
     get_env_file_path,
     get_settings,
-    resolve_env_file,
     set_env_file_path,
 )
 from pydantic import SecretStr, ValidationError
@@ -383,92 +382,6 @@ class TestServerSettings:
         """Test invalid log format is rejected."""
         with pytest.raises(ValidationError):
             ServerSettings(log_format="yaml", _env_file=None)  # type: ignore[call-arg]
-
-
-class TestResolveEnvFile:
-    """Tests for cascading env file resolution."""
-
-    def test_explicit_path_returned(self, tmp_path: Path) -> None:
-        """Test explicitly provided path is returned."""
-        env_file = tmp_path / "custom.env"
-        env_file.write_text("MAMBA_MCP_HANA_DB_HOST=localhost\n")
-
-        result = resolve_env_file(str(env_file))
-        assert result == str(env_file.resolve())
-
-    def test_explicit_missing_raises_error(self, tmp_path: Path) -> None:
-        """Test explicit path to missing file raises FileNotFoundError."""
-        missing = tmp_path / "missing.env"
-
-        with pytest.raises(FileNotFoundError) as exc_info:
-            resolve_env_file(str(missing))
-
-        assert "Environment file not found" in str(exc_info.value)
-        assert "missing.env" in str(exc_info.value)
-
-    def test_explicit_directory_raises_error(self, tmp_path: Path) -> None:
-        """Test explicit path to directory raises FileNotFoundError."""
-        with pytest.raises(FileNotFoundError) as exc_info:
-            resolve_env_file(str(tmp_path))
-
-        assert "not a file" in str(exc_info.value)
-
-    def test_detects_cwd_mamba_env(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-        """Test detection of mamba.env in current working directory."""
-        env_file = tmp_path / "mamba.env"
-        env_file.write_text("MAMBA_MCP_HANA_DB_HOST=localhost\n")
-
-        monkeypatch.chdir(tmp_path)
-
-        result = resolve_env_file(None)
-        assert result == str(env_file.resolve())
-
-    def test_falls_back_to_home_mamba_env(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Test fallback to ~/mamba.env when no mamba.env in cwd."""
-        monkeypatch.chdir(tmp_path)
-
-        fake_home = tmp_path / "fakehome"
-        fake_home.mkdir()
-        home_env = fake_home / "mamba.env"
-        home_env.write_text("MAMBA_MCP_HANA_DB_HOST=home-host\n")
-
-        monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
-
-        result = resolve_env_file(None)
-        assert result == str(home_env.resolve())
-
-    def test_cwd_takes_priority_over_home(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Test that cwd mamba.env takes priority over ~/mamba.env."""
-        cwd_env = tmp_path / "mamba.env"
-        cwd_env.write_text("MAMBA_MCP_HANA_DB_HOST=cwd-host\n")
-
-        fake_home = tmp_path / "fakehome"
-        fake_home.mkdir()
-        home_env = fake_home / "mamba.env"
-        home_env.write_text("MAMBA_MCP_HANA_DB_HOST=home-host\n")
-
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
-
-        result = resolve_env_file(None)
-        assert result == str(cwd_env.resolve())
-
-    def test_returns_none_when_no_env_file(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Test None returned when no mamba.env exists anywhere."""
-        fake_home = tmp_path / "fakehome"
-        fake_home.mkdir()
-
-        monkeypatch.chdir(tmp_path)
-        monkeypatch.setattr(Path, "home", classmethod(lambda cls: fake_home))
-
-        result = resolve_env_file(None)
-        assert result is None
 
 
 class TestEnvFilePathState:

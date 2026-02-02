@@ -14,74 +14,14 @@ Auto-detects TLS encryption when port is 443 (HANA Cloud).
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
+from mamba_mcp_core.config import get_env_file_path, set_env_file_path
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Module-level state for env file path
-_env_file_path: str | None = None
-
-
-def set_env_file_path(path: str | None) -> None:
-    """Set the env file path for settings to use.
-
-    Args:
-        path: Path to .env file, or None to use default (mamba.env in current directory).
-    """
-    global _env_file_path
-    _env_file_path = path
-
-
-def get_env_file_path() -> str | None:
-    """Get the currently configured env file path.
-
-    Returns:
-        The configured env file path, or None if using default.
-    """
-    return _env_file_path
-
-
-def resolve_env_file(explicit_path: str | None) -> str | None:
-    """Resolve env file path with cascading fallback.
-
-    Resolution order:
-    1. Explicit path (if provided) - raises FileNotFoundError if not found
-    2. ./mamba.env (current working directory)
-    3. ~/mamba.env (home directory)
-    4. None (no env file)
-
-    Args:
-        explicit_path: Explicitly provided env file path, or None.
-
-    Returns:
-        Resolved env file path, or None if no env file found.
-
-    Raises:
-        FileNotFoundError: If an explicit path is provided but does not exist or is not a file.
-    """
-    if explicit_path is not None:
-        resolved = Path(explicit_path).resolve()
-        if not resolved.exists():
-            msg = f"Environment file not found: {explicit_path}"
-            raise FileNotFoundError(msg)
-        if not resolved.is_file():
-            msg = f"Environment file path is not a file: {explicit_path}"
-            raise FileNotFoundError(msg)
-        return str(resolved)
-
-    # Check ./mamba.env
-    cwd_env = Path.cwd() / "mamba.env"
-    if cwd_env.is_file():
-        return str(cwd_env.resolve())
-
-    # Check ~/mamba.env
-    home_env = Path.home() / "mamba.env"
-    if home_env.is_file():
-        return str(home_env.resolve())
-
-    return None
+# Re-export for backward compatibility
+__all__ = ["get_env_file_path", "set_env_file_path", "get_settings", "Settings"]
 
 
 class DatabaseSettings(BaseSettings):
@@ -177,8 +117,8 @@ class ServerSettings(BaseSettings):
 
     transport: str = Field(
         default="stdio",
-        pattern=r"^(stdio|http)$",
-        description="Transport type (stdio or http)",
+        pattern=r"^(stdio|http|streamable-http)$",
+        description="Transport type (stdio, http, or streamable-http)",
     )
     server_host: str = Field(default="0.0.0.0", description="HTTP server bind host")
     server_port: int = Field(default=8080, ge=1, le=65535, description="HTTP server bind port")
@@ -210,7 +150,7 @@ class Settings(BaseSettings):
     @classmethod
     def load_nested_settings(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Load nested settings with the configured env file path."""
-        env_file = _env_file_path
+        env_file = get_env_file_path()
         if "database" not in data or data["database"] is None:
             data["database"] = DatabaseSettings(_env_file=env_file)  # type: ignore[call-arg]
         if "server" not in data or data["server"] is None:
