@@ -11,6 +11,7 @@ Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) pac
 - **mamba-mcp-pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
 - **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
 - **mamba-mcp-hana** - SAP HANA MCP Server with layered schema discovery (11 tools across 4 layers)
+- **mamba-mcp-gitlab** - GitLab MCP Server for merge requests, issues, pipelines, and search (18 tools across 4 categories)
 
 ## Development Commands
 
@@ -27,6 +28,7 @@ uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
 uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
 uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
 uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
+uv run --package mamba-mcp-gitlab pytest packages/mamba-mcp-gitlab/
 
 # Type check
 mypy packages/
@@ -111,16 +113,29 @@ mamba-mcp/
 │   │   │   ├── models/         # Pydantic I/O models
 │   │   │   └── tools/          # MCP tool definitions (12 tools)
 │   │   └── tests/
-│   └── mamba-mcp-hana/
+│   ├── mamba-mcp-hana/
+│   │   ├── pyproject.toml
+│   │   ├── src/mamba_mcp_hana/
+│   │   │   ├── __main__.py     # Typer CLI (test, serve)
+│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
+│   │   │   ├── errors.py       # Error codes & fuzzy matching
+│   │   │   ├── server.py       # FastMCP server & lifespan
+│   │   │   ├── database/       # hdbcli async services
+│   │   │   ├── models/         # Pydantic I/O models
+│   │   │   └── tools/          # MCP tool definitions (11 tools)
+│   │   └── tests/
+│   └── mamba-mcp-gitlab/
 │       ├── pyproject.toml
-│       ├── src/mamba_mcp_hana/
+│       ├── src/mamba_mcp_gitlab/
 │       │   ├── __main__.py     # Typer CLI (test, serve)
-│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
+│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_GITLAB_*)
+│       │   ├── auth.py         # PAT & OAuth 2.0 auth strategies
 │       │   ├── errors.py       # Error codes & fuzzy matching
+│       │   ├── rate_limit.py   # Sliding window rate limiter
 │       │   ├── server.py       # FastMCP server & lifespan
-│       │   ├── database/       # hdbcli async services
+│       │   ├── services/       # GitLab API service classes
 │       │   ├── models/         # Pydantic I/O models
-│       │   └── tools/          # MCP tool definitions (11 tools)
+│       │   └── tools/          # MCP tool definitions (18 tools)
 │       └── tests/
 └── internal/                   # Specs & images
 ```
@@ -172,14 +187,30 @@ mamba-mcp/
 - CLI: `mamba-mcp-hana --env-file mamba.env test` / `mamba-mcp-hana` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `hdbcli`, `pydantic-settings`
 
+## Architecture (mamba-mcp-gitlab)
+
+- 4-category MCP tool architecture:
+  - **Merge Requests (7 tools):** `list_mrs`, `get_mr`, `get_mr_diffs`, `get_mr_commits`, `get_mr_pipelines`, `create_mr`, `update_mr`
+  - **Issues (6 tools):** `list_issues`, `get_issue`, `list_issue_comments`, `create_issue`, `update_issue`, `add_issue_comment`
+  - **Pipelines (4 tools):** `list_pipelines`, `get_pipeline`, `get_pipeline_jobs`, `get_job_log`
+  - **Search (1 tool):** `search` (instance/project/group scoped)
+- Auth strategies: PAT (Private Access Token) and OAuth 2.0 (client credentials with token refresh)
+- Services in `services/` module (GitLabService base, MergeRequestService, IssueService, PipelineService, SearchService)
+- Read-only mode: runtime gating via `check_read_only()` on write tools (create/update MRs, create/update issues, add comments)
+- Rate limiting: sliding window per-server-instance limiter with configurable window and max requests
+- Config via `MAMBA_MCP_GITLAB_*` env vars or `mamba.env` file, auto-detected from cwd
+- CLI: `mamba-mcp-gitlab --env-file mamba.env test` / `mamba-mcp-gitlab` (serve)
+- Uses `mcp>=1.0.0` (FastMCP), `httpx`, `pydantic-settings`
+
 ## Dependency Graph
 
 ```
 mamba-mcp-core (shared library, no CLI)
-  ↑ depended on by all 3 servers
-  ├── mamba-mcp-pg   (asyncpg, sqlalchemy[asyncio])
-  ├── mamba-mcp-fs   (fsspec, s3fs)
-  └── mamba-mcp-hana (hdbcli)
+  ↑ depended on by all 4 servers
+  ├── mamba-mcp-pg     (asyncpg, sqlalchemy[asyncio])
+  ├── mamba-mcp-fs     (fsspec, s3fs)
+  ├── mamba-mcp-hana   (hdbcli)
+  └── mamba-mcp-gitlab (httpx)
 
 mamba-mcp-client (fully independent — no dependency on core or any server)
   └── fastmcp, textual, httpx
@@ -187,15 +218,15 @@ mamba-mcp-client (fully independent — no dependency on core or any server)
 
 - **Client is independent**: It does not import from `mamba-mcp-core` or any server package
 - **Servers all depend on core**: Shared CLI helpers, error model, fuzzy matching, transport normalization
-- **No cross-server dependencies**: PG, FS, and HANA are completely independent of each other
-- **Total MCP tools**: 31 across all servers (PG: 8, FS: 12, HANA: 11)
+- **No cross-server dependencies**: PG, FS, HANA, and GitLab are completely independent of each other
+- **Total MCP tools**: 49 across all servers (PG: 8, FS: 12, HANA: 11, GitLab: 18)
 
 ## Critical Files for Onboarding
 
 When getting familiar with this codebase, read these files in order:
 
 1. `packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py` — The reference server implementation (HANA and FS were modeled from this)
-2. `packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py` — Canonical tool handler pattern used by all 31 tools
+2. `packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py` — Canonical tool handler pattern used by all 49 tools
 3. `packages/mamba-mcp-core/src/mamba_mcp_core/errors.py` — Shared `ToolError` model with dependency-injected suggestions
 4. `packages/mamba-mcp-fs/src/mamba_mcp_fs/security.py` — Most security-critical file, defense-in-depth path validation
 5. `packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py` — `BackendProtocol` + `BackendManager` routing pattern
@@ -279,8 +310,7 @@ The following have been standardized:
 ## CI/CD Notes
 
 - **Pipeline**: `.github/workflows/ci.yml` runs lint, type-check, and test jobs in parallel
-- **Test matrix**: Per-package isolation via `uv run --package` (core, pg, fs, hana)
-- **Known gap**: `mamba-mcp-client` is not in the CI test matrix — client tests only run locally
+- **Test matrix**: Per-package isolation via `uv run --package` (core, client, pg, fs, hana, gitlab)
 - **Client test coverage**: Minimal — only `test_client.py` exists; CLI commands and TUI lack tests
 
 ## Code Standards
