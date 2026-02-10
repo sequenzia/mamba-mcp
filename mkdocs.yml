@@ -1,0 +1,65 @@
+site_name: Mamba MCP
+site_description: A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.
+site_url: ""
+repo_url: https://github.com/sequenzia/mamba-mcp
+repo_name: sequenzia/mamba-mcp
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_guess: false
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - Packages:
+    - Core Library: packages/core.md
+    - MCP Client: packages/client.md
+  - MCP Servers:
+    - PostgreSQL: servers/pg.md
+    - Filesystem: servers/fs.md
+    - SAP HANA: servers/hana.md
+    - GitLab: servers/gitlab.md
+  - Development Guide: development.md
