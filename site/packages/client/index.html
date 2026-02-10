@@ -1,0 +1,2896 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.">
+      
+      
+      
+      
+        <link rel="prev" href="../core/">
+      
+      
+        <link rel="next" href="../../servers/pg/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>MCP Client - Mamba MCP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mcp-client" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Mamba MCP" class="md-header__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Mamba MCP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              MCP Client
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../core/" class="md-tabs__link">
+          
+  
+  
+  Packages
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../servers/pg/" class="md-tabs__link">
+          
+  
+  
+  MCP Servers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../development/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Development Guide
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Mamba MCP" class="md-nav__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Mamba MCP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Packages
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Client
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        At a Glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive TUI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interactive TUI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#screenshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Screenshots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyboard Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tui-launch-interactive-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tui -- Launch Interactive TUI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connect-connect-and-inspect-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        connect -- Connect and Inspect Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools-list-available-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tools -- List Available Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources-list-available-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resources -- List Available Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompts-list-available-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompts -- List Available Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-call-a-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        call -- Call a Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read-read-a-resource" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read -- Read a Resource
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-get-a-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt -- Get a Prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extra-server-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extra Server Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python API
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clientconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClientConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClientConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#factory-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcptestclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCPTestClient
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCPTestClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toolcallresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolCallResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transport Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transport Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transport-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transport Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#env-file-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Env File Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sample_serverpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sample_server.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_usagepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_usage.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Servers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MCP Servers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/pg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/fs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/hana/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAP HANA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/gitlab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitLab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        At a Glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive TUI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interactive TUI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#screenshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Screenshots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyboard Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tui-launch-interactive-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tui -- Launch Interactive TUI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connect-connect-and-inspect-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        connect -- Connect and Inspect Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools-list-available-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tools -- List Available Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources-list-available-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resources -- List Available Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompts-list-available-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompts -- List Available Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-call-a-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        call -- Call a Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read-read-a-resource" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read -- Read a Resource
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-get-a-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt -- Get a Prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extra-server-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extra Server Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python API
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clientconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClientConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClientConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#factory-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcptestclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCPTestClient
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCPTestClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toolcallresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolCallResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transport Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transport Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transport-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transport Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#env-file-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Env File Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sample_serverpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sample_server.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_usagepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_usage.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="mcp-client">MCP Client<a class="headerlink" href="#mcp-client" title="Permanent link">&para;</a></h1>
+<p>The MCP Client (<code>mamba-mcp-client</code>) is a testing and debugging tool for <strong>any</strong> MCP server. It provides three interfaces for interacting with servers: an interactive terminal UI, a set of CLI commands, and a programmatic Python API. The client supports all five MCP transport types and is fully independent -- it has no dependency on <code>mamba-mcp-core</code> or any server package.</p>
+<h2 id="at-a-glance">At a Glance<a class="headerlink" href="#at-a-glance" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Interfaces</strong></td>
+<td>Interactive TUI, CLI commands, Python API</td>
+</tr>
+<tr>
+<td><strong>Transports</strong></td>
+<td>stdio, SSE, Streamable HTTP, UV-installed, UV-local</td>
+</tr>
+<tr>
+<td><strong>Output formats</strong></td>
+<td>Rich tables, JSON, plain table</td>
+</tr>
+<tr>
+<td><strong>Protocol logging</strong></td>
+<td>Full request/response capture with timing</td>
+</tr>
+<tr>
+<td><strong>Dependencies</strong></td>
+<td><code>fastmcp</code>, <code>textual</code>, <code>httpx</code>, <code>typer</code>, <code>pydantic-settings</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pip</label><label for="__tabbed_1_2">uv</label><label for="__tabbed_1_3">From workspace</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mamba-mcp-client
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>add<span class="w"> </span>mamba-mcp-client
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>run<span class="w"> </span>--package<span class="w"> </span>mamba-mcp-client<span class="w"> </span>mamba-mcp<span class="w"> </span>--help
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<hr />
+<h2 id="interactive-tui">Interactive TUI<a class="headerlink" href="#interactive-tui" title="Permanent link">&para;</a></h2>
+<p>The TUI is a Textual-based terminal application for visually exploring and testing MCP servers.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Server info panel</strong> -- Displays name, version, protocol version, and capabilities on connect</li>
+<li><strong>Capability tree</strong> -- Expandable tree view of all tools, resources, and prompts with schema details</li>
+<li><strong>Tool call dialog</strong> -- Type-aware input fields generated from each tool's JSON Schema (strings, integers, booleans, arrays, objects)</li>
+<li><strong>Results panel</strong> -- Syntax-highlighted JSON output from tool calls and resource reads</li>
+<li><strong>Logs tab</strong> -- Timestamped request/response log with method names and durations</li>
+<li><strong>Clipboard support</strong> -- Copy results to clipboard via <code>y</code> (uses pyperclip or OSC 52 fallback)</li>
+</ul>
+<h3 id="screenshots">Screenshots<a class="headerlink" href="#screenshots" title="Permanent link">&para;</a></h3>
+<p><strong>Main interface</strong> -- Server info, capability tree, and results panel:</p>
+<p><img alt="TUI main interface" src="../../internal/images/mcp-client-01.png" /></p>
+<p><strong>Tool inspection</strong> -- Selecting a tool reveals its full JSON Schema in the results panel:</p>
+<p><img alt="Tool schema inspection" src="../../internal/images/mcp-client-02.png" /></p>
+<p><strong>Tool call dialog</strong> -- Type-aware input fields with Call/Cancel actions:</p>
+<p><img alt="Tool call dialog" src="../../internal/images/mcp-client-03.png" /></p>
+<h3 id="keyboard-shortcuts">Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>++q++</td>
+<td>Quit the application</td>
+</tr>
+<tr>
+<td>++r++</td>
+<td>Refresh capabilities from server</td>
+</tr>
+<tr>
+<td>++l++</td>
+<td>Switch to the Logs tab</td>
+</tr>
+<tr>
+<td>++p++</td>
+<td>Ping the server</td>
+</tr>
+<tr>
+<td>++x++</td>
+<td>Clear the results panel</td>
+</tr>
+<tr>
+<td>++t++ / ++enter++</td>
+<td>Open tool call dialog for selected tool</td>
+</tr>
+<tr>
+<td>++y++</td>
+<td>Copy results to clipboard</td>
+</tr>
+<tr>
+<td>++slash++</td>
+<td>Open command palette</td>
+</tr>
+<tr>
+<td>++escape++</td>
+<td>Close dialog</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cli-commands">CLI Commands<a class="headerlink" href="#cli-commands" title="Permanent link">&para;</a></h2>
+<p>All commands require exactly one transport flag. Use <code>--help</code> on any command for full option details.</p>
+<h3 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Permanent link">&para;</a></h3>
+<p>These options are available on every command:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Short</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--stdio</code></td>
+<td><code>-s</code></td>
+<td>Connect via stdio (quote the full command)</td>
+</tr>
+<tr>
+<td><code>--sse</code></td>
+<td></td>
+<td>Connect via SSE to a URL</td>
+</tr>
+<tr>
+<td><code>--http</code></td>
+<td></td>
+<td>Connect via Streamable HTTP to a URL</td>
+</tr>
+<tr>
+<td><code>--uv</code></td>
+<td></td>
+<td>Connect to a UV-installed MCP server</td>
+</tr>
+<tr>
+<td><code>--uv-local-path</code></td>
+<td></td>
+<td>Project path for local UV server</td>
+</tr>
+<tr>
+<td><code>--uv-local-name</code></td>
+<td></td>
+<td>Server name for local UV server</td>
+</tr>
+<tr>
+<td><code>--python</code></td>
+<td></td>
+<td>Python version for UV modes (e.g., <code>3.11</code>)</td>
+</tr>
+<tr>
+<td><code>--with</code></td>
+<td></td>
+<td>Additional packages for UV modes (repeatable)</td>
+</tr>
+<tr>
+<td><code>--timeout</code></td>
+<td><code>-t</code></td>
+<td>Connection timeout in seconds (default: 30)</td>
+</tr>
+<tr>
+<td><code>--log-level</code></td>
+<td><code>-l</code></td>
+<td>Log level: <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code></td>
+</tr>
+<tr>
+<td><code>--output</code></td>
+<td><code>-o</code></td>
+<td>Output format: <code>json</code>, <code>table</code>, <code>rich</code> (default: <code>rich</code>)</td>
+</tr>
+<tr>
+<td><code>--env-file</code></td>
+<td><code>-e</code></td>
+<td>Path to <code>.env</code> file</td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td></td>
+<td>Show version and exit</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">UV Local Transport</p>
+<p><code>--uv-local-path</code> and <code>--uv-local-name</code> must always be used together. They cannot be combined with other transport flags.</p>
+</div>
+<h3 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Permanent link">&para;</a></h3>
+<h4 id="tui-launch-interactive-tui"><code>tui</code> -- Launch Interactive TUI<a class="headerlink" href="#tui-launch-interactive-tui" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse
+</span></code></pre></div>
+<p>Opens the full-screen Textual interface. Supports all transport types and extra server arguments.</p>
+<h4 id="connect-connect-and-inspect-server"><code>connect</code> -- Connect and Inspect Server<a class="headerlink" href="#connect-connect-and-inspect-server" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--http<span class="w"> </span>http://localhost:8000/mcp<span class="w"> </span>-o<span class="w"> </span>json
+</span></code></pre></div>
+<p>Connects, displays server name, version, protocol version, and capabilities, then exits. Useful for verifying a server is reachable.</p>
+<h4 id="tools-list-available-tools"><code>tools</code> -- List Available Tools<a class="headerlink" href="#tools-list-available-tools" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mamba-mcp<span class="w"> </span>tools<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mamba-mcp<span class="w"> </span>tools<span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse<span class="w"> </span>-o<span class="w"> </span>json
+</span></code></pre></div>
+<p>Lists all tools the server exposes, showing tool names and descriptions.</p>
+<h4 id="resources-list-available-resources"><code>resources</code> -- List Available Resources<a class="headerlink" href="#resources-list-available-resources" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mamba-mcp<span class="w"> </span>resources<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<p>Lists all resources with their names, URIs, and descriptions.</p>
+<h4 id="prompts-list-available-prompts"><code>prompts</code> -- List Available Prompts<a class="headerlink" href="#prompts-list-available-prompts" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mamba-mcp<span class="w"> </span>prompts<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<p>Lists all prompts with their names and descriptions.</p>
+<h4 id="call-call-a-tool"><code>call</code> -- Call a Tool<a class="headerlink" href="#call-call-a-tool" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mamba-mcp<span class="w"> </span>call<span class="w"> </span>add<span class="w"> </span>--args<span class="w"> </span><span class="s1">&#39;{&quot;a&quot;: 5, &quot;b&quot;: 3}&#39;</span><span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>mamba-mcp<span class="w"> </span>call<span class="w"> </span>execute_query<span class="w"> </span>--args<span class="w"> </span><span class="s1">&#39;{&quot;sql&quot;: &quot;SELECT 1&quot;}&#39;</span><span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse
+</span></code></pre></div>
+<p>Calls a tool by name with a JSON arguments string. The <code>--args</code> / <code>-a</code> flag defaults to <code>{}</code> if omitted.</p>
+<h4 id="read-read-a-resource"><code>read</code> -- Read a Resource<a class="headerlink" href="#read-read-a-resource" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>mamba-mcp<span class="w"> </span><span class="nb">read</span><span class="w"> </span><span class="s2">&quot;config://version&quot;</span><span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<p>Reads a resource by URI and displays its contents.</p>
+<h4 id="prompt-get-a-prompt"><code>prompt</code> -- Get a Prompt<a class="headerlink" href="#prompt-get-a-prompt" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>mamba-mcp<span class="w"> </span>prompt<span class="w"> </span>code_review<span class="w"> </span>--args<span class="w"> </span><span class="s1">&#39;{&quot;language&quot;: &quot;python&quot;}&#39;</span><span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<p>Retrieves a prompt by name with optional JSON arguments. Displays each message with its role.</p>
+<h3 id="extra-server-arguments">Extra Server Arguments<a class="headerlink" href="#extra-server-arguments" title="Permanent link">&para;</a></h3>
+<p>Use the <code>--</code> separator to pass extra arguments to the server:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Stdio / UV transports</label><label for="__tabbed_2_2">SSE / HTTP transports</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Extra arguments are appended as <strong>command-line arguments</strong> to the server process:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span><span class="w"> </span>--<span class="w"> </span>--verbose<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># Runs: python server.py --verbose --port 8080</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Extra arguments are appended as <strong>query parameters</strong> to the URL:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse<span class="w"> </span>--<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">debug</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># Connects to: http://localhost:8000/sse?env=prod&amp;debug=true</span>
+</span></code></pre></div>
+<p>Bare arguments (without <code>=</code>) become <code>arg=true</code>.</p>
+</div>
+</div>
+</div>
+<hr />
+<h2 id="python-api">Python API<a class="headerlink" href="#python-api" title="Permanent link">&para;</a></h2>
+<p>The Python API provides full programmatic access to MCP servers through the <code>MCPTestClient</code> class and <code>ClientConfig</code> factory methods.</p>
+<h3 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">basic_usage.py</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientConfig</span><span class="p">,</span> <span class="n">MCPTestClient</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_stdio</span><span class="p">(</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        <span class="n">command</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;server.py&quot;</span><span class="p">],</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="p">)</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">MCPTestClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>        <span class="c1"># Server info is available immediately after connect</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to: </span><span class="si">{</span><span class="n">client</span><span class="o">.</span><span class="n">server_info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>        <span class="c1"># List and call tools</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>        <span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Async Context Manager Required</p>
+<p><code>MCPTestClient.connect()</code> is an async context manager. All client methods must be called <strong>inside</strong> the <code>async with client.connect():</code> block. Calling methods outside this block raises <code>RuntimeError</code>.</p>
+</div>
+<h3 id="clientconfig">ClientConfig<a class="headerlink" href="#clientconfig" title="Permanent link">&para;</a></h3>
+<p><code>ClientConfig</code> is a Pydantic settings model with factory methods for each transport type. Use the factory methods rather than constructing the config manually.</p>
+<h4 id="factory-methods">Factory Methods<a class="headerlink" href="#factory-methods" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">ClientConfig.for_stdio()</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_stdio</span><span class="p">(</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="n">command</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>         <span class="c1"># Command to run</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;server.py&quot;</span><span class="p">],</span>       <span class="c1"># Command arguments (optional)</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;KEY&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span>     <span class="c1"># Environment variables (optional)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--verbose&quot;</span><span class="p">],</span> <span class="c1"># Extra args appended to command (optional)</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">ClientConfig.for_sse()</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_sse</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8000/sse&quot;</span><span class="p">,</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer token&quot;</span><span class="p">},</span>  <span class="c1"># Optional</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>                                <span class="c1"># Default: 30.0</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;env=prod&quot;</span><span class="p">],</span>                     <span class="c1"># Appended as query params</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">ClientConfig.for_http()</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_http</span><span class="p">(</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8000/mcp&quot;</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer token&quot;</span><span class="p">},</span>  <span class="c1"># Optional</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>                                <span class="c1"># Default: 30.0</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;env=prod&quot;</span><span class="p">],</span>                     <span class="c1"># Appended as query params</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">ClientConfig.for_uv_installed()</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_uv_installed</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">server_name</span><span class="o">=</span><span class="s2">&quot;mcp-server-filesystem&quot;</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--root&quot;</span><span class="p">,</span> <span class="s2">&quot;/data&quot;</span><span class="p">],</span>             <span class="c1"># Optional</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">python_version</span><span class="o">=</span><span class="s2">&quot;3.11&quot;</span><span class="p">,</span>                <span class="c1"># Optional</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">with_packages</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;extra-dep&quot;</span><span class="p">],</span>          <span class="c1"># Optional</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;KEY&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span>                 <span class="c1"># Optional</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--debug&quot;</span><span class="p">],</span>               <span class="c1"># Appended to server args</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">ClientConfig.for_uv_local()</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_uv_local</span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">project_path</span><span class="o">=</span><span class="s2">&quot;./my-server&quot;</span><span class="p">,</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="n">server_name</span><span class="o">=</span><span class="s2">&quot;my-mcp-server&quot;</span><span class="p">,</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="n">args</span><span class="o">=</span><span class="p">[],</span>                              <span class="c1"># Optional</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="n">python_version</span><span class="o">=</span><span class="s2">&quot;3.12&quot;</span><span class="p">,</span>                <span class="c1"># Optional</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="n">with_packages</span><span class="o">=</span><span class="p">[],</span>                     <span class="c1"># Optional</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="n">env</span><span class="o">=</span><span class="p">{},</span>                               <span class="c1"># Optional</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="n">extra_args</span><span class="o">=</span><span class="p">[],</span>                        <span class="c1"># Appended to server args</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="mcptestclient">MCPTestClient<a class="headerlink" href="#mcptestclient" title="Permanent link">&para;</a></h3>
+<p>The main client class. Wraps FastMCP's <code>Client</code> with protocol logging and a high-level API.</p>
+<h4 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">MCPTestClient</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">ClientConfig</span><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connected</code></td>
+<td><code>bool</code></td>
+<td>Whether the client is currently connected</td>
+</tr>
+<tr>
+<td><code>server_info</code></td>
+<td><code>ServerInfo \| None</code></td>
+<td>Server name, version, protocol version, instructions, capabilities</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td><code>ClientConfig</code></td>
+<td>The configuration used to create this client</td>
+</tr>
+<tr>
+<td><code>logger</code></td>
+<td><code>MCPLogger</code></td>
+<td>The protocol logger instance</td>
+</tr>
+</tbody>
+</table>
+<h4 id="connection">Connection<a class="headerlink" href="#connection" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connect()</code></td>
+<td><code>AsyncContextManager[MCPTestClient]</code></td>
+<td>Connect to the server (async context manager)</td>
+</tr>
+<tr>
+<td><code>ping()</code></td>
+<td><code>bool</code></td>
+<td>Ping the server; returns <code>True</code> on success, <code>False</code> on failure</td>
+</tr>
+<tr>
+<td><code>get_capabilities()</code></td>
+<td><code>ServerCapabilities \| None</code></td>
+<td>Get parsed server capabilities</td>
+</tr>
+<tr>
+<td><code>get_instructions()</code></td>
+<td><code>str \| None</code></td>
+<td>Get server instructions text</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_tools()</code></td>
+<td><code>list[Tool]</code></td>
+<td>List all tools on the server</td>
+</tr>
+<tr>
+<td><code>call_tool(name, arguments)</code></td>
+<td><code>ToolCallResult</code></td>
+<td>Call a tool with the given arguments dict</td>
+</tr>
+</tbody>
+</table>
+<h4 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_resources()</code></td>
+<td><code>list[Resource]</code></td>
+<td>List all resources</td>
+</tr>
+<tr>
+<td><code>read_resource(uri)</code></td>
+<td><code>ReadResourceResult</code></td>
+<td>Read a resource by URI string</td>
+</tr>
+<tr>
+<td><code>subscribe_resource(uri)</code></td>
+<td><code>None</code></td>
+<td>Subscribe to resource updates</td>
+</tr>
+<tr>
+<td><code>unsubscribe_resource(uri)</code></td>
+<td><code>None</code></td>
+<td>Unsubscribe from resource updates</td>
+</tr>
+</tbody>
+</table>
+<h4 id="prompts">Prompts<a class="headerlink" href="#prompts" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_prompts()</code></td>
+<td><code>list[Prompt]</code></td>
+<td>List all prompts</td>
+</tr>
+<tr>
+<td><code>get_prompt(name, arguments)</code></td>
+<td><code>GetPromptResult</code></td>
+<td>Get a prompt by name with optional arguments dict</td>
+</tr>
+</tbody>
+</table>
+<h4 id="roots">Roots<a class="headerlink" href="#roots" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_roots()</code></td>
+<td><code>list[Root]</code></td>
+<td>List root directories (returns <code>[]</code> if unsupported)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_log_entries()</code></td>
+<td><code>list[MCPLogEntry]</code></td>
+<td>Get all protocol log entries</td>
+</tr>
+<tr>
+<td><code>print_log_summary()</code></td>
+<td><code>None</code></td>
+<td>Print a Rich table summary of all requests/responses</td>
+</tr>
+<tr>
+<td><code>export_logs()</code></td>
+<td><code>str</code></td>
+<td>Export all log entries as a JSON string</td>
+</tr>
+<tr>
+<td><code>clear_logs()</code></td>
+<td><code>None</code></td>
+<td>Clear all stored log entries</td>
+</tr>
+</tbody>
+</table>
+<h3 id="toolcallresult">ToolCallResult<a class="headerlink" href="#toolcallresult" title="Permanent link">&para;</a></h3>
+<p>Returned by <code>call_tool()</code>. Contains the tool response data.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tool_name</code></td>
+<td><code>str</code></td>
+<td>Name of the tool that was called</td>
+</tr>
+<tr>
+<td><code>arguments</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Arguments that were passed</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td><code>list[Any]</code></td>
+<td>Raw content items from the response</td>
+</tr>
+<tr>
+<td><code>is_error</code></td>
+<td><code>bool</code></td>
+<td>Whether the tool returned an error</td>
+</tr>
+<tr>
+<td><code>raw_result</code></td>
+<td><code>Any</code></td>
+<td>The unprocessed result from FastMCP</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Convenience properties:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.text</code></td>
+<td><code>str \| None</code></td>
+<td>First text content item, or <code>None</code></td>
+</tr>
+<tr>
+<td><code>.data</code></td>
+<td><code>Any</code></td>
+<td>Data attribute from raw result, or <code>None</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="full-example">Full Example<a class="headerlink" href="#full-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">examples/api_usage.py</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientConfig</span><span class="p">,</span> <span class="n">MCPTestClient</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">ClientConfig</span><span class="o">.</span><span class="n">for_stdio</span><span class="p">(</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>        <span class="n">command</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;examples/sample_server.py&quot;</span><span class="p">],</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>    <span class="p">)</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">MCPTestClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>        <span class="c1"># Server info</span>
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>        <span class="k">if</span> <span class="n">client</span><span class="o">.</span><span class="n">server_info</span><span class="p">:</span>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to: </span><span class="si">{</span><span class="n">client</span><span class="o">.</span><span class="n">server_info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">client</span><span class="o">.</span><span class="n">server_info</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>        <span class="c1"># List tools</span>
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>        <span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - </span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>        <span class="c1"># Call a tool</span>
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>
+</span><span id="__span-21-25"><a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>        <span class="c1"># List and read resources</span>
+</span><span id="__span-21-26"><a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a>        <span class="n">resources</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
+</span><span id="__span-21-27"><a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a>        <span class="n">content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">read_resource</span><span class="p">(</span><span class="s2">&quot;config://version&quot;</span><span class="p">)</span>
+</span><span id="__span-21-28"><a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a>        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">contents</span><span class="p">:</span>
+</span><span id="__span-21-29"><a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a>            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">):</span>
+</span><span id="__span-21-30"><a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Content: </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-21-31"><a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a>
+</span><span id="__span-21-32"><a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a>        <span class="c1"># List and get prompts</span>
+</span><span id="__span-21-33"><a id="__codelineno-21-33" name="__codelineno-21-33" href="#__codelineno-21-33"></a>        <span class="n">prompts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_prompts</span><span class="p">()</span>
+</span><span id="__span-21-34"><a id="__codelineno-21-34" name="__codelineno-21-34" href="#__codelineno-21-34"></a>        <span class="n">prompt_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_prompt</span><span class="p">(</span><span class="s2">&quot;code_review&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span><span class="p">})</span>
+</span><span id="__span-21-35"><a id="__codelineno-21-35" name="__codelineno-21-35" href="#__codelineno-21-35"></a>        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">prompt_result</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+</span><span id="__span-21-36"><a id="__codelineno-21-36" name="__codelineno-21-36" href="#__codelineno-21-36"></a>            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">):</span>
+</span><span id="__span-21-37"><a id="__codelineno-21-37" name="__codelineno-21-37" href="#__codelineno-21-37"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">role</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</span><span id="__span-21-38"><a id="__codelineno-21-38" name="__codelineno-21-38" href="#__codelineno-21-38"></a>
+</span><span id="__span-21-39"><a id="__codelineno-21-39" name="__codelineno-21-39" href="#__codelineno-21-39"></a>        <span class="c1"># Print protocol log summary</span>
+</span><span id="__span-21-40"><a id="__codelineno-21-40" name="__codelineno-21-40" href="#__codelineno-21-40"></a>        <span class="n">client</span><span class="o">.</span><span class="n">print_log_summary</span><span class="p">()</span>
+</span><span id="__span-21-41"><a id="__codelineno-21-41" name="__codelineno-21-41" href="#__codelineno-21-41"></a>
+</span><span id="__span-21-42"><a id="__codelineno-21-42" name="__codelineno-21-42" href="#__codelineno-21-42"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<hr />
+<h2 id="transport-types">Transport Types<a class="headerlink" href="#transport-types" title="Permanent link">&para;</a></h2>
+<p>The client supports five transport types. Each transport determines how the client communicates with the MCP server.</p>
+<table>
+<thead>
+<tr>
+<th>Transport</th>
+<th>CLI Flag</th>
+<th>Use Case</th>
+<th>Extra Args Handling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stdio</strong></td>
+<td><code>--stdio "cmd args"</code></td>
+<td>Local servers run as child processes</td>
+<td>Appended as CLI arguments</td>
+</tr>
+<tr>
+<td><strong>SSE</strong></td>
+<td><code>--sse &lt;url&gt;</code></td>
+<td>Servers exposing an SSE endpoint</td>
+<td>Appended as URL query parameters</td>
+</tr>
+<tr>
+<td><strong>Streamable HTTP</strong></td>
+<td><code>--http &lt;url&gt;</code></td>
+<td>Servers using the Streamable HTTP transport</td>
+<td>Appended as URL query parameters</td>
+</tr>
+<tr>
+<td><strong>UV Installed</strong></td>
+<td><code>--uv &lt;name&gt;</code></td>
+<td>Globally installed UV packages (e.g., <code>@modelcontextprotocol/server-sqlite</code>)</td>
+<td>Appended as CLI arguments</td>
+</tr>
+<tr>
+<td><strong>UV Local</strong></td>
+<td><code>--uv-local-path &lt;path&gt; --uv-local-name &lt;name&gt;</code></td>
+<td>Local project directories run via <code>uvx --from</code></td>
+<td>Appended as CLI arguments</td>
+</tr>
+</tbody>
+</table>
+<h3 id="transport-examples">Transport Examples<a class="headerlink" href="#transport-examples" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:5"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><input id="__tabbed_3_4" name="__tabbed_3" type="radio" /><input id="__tabbed_3_5" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Stdio</label><label for="__tabbed_3_2">SSE</label><label for="__tabbed_3_3">Streamable HTTP</label><label for="__tabbed_3_4">UV Installed</label><label for="__tabbed_3_5">UV Local</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Local Python server</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Local Node.js server</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;node server.js&quot;</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># With extra server args</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span><span class="w"> </span>--<span class="w"> </span>--verbose
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--sse<span class="w"> </span>http://localhost:8000/sse<span class="w"> </span>--<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--http<span class="w"> </span>http://localhost:8000/mcp
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Published MCP server package</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--uv<span class="w"> </span>@modelcontextprotocol/server-sqlite
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># With Python version and extra packages</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>mamba-mcp<span class="w"> </span>tools<span class="w"> </span>--uv<span class="w"> </span>my-server<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.11<span class="w"> </span>--with<span class="w"> </span>extra-dep
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Local project</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--uv-local-path<span class="w"> </span>./my-server<span class="w"> </span>--uv-local-name<span class="w"> </span>server
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="c1"># With Python version</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--uv-local-path<span class="w"> </span>./my-server<span class="w"> </span>--uv-local-name<span class="w"> </span>server<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.12
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<hr />
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
+<p><code>ClientConfig</code> uses the <code>MAMBA_MCP_CLIENT_</code> prefix with <code>__</code> as a nested delimiter:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_TRANSPORT_TYPE</code></td>
+<td>Transport type (<code>stdio</code>, <code>sse</code>, <code>http</code>, <code>uv_installed</code>, <code>uv_local</code>)</td>
+<td><code>stdio</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_CLIENT_NAME</code></td>
+<td>Client identifier sent to server</td>
+<td><code>mamba-mcp-client</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_CLIENT_VERSION</code></td>
+<td>Client version sent to server</td>
+<td><code>1.0.0</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_STDIO__COMMAND</code></td>
+<td>Command for stdio transport</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_STDIO__ARGS</code></td>
+<td>JSON array of command arguments</td>
+<td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_HTTP__URL</code></td>
+<td>URL for SSE/HTTP transport</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_HTTP__TIMEOUT</code></td>
+<td>Request timeout in seconds</td>
+<td><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_LOGGING__ENABLED</code></td>
+<td>Enable protocol logging</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_LOGGING__LEVEL</code></td>
+<td>Log level</td>
+<td><code>INFO</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_LOGGING__LOG_FILE</code></td>
+<td>Path to log file</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_LOGGING__LOG_REQUESTS</code></td>
+<td>Log outgoing requests</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>MAMBA_MCP_CLIENT_LOGGING__LOG_RESPONSES</code></td>
+<td>Log incoming responses</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="env-file-loading">Env File Loading<a class="headerlink" href="#env-file-loading" title="Permanent link">&para;</a></h3>
+<p>The <code>--env-file</code> / <code>-e</code> CLI option loads environment variables from a file using <code>python-dotenv</code>:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--env-file<span class="w"> </span>./mamba.env<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Auto-Discovery</p>
+<p>When running from the workspace, use <code>--env-file</code> to point to your <code>.env</code> file. The CLI does not auto-discover env files the way the server packages do.</p>
+</div>
+<hr />
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p>The package includes two example files in <code>packages/mamba-mcp-client/examples/</code>:</p>
+<h3 id="sample_serverpy"><code>sample_server.py</code><a class="headerlink" href="#sample_serverpy" title="Permanent link">&para;</a></h3>
+<p>A minimal FastMCP server with 4 tools (<code>add</code>, <code>multiply</code>, <code>greet</code>, <code>get_info</code>), 2 resources (<code>config://version</code>, <code>config://settings</code>), and 2 prompts (<code>code_review</code>, <code>summarize</code>). Use this as a test target:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>mamba-mcp<span class="w"> </span>tui<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python packages/mamba-mcp-client/examples/sample_server.py&quot;</span>
+</span></code></pre></div>
+<h3 id="api_usagepy"><code>api_usage.py</code><a class="headerlink" href="#api_usagepy" title="Permanent link">&para;</a></h3>
+<p>Demonstrates the full Python API: connecting via stdio, listing tools, calling tools, reading resources, getting prompts, and printing the protocol log summary. Run it with:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--package<span class="w"> </span>mamba-mcp-client<span class="w"> </span>python<span class="w"> </span>packages/mamba-mcp-client/examples/api_usage.py
+</span></code></pre></div>
+<hr />
+<h2 id="common-pitfalls">Common Pitfalls<a class="headerlink" href="#common-pitfalls" title="Permanent link">&para;</a></h2>
+<div class="admonition danger">
+<p class="admonition-title">Forgetting the Async Context Manager</p>
+<p>All client operations must happen inside <code>async with client.connect():</code>. Calling <code>list_tools()</code> or <code>call_tool()</code> outside this block raises <code>RuntimeError: Client is not connected</code>.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># Wrong</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">client</span> <span class="o">=</span> <span class="n">MCPTestClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>  <span class="c1"># RuntimeError!</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="c1"># Correct</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="n">client</span> <span class="o">=</span> <span class="n">MCPTestClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">():</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>    <span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>
+</span></code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Quote Your Stdio Command</p>
+<p>The <code>--stdio</code> flag takes a <strong>single string</strong> that is shell-split internally. Always quote the full command:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Wrong -- typer interprets &quot;server.py&quot; as a separate argument</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span>python<span class="w"> </span>server.py
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="c1"># Correct</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span>
+</span></code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Extra Args Require the <code>--</code> Separator</p>
+<p>Without the <code>--</code> separator, extra arguments are interpreted as CLI options and will cause errors:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Wrong -- --verbose is parsed as a mamba-mcp flag</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span><span class="w"> </span>--verbose
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># Correct</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>mamba-mcp<span class="w"> </span>connect<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;python server.py&quot;</span><span class="w"> </span>--<span class="w"> </span>--verbose
+</span></code></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Transport Exclusivity</p>
+<p>Exactly one transport flag must be specified per command. Combining <code>--stdio</code> with <code>--sse</code>, or using <code>--uv-local-path</code> without <code>--uv-local-name</code>, results in an error.</p>
+</div>
+<hr />
+<h2 id="source-reference">Source Reference<a class="headerlink" href="#source-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>packages/mamba-mcp-client/src/mamba_mcp_client/cli.py</code></td>
+<td>Typer CLI entry point with 8 commands</td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/src/mamba_mcp_client/client.py</code></td>
+<td><code>MCPTestClient</code> async client and <code>ToolCallResult</code></td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/src/mamba_mcp_client/config.py</code></td>
+<td><code>ClientConfig</code> Pydantic settings with 5 factory methods</td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/src/mamba_mcp_client/logging.py</code></td>
+<td><code>MCPLogger</code> and <code>MCPLogEntry</code> protocol logging</td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/src/mamba_mcp_client/tui/app.py</code></td>
+<td>Textual TUI application</td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/examples/sample_server.py</code></td>
+<td>Sample FastMCP server for testing</td>
+</tr>
+<tr>
+<td><code>packages/mamba-mcp-client/examples/api_usage.py</code></td>
+<td>Python API usage example</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>The file above is the complete documentation page, ready to be written to <code>/Users/sequenzia/dev/repos/mamba-mcp/docs/packages/client.md</code>. Here is a summary of what it covers:</p>
+<p><strong>Key source files verified:</strong></p>
+<ul>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/cli.py</code> -- All 8 CLI commands confirmed (tui, connect, tools, resources, prompts, call, read, prompt), along with all CLI options and their defaults</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/client.py</code> -- All <code>MCPTestClient</code> methods documented including <code>connect()</code>, <code>ping()</code>, <code>list_tools()</code>, <code>call_tool()</code>, <code>list_resources()</code>, <code>read_resource()</code>, <code>subscribe_resource()</code>, <code>unsubscribe_resource()</code>, <code>list_prompts()</code>, <code>get_prompt()</code>, <code>list_roots()</code>, and the four logging methods</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/config.py</code> -- All 5 <code>ClientConfig</code> factory methods with their exact parameter signatures: <code>for_stdio()</code>, <code>for_sse()</code>, <code>for_http()</code>, <code>for_uv_installed()</code>, <code>for_uv_local()</code>. All config model classes: <code>StdioConfig</code>, <code>HttpConfig</code>, <code>UvInstalledConfig</code>, <code>UvLocalConfig</code>, <code>LogConfig</code></li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/tui/app.py</code> -- All 9 TUI keyboard bindings confirmed from the <code>BINDINGS</code> list</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/logging.py</code> -- <code>MCPLogEntry</code> fields and <code>MCPLogger</code> methods documented</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/examples/api_usage.py</code> and <code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/examples/sample_server.py</code> -- Both referenced in the Examples section</li>
+</ul>
+<p><strong>Sections included:</strong> Overview, Installation (tabbed), Interactive TUI (with all 3 screenshots and keyboard shortcut table), CLI Commands (8 commands with global options table), Python API (ClientConfig factories, MCPTestClient full method reference, ToolCallResult), Transport Types (comparison table with tabbed examples), Configuration (env vars table and env file loading), Examples, Common Pitfalls (4 admonitions), and Source Reference table.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

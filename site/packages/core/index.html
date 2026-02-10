@@ -1,0 +1,2295 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.">
+      
+      
+      
+      
+        <link rel="prev" href="../../architecture/">
+      
+      
+        <link rel="next" href="../client/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Core Library - Mamba MCP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mamba-mcp-core" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Mamba MCP" class="md-header__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Mamba MCP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core Library
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Packages
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../servers/pg/" class="md-tabs__link">
+          
+  
+  
+  MCP Servers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../development/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Development Guide
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Mamba MCP" class="md-nav__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Mamba MCP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Packages
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Library
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-cli-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cli — CLI Helpers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cli — CLI Helpers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validate_env_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_env_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolve_default_env_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve_default_env_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup_logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-configuration-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config — Configuration State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config — Configuration State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set_env_file_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_env_file_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_env_file_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_env_file_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-error-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        errors — Error Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="errors — Error Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toolerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_tool_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_tool_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzy-fuzzy-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fuzzy — Fuzzy Matching
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="fuzzy — Fuzzy Matching">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#levenshtein_distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        levenshtein_distance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find_similar_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        find_similar_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport-transport-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transport — Transport Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="transport — Transport Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#normalize_transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalize_transport
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-cli-integration-__main__py" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CLI Integration (__main__.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-config-integration-configpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Config Integration (config.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-error-integration-errorspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Error Integration (errors.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-fuzzy-matching-for-did-you-mean-suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Fuzzy Matching for "Did You Mean?" Suggestions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-transport-normalization-in-config-validators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Transport Normalization in Config Validators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decisions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-a-shared-library-instead-of-copying-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a shared library instead of copying utilities?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-dependency-injection-for-error-suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why dependency injection for error suggestions?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-module-level-state-for-env-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why module-level state for env file path?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Servers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MCP Servers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/pg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/fs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/hana/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAP HANA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../servers/gitlab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitLab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-cli-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cli — CLI Helpers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cli — CLI Helpers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validate_env_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_env_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolve_default_env_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve_default_env_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup_logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-configuration-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config — Configuration State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config — Configuration State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set_env_file_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_env_file_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_env_file_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_env_file_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-error-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        errors — Error Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="errors — Error Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toolerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_tool_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_tool_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzy-fuzzy-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fuzzy — Fuzzy Matching
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="fuzzy — Fuzzy Matching">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#levenshtein_distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        levenshtein_distance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find_similar_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        find_similar_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport-transport-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transport — Transport Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="transport — Transport Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#normalize_transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalize_transport
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-cli-integration-__main__py" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CLI Integration (__main__.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-config-integration-configpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Config Integration (config.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-error-integration-errorspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Error Integration (errors.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-fuzzy-matching-for-did-you-mean-suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Fuzzy Matching for "Did You Mean?" Suggestions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-transport-normalization-in-config-validators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Transport Normalization in Config Validators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decisions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-a-shared-library-instead-of-copying-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a shared library instead of copying utilities?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-dependency-injection-for-error-suggestions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why dependency injection for error suggestions?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-module-level-state-for-env-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why module-level state for env file path?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="mamba-mcp-core">mamba-mcp-core<a class="headerlink" href="#mamba-mcp-core" title="Permanent link">&para;</a></h1>
+<p>Shared utility library consumed by all four MCP server packages (pg, fs, hana, gitlab). It provides CLI helpers, configuration state management, a structured error model, fuzzy name matching, and transport normalization.</p>
+<p><code>mamba-mcp-core</code> has no CLI entry point and no environment variables of its own. It exists purely as a dependency.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package</strong></td>
+<td><code>mamba-mcp-core</code></td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td><code>0.1.0</code></td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td><code>&gt;=3.11</code></td>
+</tr>
+<tr>
+<td><strong>Dependencies</strong></td>
+<td><code>pydantic&gt;=2.0.0</code>, <code>typer&gt;=0.12.0</code></td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><code>packages/mamba-mcp-core/src/mamba_mcp_core/</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>graph TD
+    CORE[mamba-mcp-core]
+    PG[mamba-mcp-pg] --&gt; CORE
+    FS[mamba-mcp-fs] --&gt; CORE
+    HANA[mamba-mcp-hana] --&gt; CORE
+    GITLAB[mamba-mcp-gitlab] --&gt; CORE</code></pre>
+<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h2>
+<p>The library is organized into five focused modules, each addressing a single cross-cutting concern.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Purpose</th>
+<th>Lines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#cli-cli-helpers"><code>cli</code></a></td>
+<td>Typer callbacks and logging setup</td>
+<td>~91</td>
+</tr>
+<tr>
+<td><a href="#config-configuration-state"><code>config</code></a></td>
+<td>Module-level env file path state</td>
+<td>~29</td>
+</tr>
+<tr>
+<td><a href="#errors-error-model"><code>errors</code></a></td>
+<td><code>ToolError</code> Pydantic model and factory</td>
+<td>~72</td>
+</tr>
+<tr>
+<td><a href="#fuzzy-fuzzy-matching"><code>fuzzy</code></a></td>
+<td>Levenshtein distance and name suggestions</td>
+<td>~78</td>
+</tr>
+<tr>
+<td><a href="#transport-transport-normalization"><code>transport</code></a></td>
+<td>Transport alias resolution</td>
+<td>~24</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cli-cli-helpers"><code>cli</code> — CLI Helpers<a class="headerlink" href="#cli-cli-helpers" title="Permanent link">&para;</a></h2>
+<p>::: mamba_mcp_core.cli</p>
+<p>Provides common <a href="https://typer.tiangolo.com/">Typer</a> callbacks and helpers that every server's <code>__main__.py</code> reuses. This module handles env file validation, cascading env file discovery, and structured logging configuration.</p>
+<h3 id="validate_env_file"><code>validate_env_file</code><a class="headerlink" href="#validate_env_file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/cli.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_env_file</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Typer callback for the <code>--env-file</code> option. Validates that the specified path exists and is a regular file, then returns the resolved absolute path. Skips validation during shell completion (<code>ctx.resilient_parsing</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctx</code></td>
+<td><code>typer.Context</code></td>
+<td>Typer context (used to detect shell completion mode)</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td><code>str \| None</code></td>
+<td>User-provided path, or <code>None</code> if the option was omitted</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>str | None</code> — Resolved absolute path, or <code>None</code> if not specified.</p>
+<p><strong>Raises:</strong> <code>typer.BadParameter</code> — If the file does not exist or the path is not a file.</p>
+<h3 id="resolve_default_env_file"><code>resolve_default_env_file</code><a class="headerlink" href="#resolve_default_env_file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/cli.py</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_default_env_file</span><span class="p">(</span><span class="n">env_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Resolves the env file path using a cascading fallback strategy:</p>
+<ol>
+<li>If <code>env_file</code> is not <code>None</code>, return it as-is (explicit path wins).</li>
+<li>Check <code>./mamba.env</code> in the current working directory.</li>
+<li>Check <code>~/mamba.env</code> in the user's home directory.</li>
+<li>Return <code>None</code> if no file is found.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>env_file</code></td>
+<td><code>str \| None</code></td>
+<td>Explicitly provided path, or <code>None</code> to trigger auto-discovery</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>str | None</code> — Resolved path to the env file, or <code>None</code>.</p>
+<h3 id="setup_logging"><code>setup_logging</code><a class="headerlink" href="#setup_logging" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/cli.py</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">format_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Configures Python's <code>logging.basicConfig</code> with the specified level and format. All output is directed to <strong>stderr</strong> because MCP stdio transport uses stdout for protocol messages.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>level</code></td>
+<td><code>str</code></td>
+<td>Logging level (<code>"DEBUG"</code>, <code>"INFO"</code>, <code>"WARNING"</code>, <code>"ERROR"</code>)</td>
+</tr>
+<tr>
+<td><code>format_type</code></td>
+<td><code>str</code></td>
+<td><code>"json"</code> for structured JSON output, <code>"text"</code> for standard format</td>
+</tr>
+</tbody>
+</table>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">JSON format</label><label for="__tabbed_1_2">Text format</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>{&quot;time&quot;: &quot;2024-01-15 10:30:00,123&quot;, &quot;name&quot;: &quot;mamba_mcp_pg&quot;, &quot;level&quot;: &quot;INFO&quot;, &quot;message&quot;: &quot;Starting server&quot;}
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>2024-01-15 10:30:00,123 - mamba_mcp_pg - INFO - Starting server
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Why stderr?</p>
+<p>MCP's stdio transport communicates over stdout. Logging to stderr keeps log output separated from protocol messages, preventing corruption of the JSON-RPC stream.</p>
+</div>
+<hr />
+<h2 id="config-configuration-state"><code>config</code> — Configuration State<a class="headerlink" href="#config-configuration-state" title="Permanent link">&para;</a></h2>
+<p>::: mamba_mcp_core.config</p>
+<p>Manages a module-level variable (<code>_env_file_path</code>) that bridges CLI argument parsing in <code>__main__.py</code> to Pydantic settings loading in each server's <code>config.py</code>. This is the mechanism that lets a CLI <code>--env-file</code> flag reach the <code>@model_validator</code> that constructs nested settings classes.</p>
+<h3 id="set_env_file_path"><code>set_env_file_path</code><a class="headerlink" href="#set_env_file_path" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/config.py</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_env_file_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Sets the module-level <code>_env_file_path</code> variable. Called by each server's CLI callback after resolving the env file.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>str \| None</code></td>
+<td>Absolute path to the <code>.env</code> file, or <code>None</code> to use the default</td>
+</tr>
+</tbody>
+</table>
+<h3 id="get_env_file_path"><code>get_env_file_path</code><a class="headerlink" href="#get_env_file_path" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/config.py</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_env_file_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Returns the currently configured env file path. Called inside each server's <code>Settings.load_nested_settings()</code> model validator.</p>
+<p><strong>Returns:</strong> <code>str | None</code> — The configured path, or <code>None</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Why module-level state instead of context variables?</p>
+<p>The env file path needs to travel from a synchronous Typer callback to a Pydantic <code>@model_validator(mode="before")</code> classmethod. Context variables (<code>contextvars</code>) require an active async context, and Pydantic validators are not async-aware. A simple module-level variable is the most pragmatic bridge for this synchronous-to-synchronous handoff. Tests reset this state via autouse fixtures calling <code>set_env_file_path(None)</code>.</p>
+</div>
+<hr />
+<h2 id="errors-error-model"><code>errors</code> — Error Model<a class="headerlink" href="#errors-error-model" title="Permanent link">&para;</a></h2>
+<p>::: mamba_mcp_core.errors</p>
+<p>Provides the canonical <code>ToolError</code> Pydantic model and a factory function with dependency-injected error suggestions. Each server defines its own <code>ErrorCode</code> constants and <code>ERROR_SUGGESTIONS</code> map, then passes them into the core factory — keeping domain-specific knowledge out of the shared library.</p>
+<h3 id="toolerror"><code>ToolError</code><a class="headerlink" href="#toolerror" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/errors.py</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ToolError</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">input_received</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Standard error response model for tool failures across all servers.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td><code>str</code></td>
+<td>Machine-readable error code (e.g., <code>"SCHEMA_NOT_FOUND"</code>, <code>"RATE_LIMITED"</code>)</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>str</code></td>
+<td>Human-readable error description</td>
+</tr>
+<tr>
+<td><code>suggestion</code></td>
+<td><code>str \| None</code></td>
+<td>Actionable guidance to resolve the error</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td>Additional debugging context (elapsed time, endpoint, etc.)</td>
+</tr>
+<tr>
+<td><code>tool_name</code></td>
+<td><code>str</code></td>
+<td>Name of the MCP tool that generated the error</td>
+</tr>
+<tr>
+<td><code>input_received</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td>The input parameters that were received by the tool</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Serialized ToolError</p>
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TABLE_NOT_FOUND&quot;</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Table &#39;userz&#39; not found in schema &#39;public&#39;&quot;</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;suggestion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Did you mean: &#39;users&#39;, &#39;user_roles&#39;? List tables in schema with list_tables&quot;</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;context&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;describe_table&quot;</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nt">&quot;input_received&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;schema_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;public&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;table_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;userz&quot;</span><span class="p">}</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<h3 id="create_tool_error"><code>create_tool_error</code><a class="headerlink" href="#create_tool_error" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/errors.py</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_tool_error</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">input_received</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    <span class="n">suggestions_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ToolError</span>
+</span></code></pre></div>
+<p>Factory function that constructs a <code>ToolError</code> instance. The <code>suggestions_map</code> parameter enables dependency injection — each server passes its own <code>ERROR_SUGGESTIONS</code> dictionary so core never imports server-specific constants.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td><code>str</code></td>
+<td>Machine-readable error code</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>str</code></td>
+<td>Human-readable error message</td>
+</tr>
+<tr>
+<td><code>tool_name</code></td>
+<td><code>str</code></td>
+<td>Name of the tool that generated the error</td>
+</tr>
+<tr>
+<td><code>input_received</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td>Input parameters received by the tool</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td>Additional debugging context</td>
+</tr>
+<tr>
+<td><code>suggestion</code></td>
+<td><code>str \| None</code></td>
+<td>Explicit suggestion (overrides <code>suggestions_map</code> lookup)</td>
+</tr>
+<tr>
+<td><code>suggestions_map</code></td>
+<td><code>dict[str, str] \| None</code></td>
+<td>Server-specific error code to suggestion mapping</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ToolError</code> — A populated error model instance.</p>
+<p><strong>Suggestion resolution order:</strong></p>
+<ol>
+<li>If <code>suggestion</code> is provided, use it directly.</li>
+<li>Otherwise, look up <code>code</code> in <code>suggestions_map</code>.</li>
+<li>If neither yields a result, <code>suggestion</code> is <code>None</code>.</li>
+</ol>
+<hr />
+<h2 id="fuzzy-fuzzy-matching"><code>fuzzy</code> — Fuzzy Matching<a class="headerlink" href="#fuzzy-fuzzy-matching" title="Permanent link">&para;</a></h2>
+<p>::: mamba_mcp_core.fuzzy</p>
+<p>Provides Levenshtein distance calculation and a name suggestion function used for "did you mean?" hints when a user provides a schema, table, branch, or project name that doesn't exist.</p>
+<h3 id="levenshtein_distance"><code>levenshtein_distance</code><a class="headerlink" href="#levenshtein_distance" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/fuzzy.py</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">levenshtein_distance</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</span></code></pre></div>
+<p>Calculates the minimum number of single-character edits (insertions, deletions, substitutions) needed to transform <code>s1</code> into <code>s2</code>. Uses the Wagner-Fischer dynamic programming algorithm with a two-row optimization.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s1</code></td>
+<td><code>str</code></td>
+<td>First string</td>
+</tr>
+<tr>
+<td><code>s2</code></td>
+<td><code>str</code></td>
+<td>Second string</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>int</code> — Edit distance between the two strings.</p>
+<p><strong>Complexity:</strong> O(m * n) time, O(min(m, n)) space.</p>
+<h3 id="find_similar_names"><code>find_similar_names</code><a class="headerlink" href="#find_similar_names" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/fuzzy.py</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_similar_names</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">candidates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Finds candidate names within a scaled edit distance threshold of the input name. Comparison is case-insensitive.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>The name to match against</td>
+</tr>
+<tr>
+<td><code>candidates</code></td>
+<td><code>list[str]</code></td>
+<td>—</td>
+<td>Available names to search</td>
+</tr>
+<tr>
+<td><code>max_results</code></td>
+<td><code>int</code></td>
+<td><code>3</code></td>
+<td>Maximum number of suggestions to return</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>list[str]</code> — Similar names sorted by edit distance (closest first). Empty list if nothing is within threshold.</p>
+<p><strong>Threshold formula:</strong> <code>max(2, min(len(name) // 2, 5))</code></p>
+<p>This adaptive threshold prevents overly strict matching on short names and overly loose matching on long ones:</p>
+<table>
+<thead>
+<tr>
+<th>Input length</th>
+<th>Threshold</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1–4 chars</td>
+<td>2</td>
+<td>Short names need close matches</td>
+</tr>
+<tr>
+<td>5–10 chars</td>
+<td><code>len // 2</code></td>
+<td>Scales proportionally</td>
+</tr>
+<tr>
+<td>11+ chars</td>
+<td>5</td>
+<td>Cap prevents matching unrelated long strings</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Fuzzy matching in action</p>
+<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.fuzzy</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_similar_names</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">,</span> <span class="s2">&quot;user_roles&quot;</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="s2">&quot;payments&quot;</span><span class="p">]</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">find_similar_names</span><span class="p">(</span><span class="s2">&quot;userz&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># [&#39;users&#39;] — distance 1, within threshold 2</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">find_similar_names</span><span class="p">(</span><span class="s2">&quot;ordrs&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># [&#39;orders&#39;] — distance 1, within threshold 2</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="n">find_similar_names</span><span class="p">(</span><span class="s2">&quot;inventory&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1"># [] — no candidates within threshold 4</span>
+</span></code></pre></div>
+</div>
+<hr />
+<h2 id="transport-transport-normalization"><code>transport</code> — Transport Normalization<a class="headerlink" href="#transport-transport-normalization" title="Permanent link">&para;</a></h2>
+<p>::: mamba_mcp_core.transport</p>
+<p>Resolves a historical naming inconsistency where some servers accepted <code>"http"</code> and others required <code>"streamable-http"</code> as the transport value. This module normalizes both to the canonical FastMCP transport name.</p>
+<h3 id="normalize_transport"><code>normalize_transport</code><a class="headerlink" href="#normalize_transport" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/transport.py</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">normalize_transport</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p>Maps transport aliases to their canonical FastMCP names.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value</code></td>
+<td><code>str</code></td>
+<td>Transport name from configuration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>str</code> — Normalized transport name.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"http"</code></td>
+<td><code>"streamable-http"</code></td>
+</tr>
+<tr>
+<td><code>"streamable-http"</code></td>
+<td><code>"streamable-http"</code></td>
+</tr>
+<tr>
+<td><code>"stdio"</code></td>
+<td><code>"stdio"</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="usage-patterns">Usage Patterns<a class="headerlink" href="#usage-patterns" title="Permanent link">&para;</a></h2>
+<p>Every server package integrates with <code>mamba-mcp-core</code> through the same five touchpoints. The examples below use <code>mamba-mcp-pg</code> as the reference implementation; the pattern is identical across all four servers.</p>
+<h3 id="1-cli-integration-__main__py">1. CLI Integration (<code>__main__.py</code>)<a class="headerlink" href="#1-cli-integration-__main__py" title="Permanent link">&para;</a></h3>
+<p>The server's Typer entry point uses three core functions to handle env file resolution and logging setup.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_default_env_file</span><span class="p">,</span> <span class="n">setup_logging</span><span class="p">,</span> <span class="n">validate_env_file</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.transport</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_transport</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;mamba-mcp-pg&quot;</span><span class="p">,</span> <span class="n">no_args_is_help</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">invoke_without_command</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="n">env_file</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>        <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>            <span class="s2">&quot;--env-file&quot;</span><span class="p">,</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to .env file (default: ./mamba.env or ~/mamba.env)&quot;</span><span class="p">,</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>            <span class="n">callback</span><span class="o">=</span><span class="n">validate_env_file</span><span class="p">,</span>  <span class="c1"># 1. Validate on input</span>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>            <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;PATH&quot;</span><span class="p">,</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>        <span class="p">),</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>    <span class="n">resolved_env_file</span> <span class="o">=</span> <span class="n">resolve_default_env_file</span><span class="p">(</span><span class="n">env_file</span><span class="p">)</span>  <span class="c1"># 2. Cascade fallback</span>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>
+</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>    <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">invoked_subcommand</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>        <span class="n">set_env_file_path</span><span class="p">(</span><span class="n">resolved_env_file</span><span class="p">)</span>
+</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a>        <span class="k">return</span>
+</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>
+</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>    <span class="n">set_env_file_path</span><span class="p">(</span><span class="n">resolved_env_file</span><span class="p">)</span>  <span class="c1"># 3. Bridge to config</span>
+</span><span id="__span-14-26"><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-14-27"><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>    <span class="n">setup_logging</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">log_format</span><span class="p">)</span>  <span class="c1"># 4. Configure logging</span>
+</span><span id="__span-14-28"><a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>
+</span><span id="__span-14-29"><a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>    <span class="n">transport</span> <span class="o">=</span> <span class="n">normalize_transport</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">transport</span><span class="p">)</span>  <span class="c1"># 5. Normalize transport</span>
+</span><span id="__span-14-30"><a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>    <span class="k">if</span> <span class="n">transport</span> <span class="o">==</span> <span class="s2">&quot;stdio&quot;</span><span class="p">:</span>
+</span><span id="__span-14-31"><a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a>        <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;stdio&quot;</span><span class="p">)</span>
+</span><span id="__span-14-32"><a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-14-33"><a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a>        <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;streamable-http&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The flow is: <strong>validate</strong> (<code>validate_env_file</code>) <strong>-&gt;</strong> <strong>resolve</strong> (<code>resolve_default_env_file</code>) <strong>-&gt;</strong> <strong>bridge</strong> (<code>set_env_file_path</code>) <strong>-&gt;</strong> <strong>configure</strong> (<code>setup_logging</code>) <strong>-&gt;</strong> <strong>normalize</strong> (<code>normalize_transport</code>).</p>
+<h3 id="2-config-integration-configpy">2. Config Integration (<code>config.py</code>)<a class="headerlink" href="#2-config-integration-configpy" title="Permanent link">&para;</a></h3>
+<p>Each server's root <code>Settings</code> class reads the env file path inside a Pydantic model validator, then passes it to nested settings constructors via the <code>_env_file</code> parameter.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/config.py</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_env_file_path</span><span class="p">,</span> <span class="n">set_env_file_path</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">database</span><span class="p">:</span> <span class="n">DatabaseSettings</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">ServerSettings</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="nd">@classmethod</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_nested_settings</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>        <span class="n">env_file</span> <span class="o">=</span> <span class="n">get_env_file_path</span><span class="p">()</span>  <span class="c1"># Read what CLI set</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>        <span class="k">if</span> <span class="s2">&quot;database&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DatabaseSettings</span><span class="p">(</span><span class="n">_env_file</span><span class="o">=</span><span class="n">env_file</span><span class="p">)</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>        <span class="k">if</span> <span class="s2">&quot;server&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;server&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;server&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ServerSettings</span><span class="p">(</span><span class="n">_env_file</span><span class="o">=</span><span class="n">env_file</span><span class="p">)</span>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>        <span class="k">return</span> <span class="n">data</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Re-exports for backward compatibility</p>
+<p>Server <code>config.py</code> modules re-export <code>set_env_file_path</code> and <code>get_env_file_path</code> so that existing imports from within the server package continue to work without changes:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># In server config.py</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_env_file_path</span><span class="p">,</span> <span class="n">set_env_file_path</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_env_file_path&quot;</span><span class="p">,</span> <span class="s2">&quot;set_env_file_path&quot;</span><span class="p">,</span> <span class="s2">&quot;get_settings&quot;</span><span class="p">,</span> <span class="s2">&quot;Settings&quot;</span><span class="p">]</span>
+</span></code></pre></div>
+</div>
+<h3 id="3-error-integration-errorspy">3. Error Integration (<code>errors.py</code>)<a class="headerlink" href="#3-error-integration-errorspy" title="Permanent link">&para;</a></h3>
+<p>Each server defines its own <code>ErrorCode</code> constants and <code>ERROR_SUGGESTIONS</code> map, then wraps the core <code>create_tool_error</code> to inject its domain-specific suggestions.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/errors.py</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_tool_error</span> <span class="k">as</span> <span class="n">_core_create_tool_error</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">ErrorCode</span><span class="p">:</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="n">SCHEMA_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;SCHEMA_NOT_FOUND&quot;</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="n">TABLE_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;TABLE_NOT_FOUND&quot;</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="c1"># ... server-specific codes</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="n">ERROR_SUGGESTIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SCHEMA_NOT_FOUND</span><span class="p">:</span> <span class="s2">&quot;List available schemas with list_schemas&quot;</span><span class="p">,</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">TABLE_NOT_FOUND</span><span class="p">:</span> <span class="s2">&quot;List tables in schema with list_tables&quot;</span><span class="p">,</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    <span class="c1"># ...</span>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="p">}</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_tool_error</span><span class="p">(</span>
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>    <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-17-18"><a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>    <span class="n">input_received</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-17-19"><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>    <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-17-20"><a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>    <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-17-21"><a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-17-22"><a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Thin wrapper: injects ERROR_SUGGESTIONS, converts to dict.&quot;&quot;&quot;</span>
+</span><span id="__span-17-23"><a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>    <span class="n">error</span> <span class="o">=</span> <span class="n">_core_create_tool_error</span><span class="p">(</span>
+</span><span id="__span-17-24"><a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>        <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span>
+</span><span id="__span-17-25"><a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a>        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+</span><span id="__span-17-26"><a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a>        <span class="n">tool_name</span><span class="o">=</span><span class="n">tool_name</span><span class="p">,</span>
+</span><span id="__span-17-27"><a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a>        <span class="n">input_received</span><span class="o">=</span><span class="n">input_received</span><span class="p">,</span>
+</span><span id="__span-17-28"><a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a>        <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+</span><span id="__span-17-29"><a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a>        <span class="n">suggestion</span><span class="o">=</span><span class="n">suggestion</span><span class="p">,</span>
+</span><span id="__span-17-30"><a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a>        <span class="n">suggestions_map</span><span class="o">=</span><span class="n">ERROR_SUGGESTIONS</span><span class="p">,</span>  <span class="c1"># Dependency injection</span>
+</span><span id="__span-17-31"><a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a>    <span class="p">)</span>
+</span><span id="__span-17-32"><a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a>    <span class="k">return</span> <span class="n">error</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Return type varies by server</p>
+<p>The core <code>create_tool_error</code> returns a <code>ToolError</code> model instance. Each server's wrapper may convert this differently:</p>
+<ul>
+<li><strong>PG, FS, GitLab</strong> — call <code>.model_dump()</code> and return <code>dict[str, Any]</code></li>
+<li><strong>HANA</strong> — returns the <code>ToolError</code> instance directly</li>
+</ul>
+<p>This preserves each server's existing return type contract (<code>OutputModel | dict[str, Any]</code> vs <code>OutputModel | ToolError</code>).</p>
+</div>
+<h3 id="4-fuzzy-matching-for-did-you-mean-suggestions">4. Fuzzy Matching for "Did You Mean?" Suggestions<a class="headerlink" href="#4-fuzzy-matching-for-did-you-mean-suggestions" title="Permanent link">&para;</a></h3>
+<p>Servers use <code>find_similar_names</code> in tool handlers when a user-provided name (schema, table, branch, project) is not found. The function is re-exported from each server's <code>errors.py</code>.</p>
+<div class="highlight"><span class="filename">Example: fuzzy matching in a tool handler</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.fuzzy</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_similar_names</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># Inside a tool handler after discovering &quot;userz&quot; doesn&#39;t exist:</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">available_tables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">,</span> <span class="s2">&quot;user_roles&quot;</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">]</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">similar</span> <span class="o">=</span> <span class="n">find_similar_names</span><span class="p">(</span><span class="s2">&quot;userz&quot;</span><span class="p">,</span> <span class="n">available_tables</span><span class="p">)</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">if</span> <span class="n">similar</span><span class="p">:</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">names_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">similar</span><span class="p">)</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Did you mean: </span><span class="si">{</span><span class="n">names_str</span><span class="si">}</span><span class="s2">? List tables in schema with list_tables&quot;</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="s2">&quot;List tables in schema with list_tables&quot;</span>
+</span></code></pre></div>
+<p>The GitLab server wraps this into dedicated helpers like <code>suggest_project_names()</code> and <code>suggest_branch_names()</code> for convenience.</p>
+<h3 id="5-transport-normalization-in-config-validators">5. Transport Normalization in Config Validators<a class="headerlink" href="#5-transport-normalization-in-config-validators" title="Permanent link">&para;</a></h3>
+<p>Servers call <code>normalize_transport</code> at startup to map user-friendly aliases to canonical FastMCP transport names.</p>
+<div class="highlight"><span class="filename">Usage in server __main__.py</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.transport</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_transport</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">transport</span> <span class="o">=</span> <span class="n">normalize_transport</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">transport</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># &quot;http&quot; becomes &quot;streamable-http&quot;, &quot;stdio&quot; stays &quot;stdio&quot;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="k">if</span> <span class="n">transport</span> <span class="o">==</span> <span class="s2">&quot;stdio&quot;</span><span class="p">:</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;stdio&quot;</span><span class="p">)</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;streamable-http&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="architecture-decisions">Architecture Decisions<a class="headerlink" href="#architecture-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="why-a-shared-library-instead-of-copying-utilities">Why a shared library instead of copying utilities?<a class="headerlink" href="#why-a-shared-library-instead-of-copying-utilities" title="Permanent link">&para;</a></h3>
+<p>Before <code>mamba-mcp-core</code> was extracted, each server had its own copy of the Levenshtein function, env file resolution logic, and error model. This led to drift: fuzzy matching thresholds diverged, transport naming was inconsistent, and bug fixes had to be applied in multiple places. Consolidating into a shared library ensures all servers behave identically.</p>
+<h3 id="why-dependency-injection-for-error-suggestions">Why dependency injection for error suggestions?<a class="headerlink" href="#why-dependency-injection-for-error-suggestions" title="Permanent link">&para;</a></h3>
+<p>The core library cannot import server packages (that would create circular dependencies). Instead, each server passes its <code>ERROR_SUGGESTIONS</code> dict into <code>create_tool_error()</code> via the <code>suggestions_map</code> parameter. This keeps domain-specific error codes out of the shared library while reusing the common factory logic.</p>
+<pre class="mermaid"><code>graph LR
+    subgraph "mamba-mcp-core"
+        A[create_tool_error]
+        B[ToolError model]
+        A --&gt; B
+    end
+
+    subgraph "mamba-mcp-pg"
+        C[ErrorCode constants]
+        D[ERROR_SUGGESTIONS map]
+        E[create_tool_error wrapper]
+        E -- "suggestions_map=" --&gt; A
+        C --&gt; D
+        D --&gt; E
+    end</code></pre>
+<h3 id="why-module-level-state-for-env-file-path">Why module-level state for env file path?<a class="headerlink" href="#why-module-level-state-for-env-file-path" title="Permanent link">&para;</a></h3>
+<p>The env file path must travel from a synchronous Typer callback to a synchronous Pydantic <code>@model_validator(mode="before")</code>. Neither <code>contextvars</code> (requires async context) nor function parameters (Pydantic validators have a fixed signature) are suitable. A module-level global with getter/setter is the simplest correct solution. The tradeoff is that tests must reset this state, which is handled by autouse fixtures.</p>
+<hr />
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<p>Core tests are located at <code>packages/mamba-mcp-core/tests/</code> and follow the project's standard conventions.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--package<span class="w"> </span>mamba-mcp-core<span class="w"> </span>pytest<span class="w"> </span>packages/mamba-mcp-core/
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Autouse fixture for config state</p>
+<p>Any test that calls <code>set_env_file_path()</code> should include an autouse fixture to reset the module-level state after each test:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">_reset_env_file_path</span><span class="p">():</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="k">yield</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">set_env_file_path</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

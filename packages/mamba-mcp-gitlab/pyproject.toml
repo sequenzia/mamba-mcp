@@ -1,6 +1,6 @@
 [project]
 name = "mamba-mcp-gitlab"
-version = "0.1.0"
+dynamic = ["version"]
 description = "GitLab MCP Server for merge requests, issues, pipelines, and search"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -29,8 +29,17 @@ dependencies = [
 mamba-mcp-gitlab = "mamba_mcp_gitlab.__main__:app"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+raw-options.root = "../.."
+raw-options.version_scheme = "python-simplified-semver"
+raw-options.local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/mamba_mcp_gitlab/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mamba_mcp_gitlab"]

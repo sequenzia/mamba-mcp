@@ -5,6 +5,9 @@ description = "Mamba MCP - A collection of MCP tools and servers"
 requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "MIT" }
+dependencies = [
+    "mkdocs-material>=9.7.1",
+]
 
 # No dependencies at root - this is a virtual workspace
 

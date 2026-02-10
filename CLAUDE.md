@@ -313,6 +313,29 @@ The following have been standardized:
 - **Test matrix**: Per-package isolation via `uv run --package` (core, client, pg, fs, hana, gitlab)
 - **Client test coverage**: Minimal — only `test_client.py` exists; CLI commands and TUI lack tests
 
+## Versioning & Release Process
+
+All 6 packages share a single version derived from git tags via **hatch-vcs**.
+
+- **Version source of truth**: Git tags (e.g., `v0.1.0`)
+- **Dynamic versioning**: Each package's `pyproject.toml` uses `dynamic = ["version"]` with `hatch-vcs`
+- **`_version.py` files**: Auto-generated at build time, gitignored — do not commit these
+- **Dev version fallback**: `__init__.py` files fall back to `"0.0.0.dev0"` when `_version.py` doesn't exist (editable installs)
+
+### How to Release
+
+1. Update `CHANGELOG.md` — move items from `[Unreleased]` to a new version section
+2. Create an annotated tag: `git tag -a v0.2.0 -m "Release v0.2.0"`
+3. Push the tag: `git push origin v0.2.0`
+4. GitHub Actions handles the rest: **build** → **TestPyPI** → **PyPI** → **GitHub Release**
+
+### Release Pipeline (`.github/workflows/release.yml`)
+
+- Triggered by `v*` tags pushed to the repository
+- Builds all 6 packages with `uv build --package <name>`
+- Publishes to TestPyPI first (gate), then PyPI, then creates a GitHub Release
+- Uses OIDC trusted publishing (no API tokens needed — configured in PyPI/TestPyPI settings)
+
 ## Code Standards
 
 - Python 3.11+

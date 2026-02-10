@@ -1,6 +1,6 @@
 [project]
 name = "mamba-mcp-client"
-version = "1.0.0"
+dynamic = ["version"]
 description = "A Python-based MCP Client for testing and debugging MCP Servers"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -34,8 +34,17 @@ dependencies = [
 mamba-mcp-client = "mamba_mcp_client.cli:main"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+raw-options.root = "../.."
+raw-options.version_scheme = "python-simplified-semver"
+raw-options.local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/mamba_mcp_client/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mamba_mcp_client"]

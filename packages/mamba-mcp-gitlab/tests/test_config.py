@@ -25,9 +25,10 @@ class TestPackageImport:
         assert mamba_mcp_gitlab is not None
 
     def test_version_defined(self) -> None:
-        """Test that __version__ is defined."""
+        """Test that __version__ is defined and is a non-empty string."""
         assert hasattr(mamba_mcp_gitlab, "__version__")
-        assert mamba_mcp_gitlab.__version__ == "0.1.0"
+        assert isinstance(mamba_mcp_gitlab.__version__, str)
+        assert len(mamba_mcp_gitlab.__version__) > 0
 
 
 class TestGitLabSettings:

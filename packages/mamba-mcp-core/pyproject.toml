@@ -1,6 +1,6 @@
 [project]
 name = "mamba-mcp-core"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Shared utilities for Mamba MCP server packages"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -22,8 +22,17 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+raw-options.root = "../.."
+raw-options.version_scheme = "python-simplified-semver"
+raw-options.local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/mamba_mcp_core/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mamba_mcp_core"]

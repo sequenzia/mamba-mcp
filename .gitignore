@@ -1,3 +1,6 @@
 **/__pycache__
 .env
 mamba.env
+
+# Auto-generated version files (hatch-vcs)
+**/_version.py

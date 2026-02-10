@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for hatch-vcs version resolution
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
@@ -22,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for hatch-vcs version resolution
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
@@ -42,6 +46,8 @@ jobs:
           - mamba-mcp-gitlab
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for hatch-vcs version resolution
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
