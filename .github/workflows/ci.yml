@@ -39,6 +39,7 @@ jobs:
           - mamba-mcp-pg
           - mamba-mcp-fs
           - mamba-mcp-hana
+          - mamba-mcp-gitlab
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
