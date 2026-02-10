@@ -119,7 +119,7 @@ class GitLabService:
                 error_code=ErrorCode.RATE_LIMITED,
             ) from exc
 
-    async def _get(self, path: str, params: dict[str, Any] | None = None) -> Any:
+    async def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Send a GET request to the GitLab API.
 
         Args:
@@ -132,9 +132,10 @@ class GitLabService:
         Raises:
             GitLabAPIError: On HTTP error or connection failure.
         """
-        return await self._request("GET", path, params=params)
+        result: dict[str, Any] = await self._request("GET", path, params=params)
+        return result
 
-    async def _post(self, path: str, json: dict[str, Any] | None = None) -> Any:
+    async def _post(self, path: str, json: dict[str, Any] | None = None) -> dict[str, Any]:
         """Send a POST request to the GitLab API.
 
         Args:
@@ -147,9 +148,10 @@ class GitLabService:
         Raises:
             GitLabAPIError: On HTTP error or connection failure.
         """
-        return await self._request("POST", path, json=json)
+        result: dict[str, Any] = await self._request("POST", path, json=json)
+        return result
 
-    async def _put(self, path: str, json: dict[str, Any] | None = None) -> Any:
+    async def _put(self, path: str, json: dict[str, Any] | None = None) -> dict[str, Any]:
         """Send a PUT request to the GitLab API.
 
         Args:
@@ -162,7 +164,8 @@ class GitLabService:
         Raises:
             GitLabAPIError: On HTTP error or connection failure.
         """
-        return await self._request("PUT", path, json=json)
+        result: dict[str, Any] = await self._request("PUT", path, json=json)
+        return result
 
     async def _get_paginated(
         self,
