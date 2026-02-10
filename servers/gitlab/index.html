@@ -1,0 +1,3577 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.">
+      
+      
+      
+      
+        <link rel="prev" href="../hana/">
+      
+      
+        <link rel="next" href="../../development/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>GitLab - Mamba MCP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gitlab-mcp-server" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Mamba MCP" class="md-header__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Mamba MCP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GitLab
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../packages/core/" class="md-tabs__link">
+          
+  
+  
+  Packages
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../pg/" class="md-tabs__link">
+          
+  
+  
+  MCP Servers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../development/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Development Guide
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Mamba MCP" class="md-nav__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Mamba MCP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Packages
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Servers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MCP Servers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hana/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAP HANA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitLab
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitLab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-a-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create a configuration file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-test-connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Test connectivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-start-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Start the server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-connect-with-mamba-mcp-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Connect with mamba-mcp-client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLab Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limit-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limit Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tool-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tool Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#merge-requests-7-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge Requests (7 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Merge Requests (7 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_mrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_mrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_diffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_diffs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_commits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_pipelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_mr-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_mr :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update_mr-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update_mr :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issues-6-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issues (6 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Issues (6 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_issue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list_issue_comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_issue_comments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_issue-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_issue :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update_issue-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update_issue :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_issue_comment-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_issue_comment :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipelines-4-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipelines (4 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipelines (4 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_pipelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_pipeline_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_pipeline_jobs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_job_log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_job_log
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-1-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search (1 tool)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Search (1 tool)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        search
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#personal-access-token-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personal Access Token (PAT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-20-client-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth 2.0 (Client Credentials)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-only-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read-Only Mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limiting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rate Limiting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitlabservice-base-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLabService (base class)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-handler-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool handler pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-a-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create a configuration file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-test-connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Test connectivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-start-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Start the server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-connect-with-mamba-mcp-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Connect with mamba-mcp-client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLab Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limit-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limit Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tool-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tool Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#merge-requests-7-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge Requests (7 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Merge Requests (7 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_mrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_mrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_diffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_diffs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_commits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_mr_pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_mr_pipelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_mr-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_mr :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update_mr-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update_mr :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issues-6-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issues (6 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Issues (6 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_issue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list_issue_comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_issue_comments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_issue-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_issue :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update_issue-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update_issue :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_issue_comment-material-pencil-titlewrite-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_issue_comment :material-pencil:{ title="Write tool" }
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipelines-4-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipelines (4 tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipelines (4 tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_pipelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_pipeline_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_pipeline_jobs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_job_log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_job_log
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-1-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search (1 tool)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Search (1 tool)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        search
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#personal-access-token-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personal Access Token (PAT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-20-client-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth 2.0 (Client Credentials)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-only-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read-Only Mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limiting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rate Limiting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitlabservice-base-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLabService (base class)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-handler-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool handler pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="gitlab-mcp-server">GitLab MCP Server<a class="headerlink" href="#gitlab-mcp-server" title="Permanent link">&para;</a></h1>
+<p>The GitLab MCP Server (<code>mamba-mcp-gitlab</code>) exposes 18 MCP tools for interacting with GitLab merge requests, issues, CI/CD pipelines, and search. It connects to any GitLab instance (self-managed or GitLab.com) using either a Personal Access Token or OAuth 2.0 client credentials, with optional read-only mode and client-side rate limiting.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph LR
+    A[MCP Client] --&gt;|stdio / streamable-http| B[mamba-mcp-gitlab]
+    B --&gt;|httpx async| C[GitLab API v4]
+    B --- D[Rate Limiter]
+    B --- E[Auth Strategy]
+    E --&gt;|PAT| C
+    E --&gt;|OAuth 2.0| C</code></pre>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tools</strong></td>
+<td>18 across 4 categories</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Personal Access Token (PAT) or OAuth 2.0 client credentials</td>
+</tr>
+<tr>
+<td><strong>Read-only mode</strong></td>
+<td>Runtime gating on 5 write tools</td>
+</tr>
+<tr>
+<td><strong>Rate limiting</strong></td>
+<td>Sliding window, configurable requests/window</td>
+</tr>
+<tr>
+<td><strong>HTTP client</strong></td>
+<td><code>httpx</code> async with connection pooling</td>
+</tr>
+<tr>
+<td><strong>Transport</strong></td>
+<td><code>stdio</code> (default), <code>streamable-http</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mamba-mcp-gitlab
+</span></code></pre></div>
+<p>Or within the monorepo workspace:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
+</span></code></pre></div>
+<details class="info">
+<summary>Dependencies</summary>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mamba-mcp-core</code></td>
+<td>workspace</td>
+<td>Shared CLI, errors, fuzzy matching</td>
+</tr>
+<tr>
+<td><code>mcp</code></td>
+<td><code>&gt;=1.0.0</code></td>
+<td>FastMCP server framework</td>
+</tr>
+<tr>
+<td><code>httpx</code></td>
+<td><code>&gt;=0.27.0</code></td>
+<td>Async HTTP client</td>
+</tr>
+<tr>
+<td><code>pydantic</code></td>
+<td><code>&gt;=2.0.0</code></td>
+<td>Data models and validation</td>
+</tr>
+<tr>
+<td><code>pydantic-settings</code></td>
+<td><code>&gt;=2.0.0</code></td>
+<td>Environment-based configuration</td>
+</tr>
+<tr>
+<td><code>typer</code></td>
+<td><code>&gt;=0.12.0</code></td>
+<td>CLI framework</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-a-configuration-file">1. Create a configuration file<a class="headerlink" href="#1-create-a-configuration-file" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Personal Access Token</label><label for="__tabbed_1_2">OAuth 2.0</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">mamba.env</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>MAMBA_MCP_GITLAB_URL=https://gitlab.example.com
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>MAMBA_MCP_GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>MAMBA_MCP_GITLAB_DEFAULT_PROJECT_ID=123
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">mamba.env</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>MAMBA_MCP_GITLAB_URL=https://gitlab.example.com
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>MAMBA_MCP_GITLAB_OAUTH_CLIENT_ID=your-client-id
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>MAMBA_MCP_GITLAB_OAUTH_CLIENT_SECRET=your-client-secret
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="2-test-connectivity">2. Test connectivity<a class="headerlink" href="#2-test-connectivity" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mamba-mcp-gitlab<span class="w"> </span>--env-file<span class="w"> </span>mamba.env<span class="w"> </span><span class="nb">test</span>
+</span></code></pre></div>
+<p>A successful test prints the authenticated username and token scopes:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Connection successful — authenticated as myuser with scopes: api
+</span></code></pre></div>
+<h3 id="3-start-the-server">3. Start the server<a class="headerlink" href="#3-start-the-server" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># STDIO transport (default)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mamba-mcp-gitlab<span class="w"> </span>--env-file<span class="w"> </span>mamba.env
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Streamable HTTP transport</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nv">MAMBA_MCP_GITLAB_SERVER_TRANSPORT</span><span class="o">=</span>streamable-http<span class="w"> </span>mamba-mcp-gitlab
+</span></code></pre></div>
+<h3 id="4-connect-with-mamba-mcp-client">4. Connect with mamba-mcp-client<a class="headerlink" href="#4-connect-with-mamba-mcp-client" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--package<span class="w"> </span>mamba-mcp-client<span class="w"> </span>mamba-mcp<span class="w"> </span>tools<span class="w"> </span>--stdio<span class="w"> </span><span class="s2">&quot;mamba-mcp-gitlab&quot;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>uv<span class="w"> </span>run<span class="w"> </span>--package<span class="w"> </span>mamba-mcp-client<span class="w"> </span>mamba-mcp<span class="w"> </span>call<span class="w"> </span>list_mrs<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--args<span class="w"> </span><span class="s1">&#39;{&quot;project_id&quot;: 123, &quot;state&quot;: &quot;opened&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--stdio<span class="w"> </span><span class="s2">&quot;mamba-mcp-gitlab&quot;</span>
+</span></code></pre></div>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration is loaded from environment variables or a <code>mamba.env</code> file (auto-discovered in the current directory or <code>~/mamba.env</code>). Use <code>--env-file</code> to specify a custom path.</p>
+<h3 id="gitlab-settings">GitLab Settings<a class="headerlink" href="#gitlab-settings" title="Permanent link">&para;</a></h3>
+<p>Prefix: <code>MAMBA_MCP_GITLAB_</code></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>URL</code></td>
+<td><code>str</code></td>
+<td><strong>required</strong></td>
+<td>GitLab instance URL (e.g., <code>https://gitlab.example.com</code>)</td>
+</tr>
+<tr>
+<td><code>TOKEN</code></td>
+<td><code>SecretStr</code></td>
+<td><code>None</code></td>
+<td>Personal Access Token for PAT authentication</td>
+</tr>
+<tr>
+<td><code>VERIFY_SSL</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Whether to verify SSL certificates</td>
+</tr>
+<tr>
+<td><code>DEFAULT_PROJECT_ID</code></td>
+<td><code>int</code></td>
+<td><code>None</code></td>
+<td>Default project scope when <code>project_id</code> is omitted</td>
+</tr>
+<tr>
+<td><code>DEFAULT_GROUP_ID</code></td>
+<td><code>int</code></td>
+<td><code>None</code></td>
+<td>Default group scope for search operations</td>
+</tr>
+<tr>
+<td><code>READ_ONLY</code></td>
+<td><code>bool</code></td>
+<td><code>false</code></td>
+<td>Block write tools at runtime</td>
+</tr>
+</tbody>
+</table>
+<h3 id="oauth-settings">OAuth Settings<a class="headerlink" href="#oauth-settings" title="Permanent link">&para;</a></h3>
+<p>Prefix: <code>MAMBA_MCP_GITLAB_OAUTH_</code></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLIENT_ID</code></td>
+<td><code>str</code></td>
+<td><code>None</code></td>
+<td>OAuth 2.0 application client ID</td>
+</tr>
+<tr>
+<td><code>CLIENT_SECRET</code></td>
+<td><code>SecretStr</code></td>
+<td><code>None</code></td>
+<td>OAuth 2.0 application client secret</td>
+</tr>
+<tr>
+<td><code>REDIRECT_URI</code></td>
+<td><code>str</code></td>
+<td><code>None</code></td>
+<td>OAuth 2.0 redirect URI</td>
+</tr>
+</tbody>
+</table>
+<h3 id="server-settings">Server Settings<a class="headerlink" href="#server-settings" title="Permanent link">&para;</a></h3>
+<p>Prefix: <code>MAMBA_MCP_GITLAB_SERVER_</code></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRANSPORT</code></td>
+<td><code>str</code></td>
+<td><code>stdio</code></td>
+<td>Transport type: <code>stdio</code>, <code>http</code>, or <code>streamable-http</code></td>
+</tr>
+<tr>
+<td><code>SERVER_HOST</code></td>
+<td><code>str</code></td>
+<td><code>127.0.0.1</code></td>
+<td>HTTP server bind address</td>
+</tr>
+<tr>
+<td><code>SERVER_PORT</code></td>
+<td><code>int</code></td>
+<td><code>8004</code></td>
+<td>HTTP server bind port (1--65535)</td>
+</tr>
+<tr>
+<td><code>LOG_LEVEL</code></td>
+<td><code>str</code></td>
+<td><code>INFO</code></td>
+<td>Logging level</td>
+</tr>
+<tr>
+<td><code>LOG_FORMAT</code></td>
+<td><code>str</code></td>
+<td><code>text</code></td>
+<td>Log format: <code>json</code> or <code>text</code></td>
+</tr>
+<tr>
+<td><code>MAX_CONNECTIONS</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Maximum concurrent HTTP connections to GitLab (1--100)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Transport normalization</p>
+<p>Both <code>http</code> and <code>streamable-http</code> are accepted as transport values. The server normalizes <code>http</code> to <code>streamable-http</code> internally via <code>mamba-mcp-core</code>.</p>
+</div>
+<h3 id="rate-limit-settings">Rate Limit Settings<a class="headerlink" href="#rate-limit-settings" title="Permanent link">&para;</a></h3>
+<p>Prefix: <code>MAMBA_MCP_GITLAB_RATE_LIMIT_</code></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MAX_REQUESTS</code></td>
+<td><code>int</code></td>
+<td><code>100</code></td>
+<td>Maximum requests per time window (0 disables)</td>
+</tr>
+<tr>
+<td><code>WINDOW_SECONDS</code></td>
+<td><code>int</code></td>
+<td><code>60</code></td>
+<td>Sliding window duration in seconds</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tool-reference">Tool Reference<a class="headerlink" href="#tool-reference" title="Permanent link">&para;</a></h2>
+<p>All 18 tools are organized into four categories. Every tool returns a structured Pydantic output model on success or a structured <code>ToolError</code> dict on failure. Pagination parameters (<code>page</code>, <code>per_page</code>) are automatically clamped to valid ranges (page &gt;= 1, per_page in 1--100, default 20).</p>
+<div class="admonition info">
+<p class="admonition-title">Project ID resolution</p>
+<p>When <code>project_id</code> is omitted from a tool call, the server falls back to the configured <code>MAMBA_MCP_GITLAB_DEFAULT_PROJECT_ID</code>. If neither is set, a <code>VALIDATION_ERROR</code> is returned.</p>
+</div>
+<h3 id="merge-requests-7-tools">Merge Requests (7 tools)<a class="headerlink" href="#merge-requests-7-tools" title="Permanent link">&para;</a></h3>
+<h4 id="list_mrs"><code>list_mrs</code><a class="headerlink" href="#list_mrs" title="Permanent link">&para;</a></h4>
+<p>List merge requests for a GitLab project. Use this as the entry point for discovering available MRs.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path. Falls back to default.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Filter: <code>opened</code>, <code>closed</code>, <code>merged</code>, <code>all</code></td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number (1-based). Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page (1--100). Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ListMergeRequestsOutput</code> -- paginated list of <code>MergeRequestSummary</code> items with <code>id</code>, <code>iid</code>, <code>title</code>, <code>state</code>, <code>author</code>, <code>source_branch</code>, <code>target_branch</code>, <code>web_url</code>, and timestamps.</p>
+<hr />
+<h4 id="get_mr"><code>get_mr</code><a class="headerlink" href="#get_mr" title="Permanent link">&para;</a></h4>
+<p>Get full details of a single merge request, including description, assignees, reviewers, labels, merge status, diff refs, and pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>mr_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Merge request IID (project-level identifier)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>MergeRequestDetail</code> -- extends summary with <code>description</code>, <code>assignees</code>, <code>reviewers</code>, <code>labels</code>, <code>merge_status</code>, <code>diff_refs</code>, and <code>pipeline</code>.</p>
+<hr />
+<h4 id="get_mr_diffs"><code>get_mr_diffs</code><a class="headerlink" href="#get_mr_diffs" title="Permanent link">&para;</a></h4>
+<p>Get file-level diffs for a merge request. Each diff includes old/new paths and unified diff content. Useful for code review.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>mr_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Merge request IID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>MergeRequestDiffsOutput</code> -- paginated list of <code>MergeRequestDiff</code> items with <code>old_path</code>, <code>new_path</code>, <code>diff</code>, <code>new_file</code>, <code>renamed_file</code>, <code>deleted_file</code>.</p>
+<hr />
+<h4 id="get_mr_commits"><code>get_mr_commits</code><a class="headerlink" href="#get_mr_commits" title="Permanent link">&para;</a></h4>
+<p>Get the list of commits included in a merge request.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>mr_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Merge request IID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>MergeRequestCommitsOutput</code> -- paginated list of <code>MergeRequestCommit</code> items with <code>id</code> (full SHA), <code>short_id</code>, <code>title</code>, <code>author_name</code>, <code>authored_date</code>, <code>message</code>.</p>
+<hr />
+<h4 id="get_mr_pipelines"><code>get_mr_pipelines</code><a class="headerlink" href="#get_mr_pipelines" title="Permanent link">&para;</a></h4>
+<p>Get pipelines associated with a merge request. Use this to check whether CI is passing before merging.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>mr_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Merge request IID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ListPipelinesOutput</code> -- paginated list of <code>PipelineSummary</code> items.</p>
+<hr />
+<h4 id="create_mr-material-pencil-titlewrite-tool"><code>create_mr</code> :material-pencil:{ title="Write tool" }<a class="headerlink" href="#create_mr-material-pencil-titlewrite-tool" title="Permanent link">&para;</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Write Tool</p>
+<p>Blocked when <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code>. Returns a <code>READ_ONLY</code> error.</p>
+</div>
+<p>Create a new merge request from a source branch to a target branch.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Merge request title</td>
+</tr>
+<tr>
+<td><code>source_branch</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Source branch name</td>
+</tr>
+<tr>
+<td><code>target_branch</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Target branch name</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>MR description (Markdown)</td>
+</tr>
+<tr>
+<td><code>assignee_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>User IDs to assign</td>
+</tr>
+<tr>
+<td><code>reviewer_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>User IDs to request review from</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>list[str]</code></td>
+<td>No</td>
+<td>Label names to apply</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>MergeRequestDetail</code> -- the full details of the created merge request.</p>
+<hr />
+<h4 id="update_mr-material-pencil-titlewrite-tool"><code>update_mr</code> :material-pencil:{ title="Write tool" }<a class="headerlink" href="#update_mr-material-pencil-titlewrite-tool" title="Permanent link">&para;</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Write Tool</p>
+<p>Blocked when <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code>. Returns a <code>READ_ONLY</code> error.</p>
+</div>
+<p>Update fields on an existing merge request. Only provided fields are modified.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>mr_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Merge request IID</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>New title</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>New description (Markdown)</td>
+</tr>
+<tr>
+<td><code>assignee_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>New assignee user IDs</td>
+</tr>
+<tr>
+<td><code>reviewer_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>New reviewer user IDs</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>list[str]</code></td>
+<td>No</td>
+<td>New label names</td>
+</tr>
+<tr>
+<td><code>state_event</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>State transition: <code>close</code> or <code>reopen</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>MergeRequestDetail</code> -- the updated merge request.</p>
+<hr />
+<h3 id="issues-6-tools">Issues (6 tools)<a class="headerlink" href="#issues-6-tools" title="Permanent link">&para;</a></h3>
+<h4 id="list_issues"><code>list_issues</code><a class="headerlink" href="#list_issues" title="Permanent link">&para;</a></h4>
+<p>List issues for a project with optional filters for state, labels, and assignee.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Filter: <code>opened</code>, <code>closed</code>, <code>all</code></td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Comma-separated label names (e.g., <code>"bug,urgent"</code>)</td>
+</tr>
+<tr>
+<td><code>assignee_id</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Filter by a single assignee user ID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ListIssuesOutput</code> -- paginated list of <code>IssueSummary</code> items with <code>id</code>, <code>iid</code>, <code>title</code>, <code>state</code>, <code>author</code>, <code>assignees</code>, <code>labels</code>, <code>web_url</code>, and timestamps.</p>
+<hr />
+<h4 id="get_issue"><code>get_issue</code><a class="headerlink" href="#get_issue" title="Permanent link">&para;</a></h4>
+<p>Get full details of a single issue by its project-level IID.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>issue_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Project-level issue IID</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>IssueDetail</code> -- extends summary with <code>description</code>, <code>milestone</code>, <code>user_notes_count</code>, <code>upvotes</code>, <code>downvotes</code>.</p>
+<hr />
+<h4 id="list_issue_comments"><code>list_issue_comments</code><a class="headerlink" href="#list_issue_comments" title="Permanent link">&para;</a></h4>
+<p>List comments (notes) on a specific issue, including both user and system-generated notes.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>issue_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Project-level issue IID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>IssueCommentsOutput</code> -- paginated list of <code>IssueComment</code> items with <code>id</code>, <code>body</code>, <code>author</code>, <code>created_at</code>, <code>updated_at</code>, <code>system</code>.</p>
+<hr />
+<h4 id="create_issue-material-pencil-titlewrite-tool"><code>create_issue</code> :material-pencil:{ title="Write tool" }<a class="headerlink" href="#create_issue-material-pencil-titlewrite-tool" title="Permanent link">&para;</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Write Tool</p>
+<p>Blocked when <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code>. Returns a <code>READ_ONLY</code> error.</p>
+</div>
+<p>Create a new issue in a GitLab project.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Issue title</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Issue description (Markdown)</td>
+</tr>
+<tr>
+<td><code>assignee_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>User IDs to assign</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Comma-separated label names</td>
+</tr>
+<tr>
+<td><code>milestone_id</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Milestone ID to associate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>IssueDetail</code> -- the full details of the created issue.</p>
+<hr />
+<h4 id="update_issue-material-pencil-titlewrite-tool"><code>update_issue</code> :material-pencil:{ title="Write tool" }<a class="headerlink" href="#update_issue-material-pencil-titlewrite-tool" title="Permanent link">&para;</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Write Tool</p>
+<p>Blocked when <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code>. Returns a <code>READ_ONLY</code> error.</p>
+</div>
+<p>Update fields on an existing issue. Only provided fields are modified. Labels replace the full set when provided.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>issue_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Issue IID to update</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>New title</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>New description (Markdown)</td>
+</tr>
+<tr>
+<td><code>assignee_ids</code></td>
+<td><code>list[int]</code></td>
+<td>No</td>
+<td>New assignee user IDs</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>New comma-separated label names</td>
+</tr>
+<tr>
+<td><code>state_event</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>State transition: <code>close</code> or <code>reopen</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>IssueDetail</code> -- the updated issue.</p>
+<hr />
+<h4 id="add_issue_comment-material-pencil-titlewrite-tool"><code>add_issue_comment</code> :material-pencil:{ title="Write tool" }<a class="headerlink" href="#add_issue_comment-material-pencil-titlewrite-tool" title="Permanent link">&para;</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Write Tool</p>
+<p>Blocked when <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code>. Returns a <code>READ_ONLY</code> error.</p>
+</div>
+<p>Add a comment (note) to an existing issue. Supports Markdown formatting.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>issue_iid</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Issue IID to comment on</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Comment text (Markdown)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>IssueComment</code> -- the newly created comment with <code>id</code>, <code>body</code>, <code>author</code>, <code>created_at</code>, <code>system</code>.</p>
+<hr />
+<h3 id="pipelines-4-tools">Pipelines (4 tools)<a class="headerlink" href="#pipelines-4-tools" title="Permanent link">&para;</a></h3>
+<p>All pipeline tools are read-only and always available regardless of the <code>READ_ONLY</code> setting.</p>
+<h4 id="list_pipelines"><code>list_pipelines</code><a class="headerlink" href="#list_pipelines" title="Permanent link">&para;</a></h4>
+<p>List CI/CD pipelines for a project with optional status and ref filters.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Filter: <code>running</code>, <code>pending</code>, <code>success</code>, <code>failed</code>, <code>canceled</code>, <code>skipped</code></td>
+</tr>
+<tr>
+<td><code>ref</code></td>
+<td><code>str</code></td>
+<td>No</td>
+<td>Filter by git ref (branch or tag name)</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ListPipelinesOutput</code> -- paginated list of <code>PipelineSummary</code> items with <code>id</code>, <code>iid</code>, <code>status</code>, <code>ref</code>, <code>sha</code>, <code>web_url</code>, and timestamps.</p>
+<hr />
+<h4 id="get_pipeline"><code>get_pipeline</code><a class="headerlink" href="#get_pipeline" title="Permanent link">&para;</a></h4>
+<p>Get full details of a single pipeline, including duration, coverage, and trigger user.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>pipeline_id</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Pipeline ID</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>PipelineDetail</code> -- extends summary with <code>duration</code>, <code>started_at</code>, <code>finished_at</code>, <code>coverage</code>, <code>user</code>.</p>
+<hr />
+<h4 id="get_pipeline_jobs"><code>get_pipeline_jobs</code><a class="headerlink" href="#get_pipeline_jobs" title="Permanent link">&para;</a></h4>
+<p>Get the list of jobs within a specific pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>pipeline_id</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Pipeline ID</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>PipelineJobsOutput</code> -- paginated list of <code>PipelineJob</code> items with <code>id</code>, <code>name</code>, <code>stage</code>, <code>status</code>, <code>duration</code>, <code>runner</code>, <code>web_url</code>.</p>
+<hr />
+<h4 id="get_job_log"><code>get_job_log</code><a class="headerlink" href="#get_job_log" title="Permanent link">&para;</a></h4>
+<p>Get the text log output of a specific CI/CD job. Large logs are automatically truncated.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>Yes</td>
+<td>Project ID or URL-encoded path</td>
+</tr>
+<tr>
+<td><code>job_id</code></td>
+<td><code>int</code></td>
+<td>Yes</td>
+<td>Job ID</td>
+</tr>
+<tr>
+<td><code>max_bytes</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Max log size in bytes (1,024--1,048,576). Default: 102,400 (100KB).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>JobLogOutput</code> -- <code>content</code> (log text), <code>truncated</code> (bool), <code>byte_count</code> (total bytes before truncation).</p>
+<hr />
+<h3 id="search-1-tool">Search (1 tool)<a class="headerlink" href="#search-1-tool" title="Permanent link">&para;</a></h3>
+<h4 id="search"><code>search</code><a class="headerlink" href="#search" title="Permanent link">&para;</a></h4>
+<p>Search across GitLab resources at the instance, project, or group level.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Search query string</td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td><code>str</code></td>
+<td>Yes</td>
+<td>Resource scope: <code>issues</code>, <code>merge_requests</code>, <code>projects</code>, <code>milestones</code>, etc.</td>
+</tr>
+<tr>
+<td><code>project_id</code></td>
+<td><code>int \| str</code></td>
+<td>No</td>
+<td>Project ID for project-scoped search</td>
+</tr>
+<tr>
+<td><code>group_id</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Group ID for group-scoped search</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Page number. Default: 1.</td>
+</tr>
+<tr>
+<td><code>per_page</code></td>
+<td><code>int</code></td>
+<td>No</td>
+<td>Items per page. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Scope resolution priority</p>
+<ol>
+<li>Explicit <code>project_id</code> parameter</li>
+<li>Explicit <code>group_id</code> parameter</li>
+<li>Configured <code>DEFAULT_PROJECT_ID</code></li>
+<li>Configured <code>DEFAULT_GROUP_ID</code></li>
+<li>Instance-wide search (no scope)</li>
+</ol>
+</div>
+<p><strong>Returns:</strong> <code>SearchOutput</code> -- paginated list of <code>SearchResult</code> items. Each result has a <code>type</code> (the scope) and a <code>data</code> dict containing the resource-specific payload from the GitLab API.</p>
+<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
+<p>The server supports two authentication strategies. PAT is simpler; OAuth 2.0 is better suited for service accounts and automated environments.</p>
+<h3 id="personal-access-token-pat">Personal Access Token (PAT)<a class="headerlink" href="#personal-access-token-pat" title="Permanent link">&para;</a></h3>
+<p>The server sends a <code>PRIVATE-TOKEN</code> header with each API request. On startup, it validates the token by calling <code>GET /api/v4/personal_access_tokens/self</code> and checks that the token is:</p>
+<ul>
+<li>Active (not expired)</li>
+<li>Not revoked</li>
+<li>Has at least one of the required scopes: <code>api</code> or <code>read_api</code></li>
+</ul>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Configuration</label><label for="__tabbed_2_2">Generating a Token</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">mamba.env</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>MAMBA_MCP_GITLAB_URL=https://gitlab.example.com
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>MAMBA_MCP_GITLAB_TOKEN=glpat-xxxxxxxxxxxxxxxxxxxx
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Navigate to <strong>GitLab &gt; User Settings &gt; Access Tokens</strong></li>
+<li>Set a descriptive name (e.g., <code>mamba-mcp</code>)</li>
+<li>Select the <code>api</code> scope (or <code>read_api</code> for read-only usage)</li>
+<li>Set an expiration date</li>
+<li>Copy the token value into your <code>mamba.env</code></li>
+</ol>
+</div>
+</div>
+</div>
+<h3 id="oauth-20-client-credentials">OAuth 2.0 (Client Credentials)<a class="headerlink" href="#oauth-20-client-credentials" title="Permanent link">&para;</a></h3>
+<p>The server obtains a Bearer token via <code>POST /oauth/token</code> with <code>grant_type=client_credentials</code>. The token is automatically refreshed 30 seconds before expiry. Validation is performed against <code>GET /api/v4/user</code>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Configuration</label><label for="__tabbed_3_2">Creating an OAuth Application</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">mamba.env</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>MAMBA_MCP_GITLAB_URL=https://gitlab.example.com
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>MAMBA_MCP_GITLAB_OAUTH_CLIENT_ID=your-client-id
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>MAMBA_MCP_GITLAB_OAUTH_CLIENT_SECRET=your-client-secret
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Navigate to <strong>GitLab &gt; Admin &gt; Applications</strong> (instance-level) or <strong>User Settings &gt; Applications</strong></li>
+<li>Set the name and callback URL</li>
+<li>Enable <code>client_credentials</code> grant type</li>
+<li>Select the required scopes (<code>api</code> or <code>read_api</code>)</li>
+<li>Save and copy the client ID and secret</li>
+</ol>
+</div>
+</div>
+</div>
+<h3 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>PAT</th>
+<th>OAuth 2.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Setup complexity</strong></td>
+<td>Simple -- single token</td>
+<td>Moderate -- requires OAuth app setup</td>
+</tr>
+<tr>
+<td><strong>Auth header</strong></td>
+<td><code>PRIVATE-TOKEN: {token}</code></td>
+<td><code>Authorization: Bearer {token}</code></td>
+</tr>
+<tr>
+<td><strong>Token rotation</strong></td>
+<td>Manual</td>
+<td>Automatic (30s pre-expiry refresh)</td>
+</tr>
+<tr>
+<td><strong>User binding</strong></td>
+<td>Tied to a specific user</td>
+<td>Tied to an OAuth application</td>
+</tr>
+<tr>
+<td><strong>Scope control</strong></td>
+<td>Token-level scopes</td>
+<td>OAuth application scopes</td>
+</tr>
+<tr>
+<td><strong>Best for</strong></td>
+<td>Development, personal use</td>
+<td>CI/CD, service accounts, production</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Auth priority</p>
+<p>If both <code>TOKEN</code> and <code>OAUTH_CLIENT_ID</code>/<code>OAUTH_CLIENT_SECRET</code> are configured, PAT takes precedence. Clear <code>MAMBA_MCP_GITLAB_TOKEN</code> to use OAuth instead.</p>
+</div>
+<h2 id="read-only-mode">Read-Only Mode<a class="headerlink" href="#read-only-mode" title="Permanent link">&para;</a></h2>
+<p>Setting <code>MAMBA_MCP_GITLAB_READ_ONLY=true</code> disables all write operations at runtime. The 5 affected tools are:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Category</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create_mr</code></td>
+<td>Merge Requests</td>
+</tr>
+<tr>
+<td><code>update_mr</code></td>
+<td>Merge Requests</td>
+</tr>
+<tr>
+<td><code>create_issue</code></td>
+<td>Issues</td>
+</tr>
+<tr>
+<td><code>update_issue</code></td>
+<td>Issues</td>
+</tr>
+<tr>
+<td><code>add_issue_comment</code></td>
+<td>Issues</td>
+</tr>
+</tbody>
+</table>
+<p>When a write tool is called in read-only mode, the server returns a structured error:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;READ_ONLY&quot;</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Tool &#39;create_mr&#39; is disabled in read-only mode&quot;</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;create_mr&quot;</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">&quot;suggestion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;This server is running in read-only mode. Set MAMBA_MCP_GITLAB_READ_ONLY=false to enable write operations.&quot;</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Read-only with <code>read_api</code> scope</p>
+<p>When running in read-only mode, a token with only the <code>read_api</code> scope is sufficient. This reduces the blast radius of a compromised token.</p>
+</div>
+<p>All 13 read tools (list, get, and search operations) remain fully functional in read-only mode.</p>
+<h2 id="rate-limiting">Rate Limiting<a class="headerlink" href="#rate-limiting" title="Permanent link">&para;</a></h2>
+<p>The server implements client-side rate limiting using a sliding window algorithm to prevent overwhelming the GitLab API.</p>
+<h3 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Each API request records a timestamp in a sliding window</li>
+<li>Before each request, timestamps older than <code>WINDOW_SECONDS</code> are pruned</li>
+<li>If the number of timestamps in the window reaches <code>MAX_REQUESTS</code>, the request is rejected</li>
+<li>The rejection includes a <code>retry_after</code> value indicating when the next request will be allowed</li>
+</ol>
+<h3 id="configuration_1">Configuration<a class="headerlink" href="#configuration_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">mamba.env</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a># 100 requests per 60-second window (default)
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>MAMBA_MCP_GITLAB_RATE_LIMIT_MAX_REQUESTS=100
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>MAMBA_MCP_GITLAB_RATE_LIMIT_WINDOW_SECONDS=60
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a># Disable rate limiting
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>MAMBA_MCP_GITLAB_RATE_LIMIT_MAX_REQUESTS=0
+</span></code></pre></div>
+<h3 id="error-response">Error response<a class="headerlink" href="#error-response" title="Permanent link">&para;</a></h3>
+<p>When the rate limit is exceeded, the tool returns:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RATE_LIMITED&quot;</span><span class="p">,</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rate limit exceeded: 100 requests per 60s window. Try again in 12.3 seconds.&quot;</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;list_mrs&quot;</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">&quot;suggestion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GitLab API rate limit reached. Wait before retrying.&quot;</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Client-side only</p>
+<p>This is a client-side limiter protecting the GitLab instance. GitLab's own server-side rate limits still apply. If the GitLab API returns HTTP 429, the server maps it to a <code>RATE_LIMITED</code> error with the same structured format.</p>
+</div>
+<h2 id="service-architecture">Service Architecture<a class="headerlink" href="#service-architecture" title="Permanent link">&para;</a></h2>
+<p>The server follows a layered architecture separating tool handlers from API communication.</p>
+<pre class="mermaid"><code>graph TD
+    subgraph "MCP Tool Handlers"
+        MR["mr_tools.py&lt;br/&gt;(7 tools)"]
+        IS["issue_tools.py&lt;br/&gt;(6 tools)"]
+        PL["pipeline_tools.py&lt;br/&gt;(4 tools)"]
+        SE["search_tools.py&lt;br/&gt;(1 tool)"]
+    end
+
+    subgraph "Service Layer"
+        MRS["MergeRequestService"]
+        ISS["IssueService"]
+        PLS["PipelineService"]
+        SES["SearchService"]
+    end
+
+    BASE["GitLabService (base)"]
+
+    MR --&gt; MRS
+    IS --&gt; ISS
+    PL --&gt; PLS
+    SE --&gt; SES
+    MRS --&gt; BASE
+    ISS --&gt; BASE
+    PLS --&gt; BASE
+    SES --&gt; BASE
+    BASE --&gt;|httpx| GL["GitLab API v4"]
+
+    subgraph "Shared Infrastructure"
+        RL["RateLimiter"]
+        AUTH["AuthStrategy"]
+        CFG["Settings"]
+    end
+
+    BASE --&gt; RL
+    BASE --&gt; CFG</code></pre>
+<h3 id="gitlabservice-base-class"><code>GitLabService</code> (base class)<a class="headerlink" href="#gitlabservice-base-class" title="Permanent link">&para;</a></h3>
+<p>All four service classes inherit from <code>GitLabService</code>, which provides:</p>
+<ul>
+<li><strong>HTTP methods:</strong> <code>_get()</code>, <code>_post()</code>, <code>_put()</code> for GitLab API calls</li>
+<li><strong>Pagination:</strong> <code>_get_paginated()</code> extracts <code>x-total</code> and <code>x-total-pages</code> headers</li>
+<li><strong>URL construction:</strong> <code>_build_project_url()</code> handles both integer IDs and URL-encoded paths</li>
+<li><strong>Project ID resolution:</strong> <code>_resolve_project_id()</code> falls back to the configured default</li>
+<li><strong>Error mapping:</strong> HTTP status codes are mapped to <code>ErrorCode</code> constants (401 to <code>AUTH_FAILED</code>, 403 to <code>FORBIDDEN</code>, 404 to <code>NOT_FOUND</code>, 429 to <code>RATE_LIMITED</code>, 5xx to <code>API_ERROR</code>)</li>
+<li><strong>Rate limiting:</strong> Every request checks the rate limiter before execution</li>
+</ul>
+<h3 id="tool-handler-pattern">Tool handler pattern<a class="headerlink" href="#tool-handler-pattern" title="Permanent link">&para;</a></h3>
+<p>Every tool handler follows the same 7-step skeleton:</p>
+<div class="highlight"><span class="filename">Tool handler skeleton</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="n">ToolAnnotations</span><span class="p">(</span><span class="n">readOnlyHint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tool_name</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="c1"># 1. Start timer</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="c1"># 2. Null-check context</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="k">if</span> <span class="n">ctx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        <span class="k">return</span> <span class="n">create_tool_error</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="c1"># 3. Extract AppContext from lifespan</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="n">app_ctx</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">lifespan_context</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    <span class="c1"># 4. (Write tools only) Check read-only mode</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    <span class="c1"># 5. Create service, delegate to service method</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>    <span class="c1"># 6. Convert result to Pydantic output model</span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>    <span class="c1"># 7. Catch GitLabAPIError → structured error; catch Exception → CONNECTION_ERROR</span>
+</span></code></pre></div>
+<h3 id="error-codes">Error codes<a class="headerlink" href="#error-codes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AUTH_FAILED</code></td>
+<td>401</td>
+<td>Token is invalid or expired</td>
+</tr>
+<tr>
+<td><code>FORBIDDEN</code></td>
+<td>403</td>
+<td>Token lacks required scopes</td>
+</tr>
+<tr>
+<td><code>NOT_FOUND</code></td>
+<td>404</td>
+<td>Resource not found</td>
+</tr>
+<tr>
+<td><code>PROJECT_NOT_FOUND</code></td>
+<td>--</td>
+<td>Project does not exist</td>
+</tr>
+<tr>
+<td><code>MERGE_REQUEST_NOT_FOUND</code></td>
+<td>--</td>
+<td>MR IID not found in project</td>
+</tr>
+<tr>
+<td><code>ISSUE_NOT_FOUND</code></td>
+<td>--</td>
+<td>Issue IID not found in project</td>
+</tr>
+<tr>
+<td><code>PIPELINE_NOT_FOUND</code></td>
+<td>--</td>
+<td>Pipeline ID not found</td>
+</tr>
+<tr>
+<td><code>BRANCH_NOT_FOUND</code></td>
+<td>--</td>
+<td>Branch does not exist</td>
+</tr>
+<tr>
+<td><code>RATE_LIMITED</code></td>
+<td>429</td>
+<td>Rate limit exceeded (client or server)</td>
+</tr>
+<tr>
+<td><code>VALIDATION_ERROR</code></td>
+<td>400</td>
+<td>Invalid input parameters</td>
+</tr>
+<tr>
+<td><code>CONNECTION_ERROR</code></td>
+<td>--</td>
+<td>Cannot reach GitLab</td>
+</tr>
+<tr>
+<td><code>API_ERROR</code></td>
+<td>5xx</td>
+<td>GitLab server error</td>
+</tr>
+<tr>
+<td><code>READ_ONLY</code></td>
+<td>--</td>
+<td>Write tool blocked in read-only mode</td>
+</tr>
+</tbody>
+</table>
+<p>Each error code has a default suggestion message. Errors involving resource names (projects, branches) include fuzzy matching via Levenshtein distance to suggest similar names.</p>
+<h2 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Start server (default: stdio transport)</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>mamba-mcp-gitlab<span class="w"> </span><span class="o">[</span>--env-file<span class="w"> </span>PATH<span class="o">]</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Test connectivity and token validity</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>mamba-mcp-gitlab<span class="w"> </span><span class="o">[</span>--env-file<span class="w"> </span>PATH<span class="o">]</span><span class="w"> </span><span class="nb">test</span>
+</span></code></pre></div>
+<p>The CLI auto-discovers <code>mamba.env</code> in the current directory or <code>~/mamba.env</code> if <code>--env-file</code> is not specified.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

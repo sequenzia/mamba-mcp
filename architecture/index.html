@@ -1,0 +1,2261 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.">
+      
+      
+      
+      
+        <link rel="prev" href="../getting-started/">
+      
+      
+        <link rel="next" href="../packages/core/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Architecture - Mamba MCP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Mamba MCP" class="md-header__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Mamba MCP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../packages/core/" class="md-tabs__link">
+          
+  
+  
+  Packages
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../servers/pg/" class="md-tabs__link">
+          
+  
+  
+  MCP Servers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../development/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Development Guide
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Mamba MCP" class="md-nav__button md-logo" aria-label="Mamba MCP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Mamba MCP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sequenzia/mamba-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sequenzia/mamba-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monorepo-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monorepo Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shared-server-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared Server Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shared Server Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-seven-shared-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Seven Shared Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Seven Shared Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-appcontext-via-lifespan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. AppContext via Lifespan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-tool-handler-skeleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Tool Handler Skeleton
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-error-handling-triad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Error Handling Triad
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-module-level-config-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Module-Level Config State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-nested-pydantic-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Nested Pydantic Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-cli-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CLI Entry Point
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-tool-registration-via-import-side-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Tool Registration via Import Side-Effects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layered-tool-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layered Tool Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layered Tool Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tool-distribution-by-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Distribution by Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-core-is-consumed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Core is Consumed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-design-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Design Decisions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Design Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#database-server-async-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Server Async Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-backend-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filesystem Backend Abstraction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-api-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLab API Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-independence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Independence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monorepo-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monorepo Tooling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's Next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Packages
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Servers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MCP Servers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../servers/pg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../servers/fs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../servers/hana/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAP HANA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../servers/gitlab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitLab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monorepo-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monorepo Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shared-server-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared Server Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shared Server Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-seven-shared-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Seven Shared Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Seven Shared Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-appcontext-via-lifespan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. AppContext via Lifespan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-tool-handler-skeleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Tool Handler Skeleton
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-error-handling-triad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Error Handling Triad
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-module-level-config-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Module-Level Config State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-nested-pydantic-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Nested Pydantic Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-cli-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CLI Entry Point
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-tool-registration-via-import-side-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Tool Registration via Import Side-Effects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layered-tool-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layered Tool Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layered Tool Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tool-distribution-by-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Distribution by Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-core-is-consumed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Core is Consumed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-design-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Design Decisions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Design Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#database-server-async-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Server Async Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-backend-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filesystem Backend Abstraction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-api-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitLab API Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-independence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Independence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monorepo-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monorepo Tooling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's Next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<p>Mamba MCP is a UV workspace monorepo containing six Python packages that implement the <a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (MCP). The system is split into a shared core library, four independent MCP servers, and a standalone testing client. Together they expose <strong>49 MCP tools</strong> for database access, filesystem operations, GitLab integration, and server debugging.</p>
+<p>This page covers the high-level system design, inter-package dependency graph, shared server architecture patterns, the layered tool model, and the key design decisions behind the codebase.</p>
+<h2 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h2>
+<p>The monorepo is organized around two axes: a <strong>shared foundation</strong> (core library consumed by all servers) and a <strong>tool surface</strong> (the MCP servers that expose tools to LLMs). The testing client sits outside this hierarchy entirely -- it connects to any MCP server over standard transports and has no compile-time dependency on any other package.</p>
+<pre class="mermaid"><code>graph TB
+    subgraph Workspace["UV Workspace Monorepo"]
+        direction TB
+
+        subgraph Core["Shared Foundation"]
+            CORE["mamba-mcp-core&lt;br/&gt;&lt;i&gt;CLI helpers, errors, fuzzy matching, transport&lt;/i&gt;"]
+        end
+
+        subgraph Servers["MCP Servers (49 tools)"]
+            direction LR
+            PG["mamba-mcp-pg&lt;br/&gt;&lt;i&gt;PostgreSQL &amp;middot; 8 tools&lt;/i&gt;"]
+            FS["mamba-mcp-fs&lt;br/&gt;&lt;i&gt;Filesystem &amp;middot; 12 tools&lt;/i&gt;"]
+            HANA["mamba-mcp-hana&lt;br/&gt;&lt;i&gt;SAP HANA &amp;middot; 11 tools&lt;/i&gt;"]
+            GITLAB["mamba-mcp-gitlab&lt;br/&gt;&lt;i&gt;GitLab &amp;middot; 18 tools&lt;/i&gt;"]
+        end
+
+        CLIENT["mamba-mcp-client&lt;br/&gt;&lt;i&gt;TUI, CLI, Python API&lt;/i&gt;"]
+    end
+
+    PG --&gt; CORE
+    FS --&gt; CORE
+    HANA --&gt; CORE
+    GITLAB --&gt; CORE
+
+    CLIENT -.-&gt;|"connects via MCP"| PG
+    CLIENT -.-&gt;|"connects via MCP"| FS
+    CLIENT -.-&gt;|"connects via MCP"| HANA
+    CLIENT -.-&gt;|"connects via MCP"| GITLAB</code></pre>
+<div class="admonition info">
+<p class="admonition-title">Client Independence</p>
+<p><code>mamba-mcp-client</code> has <strong>zero</strong> import-time dependencies on <code>mamba-mcp-core</code> or any server package. It communicates exclusively through the MCP protocol over stdio, SSE, or HTTP transports. This means it can test any compliant MCP server, not just the ones in this monorepo.</p>
+</div>
+<h2 id="monorepo-structure">Monorepo Structure<a class="headerlink" href="#monorepo-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mamba-mcp/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── pyproject.toml              # UV workspace root, dev dependencies, ruff/mypy config
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── uv.lock                     # Single shared lockfile for all packages
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── mkdocs.yml                  # Documentation site configuration
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── packages/
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── mamba-mcp-core/         # Shared library (no CLI, no env vars)
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   └── src/mamba_mcp_core/
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │       ├── cli.py          # validate_env_file, resolve_default_env_file, setup_logging
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │       ├── config.py       # Module-level _env_file_path state management
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │       ├── errors.py       # ToolError model &amp; create_tool_error factory
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │       ├── fuzzy.py        # Levenshtein distance &amp; find_similar_names
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │       └── transport.py    # normalize_transport (&quot;http&quot; → &quot;streamable-http&quot;)
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   ├── mamba-mcp-client/       # Standalone testing tool
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   │   └── src/mamba_mcp_client/
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   │       ├── cli.py          # Typer CLI entry point (9 commands)
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│   │       ├── client.py       # MCPTestClient async context manager
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│   │       ├── config.py       # Transport configs (Pydantic)
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│   │       ├── logging.py      # Protocol logging
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│   │       └── tui/app.py      # Textual TUI
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│   │
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│   ├── mamba-mcp-pg/           # PostgreSQL server
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│   │   └── src/mamba_mcp_pg/
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│   │       ├── __main__.py     # Typer CLI (serve / test)
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│   │       ├── server.py       # FastMCP + AppContext + lifespan
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_PG_*)
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   │       ├── errors.py       # ErrorCode + suggestions + wrapper
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   │       ├── database/       # SQLAlchemy async services
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   │       ├── models/         # Pydantic I/O models
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│   │       └── tools/          # 8 MCP tool handlers
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   │
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│   ├── mamba-mcp-fs/           # Filesystem server
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│   │   └── src/mamba_mcp_fs/
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│   │       ├── __main__.py     # Typer CLI (serve / test)
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│   │       ├── server.py       # FastMCP + AppContext + lifespan
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│   │       ├── errors.py       # FSError hierarchy + error codes
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│   │       ├── security.py     # Sandbox, path traversal, symlink policies
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│   │       ├── rate_limit.py   # Sliding window rate limiter
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│   │       ├── backends/       # BackendProtocol, LocalBackend, S3Backend
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│   │       ├── models/         # Pydantic I/O models
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│   │       └── tools/          # 12 MCP tool handlers
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│   │
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│   ├── mamba-mcp-hana/         # SAP HANA server
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│   │   └── src/mamba_mcp_hana/
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│   │       ├── __main__.py     # Typer CLI (serve / test)
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│   │       ├── server.py       # FastMCP + AppContext + lifespan
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│   │       ├── errors.py       # ErrorCode + suggestions + wrapper
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│   │       ├── database/       # HanaConnectionPool, async services
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│   │       ├── models/         # Pydantic I/O models
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>│   │       └── tools/          # 11 MCP tool handlers
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>│   │
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>│   └── mamba-mcp-gitlab/       # GitLab server
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>│       └── src/mamba_mcp_gitlab/
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>│           ├── __main__.py     # Typer CLI (serve / test)
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>│           ├── server.py       # FastMCP + AppContext + lifespan
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>│           ├── config.py       # Pydantic settings (MAMBA_MCP_GITLAB_*)
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>│           ├── auth.py         # PAT + OAuth 2.0 strategies
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>│           ├── errors.py       # ErrorCode + suggestions + wrapper
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>│           ├── rate_limit.py   # Sliding window rate limiter
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>│           ├── services/       # GitLab API service classes
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>│           ├── models/         # Pydantic I/O models
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>│           └── tools/          # 18 MCP tool handlers
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>│
+</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>└── internal/                   # Specifications &amp; design documents
+</span></code></pre></div>
+<h2 id="dependency-graph">Dependency Graph<a class="headerlink" href="#dependency-graph" title="Permanent link">&para;</a></h2>
+<p>Every server depends on <code>mamba-mcp-core</code> for shared utilities. No server depends on any other server. The client depends on neither core nor any server.</p>
+<pre class="mermaid"><code>graph LR
+    subgraph Shared
+        CORE[mamba-mcp-core]
+    end
+
+    subgraph Servers
+        PG[mamba-mcp-pg]
+        FS[mamba-mcp-fs]
+        HANA[mamba-mcp-hana]
+        GL[mamba-mcp-gitlab]
+    end
+
+    subgraph Client
+        CLI[mamba-mcp-client]
+    end
+
+    PG --&gt;|"core utils"| CORE
+    FS --&gt;|"core utils"| CORE
+    HANA --&gt;|"core utils"| CORE
+    GL --&gt;|"core utils"| CORE
+
+    PG ---|"asyncpg&lt;br/&gt;sqlalchemy"| PG_EXT[ ]
+    FS ---|"fsspec&lt;br/&gt;s3fs"| FS_EXT[ ]
+    HANA ---|"hdbcli"| HANA_EXT[ ]
+    GL ---|"httpx"| GL_EXT[ ]
+    CLI ---|"fastmcp&lt;br/&gt;textual"| CLI_EXT[ ]
+
+    style PG_EXT fill:none,stroke:none
+    style FS_EXT fill:none,stroke:none
+    style HANA_EXT fill:none,stroke:none
+    style GL_EXT fill:none,stroke:none
+    style CLI_EXT fill:none,stroke:none</code></pre>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Depends On</th>
+<th>Key External Libraries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mamba-mcp-core</code></td>
+<td><em>(none)</em></td>
+<td><code>pydantic</code>, <code>typer</code></td>
+</tr>
+<tr>
+<td><code>mamba-mcp-pg</code></td>
+<td><code>mamba-mcp-core</code></td>
+<td><code>sqlalchemy[asyncio]</code>, <code>asyncpg</code>, <code>mcp</code></td>
+</tr>
+<tr>
+<td><code>mamba-mcp-fs</code></td>
+<td><code>mamba-mcp-core</code></td>
+<td><code>fsspec</code>, <code>s3fs</code>, <code>mcp</code></td>
+</tr>
+<tr>
+<td><code>mamba-mcp-hana</code></td>
+<td><code>mamba-mcp-core</code></td>
+<td><code>hdbcli</code>, <code>mcp</code></td>
+</tr>
+<tr>
+<td><code>mamba-mcp-gitlab</code></td>
+<td><code>mamba-mcp-core</code></td>
+<td><code>httpx</code>, <code>mcp</code></td>
+</tr>
+<tr>
+<td><code>mamba-mcp-client</code></td>
+<td><em>(independent)</em></td>
+<td><code>fastmcp</code>, <code>textual</code>, <code>httpx</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">No Cross-Server Dependencies</p>
+<p>The four servers are completely independent of each other. Importing <code>mamba_mcp_pg</code> never triggers loading of <code>mamba_mcp_hana</code>, <code>mamba_mcp_fs</code>, or <code>mamba_mcp_gitlab</code>. This isolation means each server can be installed, tested, and deployed in its own environment.</p>
+</div>
+<h2 id="shared-server-architecture">Shared Server Architecture<a class="headerlink" href="#shared-server-architecture" title="Permanent link">&para;</a></h2>
+<p>All four MCP servers follow an identical internal architecture pattern, originally established in <code>mamba-mcp-pg</code> and replicated across FS, HANA, and GitLab. The diagram below shows how a request flows through any server.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["__main__.py&lt;br/&gt;&lt;b&gt;Typer CLI&lt;/b&gt;"] --&gt;|"imports tools, starts server"| B["server.py&lt;br/&gt;&lt;b&gt;FastMCP + Lifespan&lt;/b&gt;"]
+    B --&gt;|"yields AppContext"| C["tools/&lt;br/&gt;&lt;b&gt;@mcp.tool() handlers&lt;/b&gt;"]
+    C --&gt;|"delegates to"| D["database/ or backends/ or services/&lt;br/&gt;&lt;b&gt;Service Layer&lt;/b&gt;"]
+    D --&gt;|"returns data"| C
+    C --&gt;|"converts to"| E["models/&lt;br/&gt;&lt;b&gt;Pydantic I/O&lt;/b&gt;"]
+
+    F["config.py&lt;br/&gt;&lt;b&gt;Pydantic Settings&lt;/b&gt;"] -.-&gt;|"loaded at startup"| B
+    G["errors.py&lt;br/&gt;&lt;b&gt;ErrorCode + Suggestions&lt;/b&gt;"] -.-&gt;|"used on failure"| C
+
+    style A fill:#e8eaf6,stroke:#3f51b5
+    style B fill:#e8eaf6,stroke:#3f51b5
+    style C fill:#e3f2fd,stroke:#1565c0
+    style D fill:#e8f5e9,stroke:#2e7d32
+    style E fill:#fff3e0,stroke:#ef6c00
+    style F fill:#fce4ec,stroke:#c62828
+    style G fill:#fce4ec,stroke:#c62828</code></pre>
+<h3 id="the-seven-shared-patterns">The Seven Shared Patterns<a class="headerlink" href="#the-seven-shared-patterns" title="Permanent link">&para;</a></h3>
+<p>Each server implements the same seven structural patterns. Understanding these patterns once means understanding all four servers.</p>
+<h4 id="1-appcontext-via-lifespan">1. AppContext via Lifespan<a class="headerlink" href="#1-appcontext-via-lifespan" title="Permanent link">&para;</a></h4>
+<p>Every server defines a <code>@dataclass AppContext</code> that holds initialized resources (database engine, connection pool, HTTP client, backend manager). An <code>app_lifespan()</code> async context manager creates these resources at startup and tears them down on shutdown.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">PostgreSQL</label><label for="__tabbed_1_2">SAP HANA</label><label for="__tabbed_1_3">Filesystem</label><label for="__tabbed_1_4">GitLab</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">AppContext</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">AsyncEngine</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nd">@asynccontextmanager</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">app_lifespan</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">FastMCP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">AppContext</span><span class="p">]:</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">engine</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="k">await</span> <span class="n">test_connection</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="k">yield</span> <span class="n">AppContext</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="k">await</span> <span class="n">dispose_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">&quot;PostgreSQL MCP Server&quot;</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="n">app_lifespan</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">packages/mamba-mcp-hana/src/mamba_mcp_hana/server.py</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">AppContext</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">HanaConnectionPool</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nd">@asynccontextmanager</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">app_lifespan</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">FastMCP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">AppContext</span><span class="p">]:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_pool</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">test_connection</span><span class="p">()</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="k">yield</span> <span class="n">AppContext</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="k">await</span> <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">&quot;mamba-mcp-hana&quot;</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="n">app_lifespan</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">packages/mamba-mcp-fs/src/mamba_mcp_fs/server.py</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">AppContext</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">security</span><span class="p">:</span> <span class="n">SecurityValidator</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">backend_manager</span><span class="p">:</span> <span class="n">BackendManager</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">rate_limiter</span><span class="p">:</span> <span class="n">RateLimiter</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nd">@asynccontextmanager</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">app_lifespan</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">FastMCP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">AppContext</span><span class="p">]:</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">security</span> <span class="o">=</span> <span class="n">SecurityValidator</span><span class="p">(</span><span class="n">server_settings</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">backend_manager</span> <span class="o">=</span> <span class="n">BackendManager</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">security</span><span class="o">=</span><span class="n">security</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">rate_limiter</span> <span class="o">=</span> <span class="n">RateLimiter</span><span class="p">(</span><span class="n">ops_per_minute</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rate_limit</span><span class="p">)</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="k">yield</span> <span class="n">AppContext</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">security</span><span class="o">=</span><span class="n">security</span><span class="p">,</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>                     <span class="n">backend_manager</span><span class="o">=</span><span class="n">backend_manager</span><span class="p">,</span> <span class="n">rate_limiter</span><span class="o">=</span><span class="n">rate_limiter</span><span class="p">)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">&quot;mamba-mcp-fs&quot;</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="n">app_lifespan</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/server.py</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@dataclass</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">AppContext</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">client</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">rate_limiter</span><span class="p">:</span> <span class="n">RateLimiter</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">auth_info</span><span class="p">:</span> <span class="n">AuthInfo</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nd">@asynccontextmanager</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">app_lifespan</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="n">FastMCP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">AppContext</span><span class="p">]:</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">auth_strategy</span> <span class="o">=</span> <span class="n">detect_auth_strategy</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">gitlab</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">auth_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">auth_strategy</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">rate_limiter</span> <span class="o">=</span> <span class="n">RateLimiter</span><span class="p">(</span><span class="n">max_requests</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">max_requests</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>        <span class="k">yield</span> <span class="n">AppContext</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>                         <span class="n">rate_limiter</span><span class="o">=</span><span class="n">rate_limiter</span><span class="p">,</span> <span class="n">auth_info</span><span class="o">=</span><span class="n">auth_info</span><span class="p">)</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>        <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">&quot;GitLab MCP Server&quot;</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="n">app_lifespan</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<h4 id="2-tool-handler-skeleton">2. Tool Handler Skeleton<a class="headerlink" href="#2-tool-handler-skeleton" title="Permanent link">&para;</a></h4>
+<p>Every <code>@mcp.tool()</code> function follows the same 7-step skeleton. This consistency makes it possible to read any tool in the monorepo and immediately understand its structure.</p>
+<div class="highlight"><span class="filename">Canonical tool handler pattern</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="n">ToolAnnotations</span><span class="p">(</span><span class="n">readOnlyHint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tool_name</span><span class="p">(</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">[</span><span class="n">ServerSession</span><span class="p">,</span> <span class="n">AppContext</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputModel</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tool description for LLM consumption.&quot;&quot;&quot;</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="c1"># 1. Start timing</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="c1"># 2. Null-check context</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="k">if</span> <span class="n">ctx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="k">return</span> <span class="n">create_tool_error</span><span class="p">(</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">CONNECTION_ERROR</span><span class="p">,</span> <span class="s2">&quot;No context available&quot;</span><span class="p">,</span> <span class="s2">&quot;tool_name&quot;</span><span class="p">)</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="c1"># 3. Extract AppContext</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="n">app_ctx</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">lifespan_context</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="c1"># 4. Acquire connection / resource</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>        <span class="k">async</span> <span class="k">with</span> <span class="n">app_ctx</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>            <span class="c1"># 5. Delegate to service layer</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>            <span class="n">service</span> <span class="o">=</span> <span class="n">SomeService</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">do_work</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>        <span class="c1"># 6. Convert to Pydantic output model</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>        <span class="n">elapsed_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>        <span class="k">return</span> <span class="n">OutputModel</span><span class="p">(</span><span class="o">**</span><span class="n">result</span><span class="p">)</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>        <span class="c1"># 7. Return structured error with timing</span>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>        <span class="n">elapsed_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>        <span class="k">return</span> <span class="n">create_tool_error</span><span class="p">(</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">SOME_ERROR</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s2">&quot;tool_name&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;param&quot;</span><span class="p">:</span> <span class="n">param</span><span class="p">})</span>
+</span></code></pre></div>
+<h4 id="3-error-handling-triad">3. Error Handling Triad<a class="headerlink" href="#3-error-handling-triad" title="Permanent link">&para;</a></h4>
+<p>Each server's <code>errors.py</code> contains three components that work together. The core library provides the shared <code>ToolError</code> model and <code>create_tool_error()</code> factory, while each server injects its own domain-specific error codes and suggestions.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["ErrorCode&lt;br/&gt;&lt;i&gt;string constants&lt;/i&gt;"] --&gt; C["create_tool_error()&lt;br/&gt;&lt;i&gt;server wrapper&lt;/i&gt;"]
+    B["ERROR_SUGGESTIONS&lt;br/&gt;&lt;i&gt;code → message map&lt;/i&gt;"] --&gt; C
+    D["mamba_mcp_core.errors&lt;br/&gt;&lt;i&gt;ToolError model + factory&lt;/i&gt;"] --&gt; C
+    E["mamba_mcp_core.fuzzy&lt;br/&gt;&lt;i&gt;find_similar_names()&lt;/i&gt;"] -.-&gt;|"'Did you mean...?'"| C
+    C --&gt; F["Structured Error&lt;br/&gt;&lt;i&gt;dict or ToolError&lt;/i&gt;"]</code></pre>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/errors.py</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ErrorCode</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">SCHEMA_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;SCHEMA_NOT_FOUND&quot;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">TABLE_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;TABLE_NOT_FOUND&quot;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">INVALID_SQL</span> <span class="o">=</span> <span class="s2">&quot;INVALID_SQL&quot;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="c1"># ... more codes</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">ERROR_SUGGESTIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">SCHEMA_NOT_FOUND</span><span class="p">:</span> <span class="s2">&quot;List available schemas with list_schemas&quot;</span><span class="p">,</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">ErrorCode</span><span class="o">.</span><span class="n">TABLE_NOT_FOUND</span><span class="p">:</span> <span class="s2">&quot;List tables in schema with list_tables&quot;</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="c1"># ... more suggestions</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">}</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_tool_error</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">tool_name</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps core factory, injects server-specific suggestions map.&quot;&quot;&quot;</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="n">error</span> <span class="o">=</span> <span class="n">_core_create_tool_error</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">suggestions_map</span><span class="o">=</span><span class="n">ERROR_SUGGESTIONS</span><span class="p">)</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="k">return</span> <span class="n">error</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>  <span class="c1"># PG returns dict for backward compat</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Return Type Variance</p>
+<p>PG's wrapper returns <code>dict[str, Any]</code> (for backward compatibility), HANA returns the <code>ToolError</code> model directly, and FS uses its own exception hierarchy (<code>FSError</code> base with 9 subclasses) for internal flow control. All share the core <code>ToolError</code> model -- the wrapper is the only difference.</p>
+</div>
+<h4 id="4-module-level-config-state">4. Module-Level Config State<a class="headerlink" href="#4-module-level-config-state" title="Permanent link">&para;</a></h4>
+<p>A global <code>_env_file_path</code> variable bridges the gap between CLI argument parsing (Typer, at import time) and configuration loading (Pydantic Settings, at runtime). The core library owns this state; servers import <code>set_env_file_path</code> and <code>get_env_file_path</code>.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-core/src/mamba_mcp_core/config.py</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">_env_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_env_file_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="k">global</span> <span class="n">_env_file_path</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">_env_file_path</span> <span class="o">=</span> <span class="n">path</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_env_file_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="k">return</span> <span class="n">_env_file_path</span>
+</span></code></pre></div>
+<h4 id="5-nested-pydantic-settings">5. Nested Pydantic Settings<a class="headerlink" href="#5-nested-pydantic-settings" title="Permanent link">&para;</a></h4>
+<p>Every server uses a root <code>Settings</code> class that composes nested settings classes (<code>DatabaseSettings</code>, <code>ServerSettings</code>, etc.). A <code>@model_validator(mode="before")</code> hook instantiates each nested class with the correct <code>_env_file</code> parameter, connecting the module-level config state from pattern 4.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/config.py</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">database</span><span class="p">:</span> <span class="n">DatabaseSettings</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">ServerSettings</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="nd">@classmethod</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_nested_settings</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="n">env_file</span> <span class="o">=</span> <span class="n">get_env_file_path</span><span class="p">()</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="k">if</span> <span class="s2">&quot;database&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DatabaseSettings</span><span class="p">(</span><span class="n">_env_file</span><span class="o">=</span><span class="n">env_file</span><span class="p">)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>        <span class="k">if</span> <span class="s2">&quot;server&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;server&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;server&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ServerSettings</span><span class="p">(</span><span class="n">_env_file</span><span class="o">=</span><span class="n">env_file</span><span class="p">)</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="k">return</span> <span class="n">data</span>
+</span></code></pre></div>
+<h4 id="6-cli-entry-point">6. CLI Entry Point<a class="headerlink" href="#6-cli-entry-point" title="Permanent link">&para;</a></h4>
+<p>Every server uses a Typer app with <code>invoke_without_command=True</code>. Running the CLI bare starts the MCP server; the <code>test</code> subcommand validates connectivity and exits.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;mamba-mcp-pg&quot;</span><span class="p">,</span> <span class="n">no_args_is_help</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">invoke_without_command</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span> <span class="n">env_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">resolved</span> <span class="o">=</span> <span class="n">resolve_default_env_file</span><span class="p">(</span><span class="n">env_file</span><span class="p">)</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">set_env_file_path</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">invoked_subcommand</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>        <span class="k">return</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="c1"># Start the server</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="n">transport</span> <span class="o">=</span> <span class="n">normalize_transport</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">transport</span><span class="p">)</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="n">transport</span><span class="p">)</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test database connection and exit.&quot;&quot;&quot;</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="c1"># ... validate connectivity</span>
+</span></code></pre></div>
+<h4 id="7-tool-registration-via-import-side-effects">7. Tool Registration via Import Side-Effects<a class="headerlink" href="#7-tool-registration-via-import-side-effects" title="Permanent link">&para;</a></h4>
+<p>Tool modules import the module-level <code>mcp</code> instance from <code>server.py</code> and register tools via <code>@mcp.tool()</code> decorators at import time. The <code>__main__.py</code> triggers this with explicit imports that are otherwise unused.</p>
+<div class="highlight"><span class="filename">packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_pg.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">query_tools</span><span class="p">,</span> <span class="n">relationship_tools</span><span class="p">,</span> <span class="n">schema_tools</span>  <span class="c1"># noqa: F401</span>
+</span></code></pre></div>
+<h2 id="layered-tool-architecture">Layered Tool Architecture<a class="headerlink" href="#layered-tool-architecture" title="Permanent link">&para;</a></h2>
+<p>Tools across all servers are organized into layers that control registration and access. Lower layers are always available; higher layers are conditionally registered based on configuration.</p>
+<pre class="mermaid"><code>graph TB
+    subgraph "Layer 1 — Discovery (Always Active)"
+        L1["list_schemas &amp;middot; list_tables &amp;middot; describe_table &amp;middot; get_sample_rows&lt;br/&gt;list_directory &amp;middot; get_file_info &amp;middot; read_file &amp;middot; search_files"]
+    end
+
+    subgraph "Layer 2 — Relationships &amp; Extras (Conditional)"
+        L2["get_foreign_keys &amp;middot; find_join_path&lt;br/&gt;list_buckets &amp;middot; get_presigned_url &amp;middot; get_object_metadata"]
+    end
+
+    subgraph "Layer 3 — Execution &amp; Mutation (Gated by read_only)"
+        L3["execute_query &amp;middot; explain_query&lt;br/&gt;write_file &amp;middot; delete_file &amp;middot; move_file &amp;middot; copy_file &amp;middot; create_directory&lt;br/&gt;create_mr &amp;middot; update_mr &amp;middot; create_issue &amp;middot; update_issue &amp;middot; add_issue_comment"]
+    end
+
+    subgraph "Layer 4 — Platform-Specific"
+        L4["list_calculation_views &amp;middot; get_table_store_type &amp;middot; list_procedures"]
+    end
+
+    L1 --&gt; L2 --&gt; L3 --&gt; L4
+
+    style L1 fill:#c8e6c9,stroke:#2e7d32
+    style L2 fill:#fff9c4,stroke:#f9a825
+    style L3 fill:#ffcdd2,stroke:#c62828
+    style L4 fill:#e1bee7,stroke:#7b1fa2</code></pre>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td>Discovery</td>
+<td>Always registered</td>
+<td>Read-only tools for exploring schemas, directories, files. Every server has these.</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Relationships / Extras</td>
+<td>Conditional</td>
+<td>Foreign key navigation (PG, HANA), S3-specific tools (FS). Registered when the feature is available.</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Execution / Mutation</td>
+<td>Gated by <code>read_only</code></td>
+<td>SQL query execution (PG, HANA), file write operations (FS), create/update operations (GitLab). Disabled when the server runs in read-only mode.</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>Platform-Specific</td>
+<td>Always registered (HANA only)</td>
+<td>HANA-specific tools like calculation views, store types, and procedures that have no equivalent in other servers.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tool-distribution-by-server">Tool Distribution by Server<a class="headerlink" href="#tool-distribution-by-server" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Layer 1</th>
+<th>Layer 2</th>
+<th>Layer 3</th>
+<th>Layer 4</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PostgreSQL</strong></td>
+<td><code>list_schemas</code>, <code>list_tables</code>, <code>describe_table</code>, <code>get_sample_rows</code></td>
+<td><code>get_foreign_keys</code>, <code>find_join_path</code></td>
+<td><code>execute_query</code>, <code>explain_query</code></td>
+<td>--</td>
+<td><strong>8</strong></td>
+</tr>
+<tr>
+<td><strong>Filesystem</strong></td>
+<td><code>list_directory</code>, <code>get_file_info</code>, <code>read_file</code>, <code>search_files</code></td>
+<td><code>list_buckets</code>, <code>get_presigned_url</code>, <code>get_object_metadata</code></td>
+<td><code>write_file</code>, <code>delete_file</code>, <code>move_file</code>, <code>copy_file</code>, <code>create_directory</code></td>
+<td>--</td>
+<td><strong>12</strong></td>
+</tr>
+<tr>
+<td><strong>SAP HANA</strong></td>
+<td><code>list_schemas</code>, <code>list_tables</code>, <code>describe_table</code>, <code>get_sample_rows</code></td>
+<td><code>get_foreign_keys</code>, <code>find_join_path</code></td>
+<td><code>execute_query</code>, <code>explain_query</code></td>
+<td><code>list_calculation_views</code>, <code>get_table_store_type</code>, <code>list_procedures</code></td>
+<td><strong>11</strong></td>
+</tr>
+<tr>
+<td><strong>GitLab</strong></td>
+<td><code>list_mrs</code>, <code>get_mr</code>, <code>get_mr_diffs</code>, <code>get_mr_commits</code>, <code>get_mr_pipelines</code>, <code>list_issues</code>, <code>get_issue</code>, <code>list_issue_comments</code>, <code>list_pipelines</code>, <code>get_pipeline</code>, <code>get_pipeline_jobs</code>, <code>get_job_log</code>, <code>search</code></td>
+<td>--</td>
+<td><code>create_mr</code>, <code>update_mr</code>, <code>create_issue</code>, <code>update_issue</code>, <code>add_issue_comment</code></td>
+<td>--</td>
+<td><strong>18</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">GitLab Layering</p>
+<p>GitLab uses a different categorization (Merge Requests, Issues, Pipelines, Search) rather than the strict Discovery/Relationship/Execution layers. However, the same <code>read_only</code> gating applies: the 5 mutation tools (<code>create_mr</code>, <code>update_mr</code>, <code>create_issue</code>, <code>update_issue</code>, <code>add_issue_comment</code>) are disabled at runtime when <code>read_only=true</code>.</p>
+</div>
+<h2 id="how-core-is-consumed">How Core is Consumed<a class="headerlink" href="#how-core-is-consumed" title="Permanent link">&para;</a></h2>
+<p>The <code>mamba-mcp-core</code> package provides five small modules that eliminate code duplication across all four servers. None of these modules contain domain-specific logic -- they are pure utility functions with dependency injection.</p>
+<table>
+<thead>
+<tr>
+<th>Core Module</th>
+<th>Purpose</th>
+<th>Consumed By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cli.py</code></td>
+<td><code>validate_env_file()</code>, <code>resolve_default_env_file()</code>, <code>setup_logging()</code></td>
+<td>Every server's <code>__main__.py</code></td>
+</tr>
+<tr>
+<td><code>config.py</code></td>
+<td><code>set_env_file_path()</code>, <code>get_env_file_path()</code> module-level state</td>
+<td>Every server's <code>config.py</code> and <code>__main__.py</code></td>
+</tr>
+<tr>
+<td><code>errors.py</code></td>
+<td><code>ToolError</code> Pydantic model, <code>create_tool_error()</code> factory</td>
+<td>Every server's <code>errors.py</code> wrapper</td>
+</tr>
+<tr>
+<td><code>fuzzy.py</code></td>
+<td><code>levenshtein_distance()</code>, <code>find_similar_names()</code> with scaled threshold</td>
+<td>Every server's <code>errors.py</code> for "Did you mean...?" suggestions</td>
+</tr>
+<tr>
+<td><code>transport.py</code></td>
+<td><code>normalize_transport()</code> maps <code>"http"</code> to <code>"streamable-http"</code></td>
+<td>Every server's <code>__main__.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>The core library uses <strong>dependency injection</strong> for server-specific behavior. For example, <code>create_tool_error()</code> accepts a <code>suggestions_map</code> parameter -- each server passes its own <code>ERROR_SUGGESTIONS</code> dict rather than the core hardcoding any domain knowledge.</p>
+<div class="highlight"><span class="filename">Dependency injection in practice</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Core provides the factory (generic)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mamba_mcp_core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_tool_error</span> <span class="k">as</span> <span class="n">_core_create_tool_error</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Server provides the domain knowledge (specific)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">error</span> <span class="o">=</span> <span class="n">_core_create_tool_error</span><span class="p">(</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="n">code</span><span class="o">=</span><span class="s2">&quot;TABLE_NOT_FOUND&quot;</span><span class="p">,</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Table &#39;users&#39; not found&quot;</span><span class="p">,</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="n">tool_name</span><span class="o">=</span><span class="s2">&quot;describe_table&quot;</span><span class="p">,</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">suggestions_map</span><span class="o">=</span><span class="n">ERROR_SUGGESTIONS</span><span class="p">,</span>  <span class="c1"># Server-specific dict</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="database-server-async-strategies">Database Server Async Strategies<a class="headerlink" href="#database-server-async-strategies" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL needs async database access</td>
+<td>Use SQLAlchemy async with asyncpg driver</td>
+<td>SQLAlchemy provides mature async support via <code>sqlalchemy[asyncio]</code>. The asyncpg driver is the standard choice for async PostgreSQL in Python.</td>
+</tr>
+<tr>
+<td>SAP HANA needs async database access</td>
+<td>Wrap synchronous hdbcli with <code>asyncio.to_thread()</code></td>
+<td>The official SAP HANA Python driver (<code>hdbcli</code>) is synchronous-only. Using <code>sqlalchemy-hana</code> was considered but rejected because HANA is read-only in this context and the SQLAlchemy abstraction added complexity without benefit. A queue-based <code>HanaConnectionPool</code> wraps the sync calls in <code>asyncio.to_thread()</code> for non-blocking operation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="filesystem-backend-abstraction">Filesystem Backend Abstraction<a class="headerlink" href="#filesystem-backend-abstraction" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FS server needs to support local and S3 storage</td>
+<td>Use <code>BackendProtocol</code> + <code>BackendManager</code> routing via fsspec</td>
+<td>A <code>BackendProtocol</code> (runtime-checkable <code>Protocol</code>) defines the unified interface. <code>BackendManager</code> auto-detects the target backend from path prefix (<code>s3://</code> vs local) and routes operations accordingly. The <code>fsspec</code> library provides the underlying filesystem implementations for both local and S3 backends.</td>
+</tr>
+<tr>
+<td>FS server needs defense-in-depth security</td>
+<td>Dedicated <code>SecurityValidator</code> with sandbox enforcement</td>
+<td>Path traversal, symlink following, hidden file access, and extension filtering are all enforced by a centralized <code>SecurityValidator</code> that runs before every backend operation. This is the most security-critical code in the monorepo.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gitlab-api-integration">GitLab API Integration<a class="headerlink" href="#gitlab-api-integration" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitLab server needs HTTP API access</td>
+<td>Use httpx with service layer pattern</td>
+<td>httpx provides async HTTP with connection pooling. A service layer (<code>MergeRequestService</code>, <code>IssueService</code>, etc.) encapsulates API endpoint logic, keeping tool handlers thin.</td>
+</tr>
+<tr>
+<td>GitLab server needs multiple auth methods</td>
+<td>Strategy pattern with PAT and OAuth 2.0</td>
+<td>An <code>AuthStrategy</code> protocol with two implementations (<code>PATAuthStrategy</code>, <code>OAuthAuthStrategy</code>) allows seamless switching. PAT takes precedence when both are configured. OAuth handles automatic token refresh with a 30-second expiry buffer.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="client-independence">Client Independence<a class="headerlink" href="#client-independence" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testing client should work with any MCP server</td>
+<td>No dependency on core or any server package</td>
+<td>The client communicates exclusively through the MCP protocol over standard transports (stdio, SSE, HTTP). This means it can test third-party MCP servers, not just those in this monorepo.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="monorepo-tooling">Monorepo Tooling<a class="headerlink" href="#monorepo-tooling" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multiple packages need coordinated development</td>
+<td>UV workspace with shared lockfile</td>
+<td>UV workspaces provide a single <code>uv.lock</code> file across all packages while allowing per-package dependency isolation. Tests run per-package via <code>uv run --package</code> to avoid cross-package import conflicts.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="technology-stack">Technology Stack<a class="headerlink" href="#technology-stack" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Technology</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language</td>
+<td>Python</td>
+<td>3.11+</td>
+</tr>
+<tr>
+<td>MCP Framework</td>
+<td>FastMCP (<code>mcp</code>)</td>
+<td>&gt;= 1.0.0</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Pydantic + pydantic-settings</td>
+<td>--</td>
+</tr>
+<tr>
+<td>CLI Framework</td>
+<td>Typer</td>
+<td>--</td>
+</tr>
+<tr>
+<td>TUI Framework</td>
+<td>Textual</td>
+<td>--</td>
+</tr>
+<tr>
+<td>Package Manager</td>
+<td>UV</td>
+<td>--</td>
+</tr>
+<tr>
+<td>Linting</td>
+<td>Ruff</td>
+<td>Line length: 100</td>
+</tr>
+<tr>
+<td>Type Checking</td>
+<td>MyPy</td>
+<td>Strict mode</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>pytest + pytest-asyncio</td>
+<td>Auto async mode</td>
+</tr>
+</tbody>
+</table>
+<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../packages/core/">Core Library</a></strong> -- API reference for the shared utilities</li>
+<li><strong><a href="../packages/client/">MCP Client</a></strong> -- How to use the testing client</li>
+<li><strong><a href="../servers/pg/">PostgreSQL Server</a></strong> -- PG server configuration and tool reference</li>
+<li><strong><a href="../servers/fs/">Filesystem Server</a></strong> -- FS server with local and S3 backends</li>
+<li><strong><a href="../servers/hana/">SAP HANA Server</a></strong> -- HANA server configuration and tool reference</li>
+<li><strong><a href="../servers/gitlab/">GitLab Server</a></strong> -- GitLab server auth, tools, and configuration</li>
+<li><strong><a href="../development/">Development Guide</a></strong> -- Contributing, testing, and creating new server packages
+```</li>
+</ul>
+<hr />
+<p>The complete page is ready to be written to <code>/Users/sequenzia/dev/repos/mamba-mcp/docs/architecture.md</code>. Here is a summary of what the page covers and the key source files it references:</p>
+<p><strong>Page structure:</strong></p>
+<ol>
+<li><strong>System Overview</strong> -- High-level description with a Mermaid dependency graph showing all 6 packages and their relationships</li>
+<li><strong>Monorepo Structure</strong> -- Full directory tree with inline descriptions of each file's purpose</li>
+<li><strong>Dependency Graph</strong> -- Detailed Mermaid diagram plus a table mapping each package to its core and external dependencies</li>
+<li><strong>Shared Server Architecture</strong> -- Mermaid flowchart of the request path through any server, followed by all 7 shared patterns with tabbed code examples comparing all 4 server implementations</li>
+<li><strong>Layered Tool Architecture</strong> -- Mermaid layer diagram, layer descriptions table, and a per-server tool distribution table listing all 49 tools</li>
+<li><strong>How Core is Consumed</strong> -- Table mapping each core module to its consumers, with a code example showing dependency injection</li>
+<li><strong>Key Design Decisions</strong> -- Context/Decision/Rationale format for async strategies, backend abstraction, GitLab auth, client independence, and monorepo tooling</li>
+<li><strong>Technology Stack</strong> -- Summary table of all technologies and their roles</li>
+</ol>
+<p><strong>Key source files referenced:</strong></p>
+<ul>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py</code> -- Reference server implementation (AppContext + lifespan pattern)</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py</code> -- Canonical tool handler skeleton</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/errors.py</code> -- Error handling triad (ErrorCode + suggestions + wrapper)</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/config.py</code> -- Nested Pydantic settings with model validator</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py</code> -- CLI entry point pattern with tool registration via imports</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/errors.py</code> -- Shared ToolError model and factory</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/config.py</code> -- Module-level env file path state</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/fuzzy.py</code> -- Levenshtein distance with scaled threshold</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/transport.py</code> -- Transport normalization</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-fs/src/mamba_mcp_fs/server.py</code> -- FS server lifespan with SecurityValidator and BackendManager</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py</code> -- BackendProtocol and BackendManager routing</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-hana/src/mamba_mcp_hana/server.py</code> -- HANA server lifespan with HanaConnectionPool</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/server.py</code> -- GitLab server lifespan with httpx client and auth</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/auth.py</code> -- PAT and OAuth 2.0 auth strategies</li>
+<li><code>/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/client.py</code> -- MCPTestClient async context manager</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
