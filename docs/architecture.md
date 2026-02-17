@@ -1,31 +1,31 @@
 # Architecture
 
-Mamba MCP is a UV workspace monorepo containing six Python packages that implement the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP). The system is split into a shared core library, four independent MCP servers, and a standalone testing client. Together they expose **49 MCP tools** for database access, filesystem operations, GitLab integration, and server debugging.
+Mamba MCP is a single Python package with optional extras, containing six source modules that implement the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP). The system is split into a shared core library, four independent MCP servers, and a standalone testing client. Together they expose **49 MCP tools** for database access, filesystem operations, GitLab integration, and server debugging.
 
-This page covers the high-level system design, inter-package dependency graph, shared server architecture patterns, the layered tool model, and the key design decisions behind the codebase.
+This page covers the high-level system design, dependency graph, shared server architecture patterns, the layered tool model, and the key design decisions behind the codebase.
 
 ## System Overview
 
-The monorepo is organized around two axes: a **shared foundation** (core library consumed by all servers) and a **tool surface** (the MCP servers that expose tools to LLMs). The testing client sits outside this hierarchy entirely -- it connects to any MCP server over standard transports and has no compile-time dependency on any other package.
+The package is organized around two axes: a **shared foundation** (core module consumed by all servers) and a **tool surface** (the MCP servers that expose tools to LLMs). The testing client sits outside this hierarchy entirely -- it connects to any MCP server over standard transports and has no compile-time dependency on any other module.
 
 ```mermaid
 graph TB
-    subgraph Workspace["UV Workspace Monorepo"]
+    subgraph Package["mamba-mcp (single package with extras)"]
         direction TB
 
         subgraph Core["Shared Foundation"]
-            CORE["mamba-mcp-core<br/><i>CLI helpers, errors, fuzzy matching, transport</i>"]
+            CORE["mamba_mcp_core<br/><i>CLI helpers, errors, fuzzy matching, transport</i>"]
         end
 
         subgraph Servers["MCP Servers (49 tools)"]
             direction LR
-            PG["mamba-mcp-pg<br/><i>PostgreSQL &middot; 8 tools</i>"]
-            FS["mamba-mcp-fs<br/><i>Filesystem &middot; 12 tools</i>"]
-            HANA["mamba-mcp-hana<br/><i>SAP HANA &middot; 11 tools</i>"]
-            GITLAB["mamba-mcp-gitlab<br/><i>GitLab &middot; 18 tools</i>"]
+            PG["mamba_mcp_pg<br/><i>PostgreSQL &middot; 8 tools</i>"]
+            FS["mamba_mcp_fs<br/><i>Filesystem &middot; 12 tools</i>"]
+            HANA["mamba_mcp_hana<br/><i>SAP HANA &middot; 11 tools</i>"]
+            GITLAB["mamba_mcp_gitlab<br/><i>GitLab &middot; 18 tools</i>"]
         end
 
-        CLIENT["mamba-mcp-client<br/><i>TUI, CLI, Python API</i>"]
+        CLIENT["mamba_mcp_client<br/><i>TUI, CLI, Python API</i>"]
     end
 
     PG --> CORE
@@ -40,98 +40,102 @@ graph TB
 ```
 
 !!! info "Client Independence"
-    `mamba-mcp-client` has **zero** import-time dependencies on `mamba-mcp-core` or any server package. It communicates exclusively through the MCP protocol over stdio, SSE, or HTTP transports. This means it can test any compliant MCP server, not just the ones in this monorepo.
+    `mamba_mcp_client` has **zero** import-time dependencies on `mamba_mcp_core` or any server module. It communicates exclusively through the MCP protocol over stdio, SSE, or HTTP transports. This means it can test any compliant MCP server, not just the ones in this package.
 
-## Monorepo Structure
+## Project Structure
 
 ```
 mamba-mcp/
-├── pyproject.toml              # UV workspace root, dev dependencies, ruff/mypy config
-├── uv.lock                     # Single shared lockfile for all packages
+├── pyproject.toml              # Single package config, extras, ruff/mypy config
+├── uv.lock                     # Lockfile
 ├── mkdocs.yml                  # Documentation site configuration
-├── packages/
-│   ├── mamba-mcp-core/         # Shared library (no CLI, no env vars)
-│   │   └── src/mamba_mcp_core/
-│   │       ├── cli.py          # validate_env_file, resolve_default_env_file, setup_logging
-│   │       ├── config.py       # Module-level _env_file_path state management
-│   │       ├── errors.py       # ToolError model & create_tool_error factory
-│   │       ├── fuzzy.py        # Levenshtein distance & find_similar_names
-│   │       └── transport.py    # normalize_transport ("http" → "streamable-http")
+├── src/
+│   ├── mamba_mcp_core/         # Shared library (no CLI, no env vars)
+│   │   ├── cli.py              # validate_env_file, resolve_default_env_file, setup_logging
+│   │   ├── config.py           # Module-level _env_file_path state management
+│   │   ├── errors.py           # ToolError model & create_tool_error factory
+│   │   ├── fuzzy.py            # Levenshtein distance & find_similar_names
+│   │   └── transport.py        # normalize_transport ("http" → "streamable-http")
 │   │
-│   ├── mamba-mcp-client/       # Standalone testing tool
-│   │   └── src/mamba_mcp_client/
-│   │       ├── cli.py          # Typer CLI entry point (9 commands)
-│   │       ├── client.py       # MCPTestClient async context manager
-│   │       ├── config.py       # Transport configs (Pydantic)
-│   │       ├── logging.py      # Protocol logging
-│   │       └── tui/app.py      # Textual TUI
+│   ├── mamba_mcp_client/       # Standalone testing tool
+│   │   ├── cli.py              # Typer CLI entry point (9 commands)
+│   │   ├── client.py           # MCPTestClient async context manager
+│   │   ├── config.py           # Transport configs (Pydantic)
+│   │   ├── logging.py          # Protocol logging
+│   │   └── tui/app.py          # Textual TUI
 │   │
-│   ├── mamba-mcp-pg/           # PostgreSQL server
-│   │   └── src/mamba_mcp_pg/
-│   │       ├── __main__.py     # Typer CLI (serve / test)
-│   │       ├── server.py       # FastMCP + AppContext + lifespan
-│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_PG_*)
-│   │       ├── errors.py       # ErrorCode + suggestions + wrapper
-│   │       ├── database/       # SQLAlchemy async services
-│   │       ├── models/         # Pydantic I/O models
-│   │       └── tools/          # 8 MCP tool handlers
+│   ├── mamba_mcp_pg/           # PostgreSQL server
+│   │   ├── __main__.py         # Typer CLI (serve / test)
+│   │   ├── server.py           # FastMCP + AppContext + lifespan
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_PG_*)
+│   │   ├── errors.py           # ErrorCode + suggestions + wrapper
+│   │   ├── database/           # SQLAlchemy async services
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # 8 MCP tool handlers
 │   │
-│   ├── mamba-mcp-fs/           # Filesystem server
-│   │   └── src/mamba_mcp_fs/
-│   │       ├── __main__.py     # Typer CLI (serve / test)
-│   │       ├── server.py       # FastMCP + AppContext + lifespan
-│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
-│   │       ├── errors.py       # FSError hierarchy + error codes
-│   │       ├── security.py     # Sandbox, path traversal, symlink policies
-│   │       ├── rate_limit.py   # Sliding window rate limiter
-│   │       ├── backends/       # BackendProtocol, LocalBackend, S3Backend
-│   │       ├── models/         # Pydantic I/O models
-│   │       └── tools/          # 12 MCP tool handlers
+│   ├── mamba_mcp_fs/           # Filesystem server
+│   │   ├── __main__.py         # Typer CLI (serve / test)
+│   │   ├── server.py           # FastMCP + AppContext + lifespan
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_FS_*)
+│   │   ├── errors.py           # FSError hierarchy + error codes
+│   │   ├── security.py         # Sandbox, path traversal, symlink policies
+│   │   ├── rate_limit.py       # Sliding window rate limiter
+│   │   ├── backends/           # BackendProtocol, LocalBackend, S3Backend
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # 12 MCP tool handlers
 │   │
-│   ├── mamba-mcp-hana/         # SAP HANA server
-│   │   └── src/mamba_mcp_hana/
-│   │       ├── __main__.py     # Typer CLI (serve / test)
-│   │       ├── server.py       # FastMCP + AppContext + lifespan
-│   │       ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
-│   │       ├── errors.py       # ErrorCode + suggestions + wrapper
-│   │       ├── database/       # HanaConnectionPool, async services
-│   │       ├── models/         # Pydantic I/O models
-│   │       └── tools/          # 11 MCP tool handlers
+│   ├── mamba_mcp_hana/         # SAP HANA server
+│   │   ├── __main__.py         # Typer CLI (serve / test)
+│   │   ├── server.py           # FastMCP + AppContext + lifespan
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_HANA_*)
+│   │   ├── errors.py           # ErrorCode + suggestions + wrapper
+│   │   ├── database/           # HanaConnectionPool, async services
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # 11 MCP tool handlers
 │   │
-│   └── mamba-mcp-gitlab/       # GitLab server
-│       └── src/mamba_mcp_gitlab/
-│           ├── __main__.py     # Typer CLI (serve / test)
-│           ├── server.py       # FastMCP + AppContext + lifespan
-│           ├── config.py       # Pydantic settings (MAMBA_MCP_GITLAB_*)
-│           ├── auth.py         # PAT + OAuth 2.0 strategies
-│           ├── errors.py       # ErrorCode + suggestions + wrapper
-│           ├── rate_limit.py   # Sliding window rate limiter
-│           ├── services/       # GitLab API service classes
-│           ├── models/         # Pydantic I/O models
-│           └── tools/          # 18 MCP tool handlers
+│   └── mamba_mcp_gitlab/       # GitLab server
+│       ├── __main__.py         # Typer CLI (serve / test)
+│       ├── server.py           # FastMCP + AppContext + lifespan
+│       ├── config.py           # Pydantic settings (MAMBA_MCP_GITLAB_*)
+│       ├── auth.py             # PAT + OAuth 2.0 strategies
+│       ├── errors.py           # ErrorCode + suggestions + wrapper
+│       ├── rate_limit.py       # Sliding window rate limiter
+│       ├── services/           # GitLab API service classes
+│       ├── models/             # Pydantic I/O models
+│       └── tools/              # 18 MCP tool handlers
+│
+├── tests/
+│   ├── core/                   # Core library tests
+│   ├── client/                 # Client tests
+│   ├── pg/                     # PostgreSQL server tests
+│   ├── fs/                     # Filesystem server tests
+│   ├── hana/                   # SAP HANA server tests
+│   └── gitlab/                 # GitLab server tests
 │
 └── internal/                   # Specifications & design documents
 ```
 
 ## Dependency Graph
 
-Every server depends on `mamba-mcp-core` for shared utilities. No server depends on any other server. The client depends on neither core nor any server.
+All four servers import from `mamba_mcp_core` for shared utilities. No server imports from any other server. The client depends on neither core nor any server.
+
+Dependencies are managed through optional extras in a single `pyproject.toml`:
 
 ```mermaid
 graph LR
     subgraph Shared
-        CORE[mamba-mcp-core]
+        CORE[mamba_mcp_core]
     end
 
-    subgraph Servers
-        PG[mamba-mcp-pg]
-        FS[mamba-mcp-fs]
-        HANA[mamba-mcp-hana]
-        GL[mamba-mcp-gitlab]
+    subgraph "Extras"
+        PG["pip install mamba-mcp&lsqb;pg&rsqb;"]
+        FS["pip install mamba-mcp&lsqb;fs&rsqb;"]
+        HANA["pip install mamba-mcp&lsqb;hana&rsqb;"]
+        GL["pip install mamba-mcp&lsqb;gitlab&rsqb;"]
     end
 
     subgraph Client
-        CLI[mamba-mcp-client]
+        CLI["pip install mamba-mcp&lsqb;client&rsqb;"]
     end
 
     PG -->|"core utils"| CORE
@@ -152,21 +156,21 @@ graph LR
     style CLI_EXT fill:none,stroke:none
 ```
 
-| Package | Depends On | Key External Libraries |
-|---------|-----------|----------------------|
-| `mamba-mcp-core` | *(none)* | `pydantic`, `typer` |
-| `mamba-mcp-pg` | `mamba-mcp-core` | `sqlalchemy[asyncio]`, `asyncpg`, `mcp` |
-| `mamba-mcp-fs` | `mamba-mcp-core` | `fsspec`, `s3fs`, `mcp` |
-| `mamba-mcp-hana` | `mamba-mcp-core` | `hdbcli`, `mcp` |
-| `mamba-mcp-gitlab` | `mamba-mcp-core` | `httpx`, `mcp` |
-| `mamba-mcp-client` | *(independent)* | `fastmcp`, `textual`, `httpx` |
+| Extra | Imports From | Key External Libraries |
+|-------|-------------|----------------------|
+| *(core -- always installed)* | *(none)* | `pydantic`, `typer` |
+| `pg` | `mamba_mcp_core` | `sqlalchemy[asyncio]`, `asyncpg`, `mcp` |
+| `fs` | `mamba_mcp_core` | `fsspec`, `s3fs`, `mcp` |
+| `hana` | `mamba_mcp_core` | `hdbcli`, `mcp` |
+| `gitlab` | `mamba_mcp_core` | `httpx`, `mcp` |
+| `client` | *(independent)* | `fastmcp`, `textual`, `httpx` |
 
 !!! warning "No Cross-Server Dependencies"
-    The four servers are completely independent of each other. Importing `mamba_mcp_pg` never triggers loading of `mamba_mcp_hana`, `mamba_mcp_fs`, or `mamba_mcp_gitlab`. This isolation means each server can be installed, tested, and deployed in its own environment.
+    The four servers are completely independent of each other. Importing `mamba_mcp_pg` never triggers loading of `mamba_mcp_hana`, `mamba_mcp_fs`, or `mamba_mcp_gitlab`. This isolation means each extra can be installed and deployed independently.
 
 ## Shared Server Architecture
 
-All four MCP servers follow an identical internal architecture pattern, originally established in `mamba-mcp-pg` and replicated across FS, HANA, and GitLab. The diagram below shows how a request flows through any server.
+All four MCP servers follow an identical internal architecture pattern, originally established in `mamba_mcp_pg` and replicated across FS, HANA, and GitLab. The diagram below shows how a request flows through any server.
 
 ```mermaid
 flowchart TD
@@ -198,7 +202,7 @@ Every server defines a `@dataclass AppContext` that holds initialized resources 
 
 === "PostgreSQL"
 
-    ```python title="packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py"
+    ```python title="src/mamba_mcp_pg/server.py"
     @dataclass
     class AppContext:
         engine: AsyncEngine
@@ -219,7 +223,7 @@ Every server defines a `@dataclass AppContext` that holds initialized resources 
 
 === "SAP HANA"
 
-    ```python title="packages/mamba-mcp-hana/src/mamba_mcp_hana/server.py"
+    ```python title="src/mamba_mcp_hana/server.py"
     @dataclass
     class AppContext:
         pool: HanaConnectionPool
@@ -240,7 +244,7 @@ Every server defines a `@dataclass AppContext` that holds initialized resources 
 
 === "Filesystem"
 
-    ```python title="packages/mamba-mcp-fs/src/mamba_mcp_fs/server.py"
+    ```python title="src/mamba_mcp_fs/server.py"
     @dataclass
     class AppContext:
         settings: Settings
@@ -262,7 +266,7 @@ Every server defines a `@dataclass AppContext` that holds initialized resources 
 
 === "GitLab"
 
-    ```python title="packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/server.py"
+    ```python title="src/mamba_mcp_gitlab/server.py"
     @dataclass
     class AppContext:
         client: httpx.AsyncClient
@@ -288,7 +292,7 @@ Every server defines a `@dataclass AppContext` that holds initialized resources 
 
 #### 2. Tool Handler Skeleton
 
-Every `@mcp.tool()` function follows the same 7-step skeleton. This consistency makes it possible to read any tool in the monorepo and immediately understand its structure.
+Every `@mcp.tool()` function follows the same 7-step skeleton. This consistency makes it possible to read any tool in the codebase and immediately understand its structure.
 
 ```python title="Canonical tool handler pattern"
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=True, ...))
@@ -337,7 +341,7 @@ flowchart LR
     C --> F["Structured Error<br/><i>dict or ToolError</i>"]
 ```
 
-```python title="packages/mamba-mcp-pg/src/mamba_mcp_pg/errors.py"
+```python title="src/mamba_mcp_pg/errors.py"
 class ErrorCode:
     SCHEMA_NOT_FOUND = "SCHEMA_NOT_FOUND"
     TABLE_NOT_FOUND = "TABLE_NOT_FOUND"
@@ -363,7 +367,7 @@ def create_tool_error(code, message, tool_name, ...):
 
 A global `_env_file_path` variable bridges the gap between CLI argument parsing (Typer, at import time) and configuration loading (Pydantic Settings, at runtime). The core library owns this state; servers import `set_env_file_path` and `get_env_file_path`.
 
-```python title="packages/mamba-mcp-core/src/mamba_mcp_core/config.py"
+```python title="src/mamba_mcp_core/config.py"
 _env_file_path: str | None = None
 
 def set_env_file_path(path: str | None) -> None:
@@ -378,7 +382,7 @@ def get_env_file_path() -> str | None:
 
 Every server uses a root `Settings` class that composes nested settings classes (`DatabaseSettings`, `ServerSettings`, etc.). A `@model_validator(mode="before")` hook instantiates each nested class with the correct `_env_file` parameter, connecting the module-level config state from pattern 4.
 
-```python title="packages/mamba-mcp-pg/src/mamba_mcp_pg/config.py"
+```python title="src/mamba_mcp_pg/config.py"
 class Settings(BaseSettings):
     database: DatabaseSettings = Field(default=None)
     server: ServerSettings = Field(default=None)
@@ -398,7 +402,7 @@ class Settings(BaseSettings):
 
 Every server uses a Typer app with `invoke_without_command=True`. Running the CLI bare starts the MCP server; the `test` subcommand validates connectivity and exits.
 
-```python title="packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py"
+```python title="src/mamba_mcp_pg/__main__.py"
 app = typer.Typer(name="mamba-mcp-pg", no_args_is_help=False)
 
 @app.callback(invoke_without_command=True)
@@ -422,7 +426,7 @@ def test() -> None:
 
 Tool modules import the module-level `mcp` instance from `server.py` and register tools via `@mcp.tool()` decorators at import time. The `__main__.py` triggers this with explicit imports that are otherwise unused.
 
-```python title="packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py"
+```python title="src/mamba_mcp_pg/__main__.py"
 from mamba_mcp_pg.tools import query_tools, relationship_tools, schema_tools  # noqa: F401
 ```
 
@@ -477,7 +481,7 @@ graph TB
 
 ## How Core is Consumed
 
-The `mamba-mcp-core` package provides five small modules that eliminate code duplication across all four servers. None of these modules contain domain-specific logic -- they are pure utility functions with dependency injection.
+The `mamba_mcp_core` module provides five small modules that eliminate code duplication across all four servers. None of these modules contain domain-specific logic -- they are pure utility functions with dependency injection.
 
 | Core Module | Purpose | Consumed By |
 |------------|---------|-------------|
@@ -516,7 +520,7 @@ error = _core_create_tool_error(
 | Context | Decision | Rationale |
 |---------|----------|-----------|
 | FS server needs to support local and S3 storage | Use `BackendProtocol` + `BackendManager` routing via fsspec | A `BackendProtocol` (runtime-checkable `Protocol`) defines the unified interface. `BackendManager` auto-detects the target backend from path prefix (`s3://` vs local) and routes operations accordingly. The `fsspec` library provides the underlying filesystem implementations for both local and S3 backends. |
-| FS server needs defense-in-depth security | Dedicated `SecurityValidator` with sandbox enforcement | Path traversal, symlink following, hidden file access, and extension filtering are all enforced by a centralized `SecurityValidator` that runs before every backend operation. This is the most security-critical code in the monorepo. |
+| FS server needs defense-in-depth security | Dedicated `SecurityValidator` with sandbox enforcement | Path traversal, symlink following, hidden file access, and extension filtering are all enforced by a centralized `SecurityValidator` that runs before every backend operation. This is the most security-critical code in the codebase. |
 
 ### GitLab API Integration
 
@@ -529,13 +533,13 @@ error = _core_create_tool_error(
 
 | Context | Decision | Rationale |
 |---------|----------|-----------|
-| Testing client should work with any MCP server | No dependency on core or any server package | The client communicates exclusively through the MCP protocol over standard transports (stdio, SSE, HTTP). This means it can test third-party MCP servers, not just those in this monorepo. |
+| Testing client should work with any MCP server | No dependency on core or any server module | The client communicates exclusively through the MCP protocol over standard transports (stdio, SSE, HTTP). This means it can test third-party MCP servers, not just those in this package. |
 
-### Monorepo Tooling
+### Single Package with Extras
 
 | Context | Decision | Rationale |
 |---------|----------|-----------|
-| Multiple packages need coordinated development | UV workspace with shared lockfile | UV workspaces provide a single `uv.lock` file across all packages while allowing per-package dependency isolation. Tests run per-package via `uv run --package` to avoid cross-package import conflicts. |
+| Multiple modules need coordinated development and release | Single package with optional extras instead of UV workspace monorepo | A single `pyproject.toml` with extras (`pip install mamba-mcp[pg]`) simplifies the release process, eliminates inter-package version coordination, and provides a cleaner install experience. Users install one package name with the extras they need rather than remembering separate package names. |
 
 ## Technology Stack
 
@@ -560,37 +564,3 @@ error = _core_create_tool_error(
 - **[SAP HANA Server](servers/hana.md)** -- HANA server configuration and tool reference
 - **[GitLab Server](servers/gitlab.md)** -- GitLab server auth, tools, and configuration
 - **[Development Guide](development.md)** -- Contributing, testing, and creating new server packages
-```
-
----
-
-The complete page is ready to be written to `/Users/sequenzia/dev/repos/mamba-mcp/docs/architecture.md`. Here is a summary of what the page covers and the key source files it references:
-
-**Page structure:**
-
-1. **System Overview** -- High-level description with a Mermaid dependency graph showing all 6 packages and their relationships
-2. **Monorepo Structure** -- Full directory tree with inline descriptions of each file's purpose
-3. **Dependency Graph** -- Detailed Mermaid diagram plus a table mapping each package to its core and external dependencies
-4. **Shared Server Architecture** -- Mermaid flowchart of the request path through any server, followed by all 7 shared patterns with tabbed code examples comparing all 4 server implementations
-5. **Layered Tool Architecture** -- Mermaid layer diagram, layer descriptions table, and a per-server tool distribution table listing all 49 tools
-6. **How Core is Consumed** -- Table mapping each core module to its consumers, with a code example showing dependency injection
-7. **Key Design Decisions** -- Context/Decision/Rationale format for async strategies, backend abstraction, GitLab auth, client independence, and monorepo tooling
-8. **Technology Stack** -- Summary table of all technologies and their roles
-
-**Key source files referenced:**
-
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py` -- Reference server implementation (AppContext + lifespan pattern)
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py` -- Canonical tool handler skeleton
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/errors.py` -- Error handling triad (ErrorCode + suggestions + wrapper)
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/config.py` -- Nested Pydantic settings with model validator
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-pg/src/mamba_mcp_pg/__main__.py` -- CLI entry point pattern with tool registration via imports
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/errors.py` -- Shared ToolError model and factory
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/config.py` -- Module-level env file path state
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/fuzzy.py` -- Levenshtein distance with scaled threshold
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-core/src/mamba_mcp_core/transport.py` -- Transport normalization
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-fs/src/mamba_mcp_fs/server.py` -- FS server lifespan with SecurityValidator and BackendManager
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py` -- BackendProtocol and BackendManager routing
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-hana/src/mamba_mcp_hana/server.py` -- HANA server lifespan with HanaConnectionPool
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/server.py` -- GitLab server lifespan with httpx client and auth
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-gitlab/src/mamba_mcp_gitlab/auth.py` -- PAT and OAuth 2.0 auth strategies
-- `/Users/sequenzia/dev/repos/mamba-mcp/packages/mamba-mcp-client/src/mamba_mcp_client/client.py` -- MCPTestClient async context manager

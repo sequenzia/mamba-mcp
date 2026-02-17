@@ -16,9 +16,9 @@ jobs:
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-      - run: uv sync --all-packages --group dev
-      - run: uv run ruff check packages/
-      - run: uv run ruff format --check packages/
+      - run: uv sync --all-extras --group dev
+      - run: uv run ruff check src/
+      - run: uv run ruff format --check src/
 
   type-check:
     runs-on: ubuntu-latest
@@ -29,21 +29,15 @@ jobs:
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-      - run: uv sync --all-packages --group dev
-      - run: uv run mypy packages/
+      - run: uv sync --all-extras --group dev
+      - run: uv run mypy src/
 
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - mamba-mcp-core
-          - mamba-mcp-client
-          - mamba-mcp-pg
-          - mamba-mcp-fs
-          - mamba-mcp-hana
-          - mamba-mcp-gitlab
+        suite: [core, client, pg, fs, hana, gitlab]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,6 +45,6 @@ jobs:
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-      - run: uv sync --all-packages --group dev
-      - name: Run ${{ matrix.package }} tests
-        run: uv run --package ${{ matrix.package }} pytest packages/${{ matrix.package }}/ --tb=short -q
+      - run: uv sync --all-extras --group dev
+      - name: Run ${{ matrix.suite }} tests
+        run: uv run pytest tests/${{ matrix.suite }}/ --tb=short -q

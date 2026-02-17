@@ -5,54 +5,60 @@ This guide walks you through installing Mamba MCP, configuring a server, and run
 ## Prerequisites
 
 - **Python 3.11+**
-- **[UV](https://docs.astral.sh/uv/)** package manager (recommended for monorepo development)
+- **[UV](https://docs.astral.sh/uv/)** package manager (recommended for development)
 
 ## Installation
 
-### From the Monorepo (Development)
+### From Source (Development)
 
-Clone the repository and install all packages with dev dependencies:
+Clone the repository and install with all extras and dev dependencies:
 
 ```bash
 git clone https://github.com/sequenzia/mamba-mcp.git
 cd mamba-mcp
-uv sync --group dev
+uv sync --all-extras --group dev
 ```
 
-This installs all 6 packages in development mode with shared dev tools (pytest, ruff, mypy).
+This installs the `mamba-mcp` package with all optional extras and shared dev tools (pytest, ruff, mypy).
 
-### Individual Packages (Production)
+### From PyPI (Production)
 
-Install only the packages you need:
+Install only the extras you need:
 
 === "PostgreSQL Server"
 
     ```bash
-    pip install mamba-mcp-pg
+    pip install mamba-mcp[pg]
     ```
 
 === "Filesystem Server"
 
     ```bash
-    pip install mamba-mcp-fs
+    pip install mamba-mcp[fs]
     ```
 
 === "SAP HANA Server"
 
     ```bash
-    pip install mamba-mcp-hana
+    pip install mamba-mcp[hana]
     ```
 
 === "GitLab Server"
 
     ```bash
-    pip install mamba-mcp-gitlab
+    pip install mamba-mcp[gitlab]
     ```
 
 === "MCP Client"
 
     ```bash
-    pip install mamba-mcp-client
+    pip install mamba-mcp[client]
+    ```
+
+=== "Everything"
+
+    ```bash
+    pip install mamba-mcp[all]
     ```
 
 ## Quick Start: PostgreSQL Server
@@ -129,7 +135,7 @@ See the [GitLab Server docs](servers/gitlab.md) for OAuth 2.0 auth and full tool
 
 ## Using the MCP Client
 
-The `mamba-mcp-client` package lets you test and debug any MCP server — including the ones in this monorepo and third-party servers.
+The `client` extra provides tools to test and debug any MCP server -- including the ones in this package and third-party servers.
 
 ### Interactive TUI
 

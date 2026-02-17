@@ -1,16 +1,36 @@
 # Mamba MCP
 
-A Python monorepo of MCP (Model Context Protocol) tools — a testing client and production MCP servers.
+A Python collection of MCP (Model Context Protocol) tools — a testing client and production MCP servers, distributed as a single package with optional extras.
 
-## Packages
+## Installation
 
-| Package | Description |
-|---------|-------------|
-| [mamba-mcp-core](packages/mamba-mcp-core/) | Shared utilities (error models, fuzzy matching, CLI helpers, transport normalization) |
-| [mamba-mcp-client](packages/mamba-mcp-client/) | MCP testing client with interactive TUI, CLI, and Python API |
-| [mamba-mcp-pg](packages/mamba-mcp-pg/) | PostgreSQL MCP server — 8 tools across 3 layers |
-| [mamba-mcp-fs](packages/mamba-mcp-fs/) | Filesystem MCP server with local and S3 backends — 12 tools across 3 layers |
-| [mamba-mcp-hana](packages/mamba-mcp-hana/) | SAP HANA MCP server — 11 tools across 4 layers |
+```bash
+# Core only
+pip install mamba-mcp
+
+# With specific servers
+pip install mamba-mcp[pg]       # PostgreSQL server
+pip install mamba-mcp[fs]       # Filesystem server (local + S3)
+pip install mamba-mcp[hana]     # SAP HANA server
+pip install mamba-mcp[gitlab]   # GitLab server
+
+# Client (TUI, CLI, Python API)
+pip install mamba-mcp[client]
+
+# Everything
+pip install mamba-mcp[all]
+```
+
+## Modules
+
+| Module | Extra | Description |
+|--------|-------|-------------|
+| `mamba_mcp_core` | *(base)* | Shared utilities (error models, fuzzy matching, CLI helpers, transport normalization) |
+| `mamba_mcp_client` | `client` | MCP testing client with interactive TUI, CLI, and Python API |
+| `mamba_mcp_pg` | `pg` | PostgreSQL MCP server — 8 tools across 3 layers |
+| `mamba_mcp_fs` | `fs` | Filesystem MCP server with local and S3 backends — 12 tools across 3 layers |
+| `mamba_mcp_hana` | `hana` | SAP HANA MCP server — 11 tools across 4 layers |
+| `mamba_mcp_gitlab` | `gitlab` | GitLab MCP server — 18 tools across 4 categories |
 
 ### mamba-mcp-client
 
@@ -84,9 +104,26 @@ mamba-mcp-hana --env-file mamba.env test
 mamba-mcp-hana --env-file mamba.env
 ```
 
+### mamba-mcp-gitlab
+
+GitLab MCP server for merge requests, issues, pipelines, and search.
+
+- **Merge Requests (7)** — List, get, diffs, commits, pipelines, create, update
+- **Issues (6)** — List, get, comments, create, update, add comment
+- **Pipelines (4)** — List, get, jobs, job log
+- **Search (1)** — Instance, project, or group scoped search
+
+```bash
+# Test GitLab connectivity
+mamba-mcp-gitlab --env-file mamba.env test
+
+# Run the MCP server
+mamba-mcp-gitlab --env-file mamba.env
+```
+
 ## Architecture
 
-All three MCP server packages follow a consistent internal architecture built on **FastMCP** with a **layered tool system**:
+All four MCP server modules follow a consistent internal architecture built on **FastMCP** with a **layered tool system**:
 
 ```
 __main__.py (Typer CLI)
@@ -104,13 +141,11 @@ __main__.py (Typer CLI)
 - **Error Framework** — Structured error codes with fuzzy name matching ("did you mean?") suggestions
 - **Service Layer** — Thin tool handlers delegate to service classes that encapsulate domain logic
 
-**Tech stack:** Python 3.11+, FastMCP, Pydantic, Typer, Textual, SQLAlchemy+asyncpg, hdbcli, fsspec+s3fs
-
-The three server packages share `mamba-mcp-core` for common utilities (error models, fuzzy matching, CLI helpers, transport normalization). The client package is fully independent.
+**Tech stack:** Python 3.11+, FastMCP, Pydantic, Typer, Textual, SQLAlchemy+asyncpg, hdbcli, fsspec+s3fs, httpx
 
 ## Configuration
 
-All packages use `mamba.env` for environment-based configuration. Default file locations (checked in order):
+All servers use `mamba.env` for environment-based configuration. Default file locations (checked in order):
 
 1. `./mamba.env` (project-local)
 2. `~/mamba.env` (global fallback)
@@ -118,47 +153,44 @@ All packages use `mamba.env` for environment-based configuration. Default file l
 ## Development
 
 ```bash
-# Install all packages
-uv sync --group dev
+# Install with all extras and dev tools
+uv sync --all-extras --group dev
 
-# Run tests (per-package to avoid cross-package import conflicts)
-uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/
-uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
-uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
-uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
+# Run tests
+uv run pytest tests/                    # all tests
+uv run pytest tests/pg/                 # per-module
+uv run pytest tests/core/ tests/client/ # multiple modules
 
 # Type check
-mypy packages/
+uv run mypy src/
 
 # Lint and format
-ruff check packages/
-ruff format packages/
+uv run ruff check src/
+uv run ruff format src/
 ```
 
 ## Repository Structure
 
 ```
 mamba-mcp/
-├── pyproject.toml              # Workspace configuration
+├── pyproject.toml              # Single package config with extras
 ├── uv.lock                     # Shared lockfile
-├── packages/
-│   ├── mamba-mcp-core/         # Shared utilities
-│   │   ├── src/mamba_mcp_core/
-│   │   └── tests/
-│   ├── mamba-mcp-client/       # MCP testing client
-│   │   ├── src/mamba_mcp_client/
-│   │   ├── tests/
-│   │   └── examples/
-│   ├── mamba-mcp-pg/           # PostgreSQL MCP server
-│   │   ├── src/mamba_mcp_pg/
-│   │   └── tests/
-│   ├── mamba-mcp-fs/           # Filesystem MCP server
-│   │   ├── src/mamba_mcp_fs/
-│   │   └── tests/
-│   └── mamba-mcp-hana/         # SAP HANA MCP server
-│       ├── src/mamba_mcp_hana/
-│       └── tests/
+├── src/
+│   ├── mamba_mcp_core/         # Shared utilities
+│   ├── mamba_mcp_client/       # MCP testing client
+│   ├── mamba_mcp_pg/           # PostgreSQL MCP server
+│   ├── mamba_mcp_fs/           # Filesystem MCP server
+│   ├── mamba_mcp_hana/         # SAP HANA MCP server
+│   └── mamba_mcp_gitlab/       # GitLab MCP server
+├── tests/
+│   ├── core/
+│   ├── client/
+│   ├── pg/
+│   ├── fs/
+│   ├── hana/
+│   └── gitlab/
+├── examples/                   # Client usage examples
+├── docs/                       # MkDocs documentation
 └── internal/                   # Specs & images
 ```
 

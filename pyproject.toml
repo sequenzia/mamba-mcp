@@ -1,26 +1,93 @@
 [project]
 name = "mamba-mcp"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Mamba MCP - A collection of MCP tools and servers"
-requires-python = ">=3.11"
 readme = "README.md"
+requires-python = ">=3.11"
 license = { text = "MIT" }
-dependencies = [
-    "mkdocs-material>=9.7.1",
+authors = [{ name = "Sequenzia" }]
+keywords = ["mcp", "model-context-protocol", "postgresql", "hana", "filesystem", "gitlab", "llm", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
-# No dependencies at root - this is a virtual workspace
+# Base dependencies (core only — always installed)
+dependencies = [
+    "pydantic>=2.0.0",
+    "typer>=0.12.0",
+]
 
-[tool.uv.workspace]
-members = ["packages/*"]
+[project.optional-dependencies]
+client = [
+    "fastmcp>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "textual>=0.50.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "httpx>=0.27.0",
+    "anyio>=4.0.0",
+    "pyperclip>=1.9.0",
+]
+pg = [
+    "mcp>=1.0.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "asyncpg>=0.29.0",
+    "pydantic-settings>=2.0.0",
+]
+fs = [
+    "mcp>=1.0.0",
+    "fsspec",
+    "s3fs",
+    "pydantic-settings>=2.0.0",
+]
+hana = [
+    "mcp>=1.0.0",
+    "hdbcli",
+    "pydantic-settings>=2.0.0",
+]
+gitlab = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+    "pydantic-settings>=2.0.0",
+]
+all = [
+    "mamba-mcp[client,pg,fs,hana,gitlab]",
+]
 
-[tool.uv.sources]
-mamba-mcp-core = { workspace = true }
-mamba-mcp-client = { workspace = true }
-mamba-mcp-pg = { workspace = true }
-mamba-mcp-fs = { workspace = true }
-mamba-mcp-hana = { workspace = true }
-mamba-mcp-gitlab = { workspace = true }
+[project.scripts]
+mamba-mcp = "mamba_mcp_client.cli:main"
+mamba-mcp-client = "mamba_mcp_client.cli:main"
+mamba-mcp-pg = "mamba_mcp_pg.__main__:app"
+mamba-mcp-fs = "mamba_mcp_fs.__main__:app"
+mamba-mcp-hana = "mamba_mcp_hana.__main__:app"
+mamba-mcp-gitlab = "mamba_mcp_gitlab.__main__:app"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+raw-options.version_scheme = "python-simplified-semver"
+raw-options.local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/mamba_mcp_core/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/mamba_mcp_core",
+    "src/mamba_mcp_client",
+    "src/mamba_mcp_pg",
+    "src/mamba_mcp_fs",
+    "src/mamba_mcp_hana",
+    "src/mamba_mcp_gitlab",
+]
 
 [dependency-groups]
 dev = [
@@ -30,6 +97,7 @@ dev = [
     "ruff>=0.3.0",
     "mypy>=1.8.0",
     "respx>=0.22.0",
+    "mkdocs-material>=9.7.1",
 ]
 
 [tool.ruff]
@@ -43,10 +111,11 @@ select = ["E", "F", "I", "N", "W", "UP"]
 python_version = "3.11"
 strict = true
 explicit_package_bases = true
+mypy_path = "src"
 warn_unused_ignores = false
 exclude = [
-    "packages/.*/tests/",
-    "packages/.*/examples/",
+    "tests/",
+    "examples/",
 ]
 
 [[tool.mypy.overrides]]
@@ -96,3 +165,4 @@ disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+testpaths = ["tests"]
