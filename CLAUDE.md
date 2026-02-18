@@ -4,41 +4,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Mamba MCP is a UV workspace monorepo containing MCP (Model Context Protocol) packages:
+Mamba MCP is a single Python package (`mamba-mcp`) with optional extras, containing MCP (Model Context Protocol) modules:
 
-- **mamba-mcp-core** - Shared utilities (CLI helpers, error models, fuzzy matching, transport normalization)
-- **mamba-mcp-client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
-- **mamba-mcp-pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
-- **mamba-mcp-fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
-- **mamba-mcp-hana** - SAP HANA MCP Server with layered schema discovery (11 tools across 4 layers)
-- **mamba-mcp-gitlab** - GitLab MCP Server for merge requests, issues, pipelines, and search (18 tools across 4 categories)
+- **mamba_mcp_core** - Shared utilities (CLI helpers, error models, fuzzy matching, transport normalization)
+- **mamba_mcp_client** - Testing and debugging tool for MCP servers (TUI, CLI, Python API)
+- **mamba_mcp_pg** - PostgreSQL MCP Server with layered schema discovery (8 tools across 3 layers)
+- **mamba_mcp_fs** - Filesystem MCP Server with local and S3 backend support (12 tools across 3 layers)
+- **mamba_mcp_hana** - SAP HANA MCP Server with layered schema discovery (11 tools across 4 layers)
+- **mamba_mcp_gitlab** - GitLab MCP Server for merge requests, issues, pipelines, and search (18 tools across 4 categories)
+
+### Installation Extras
+
+```bash
+pip install mamba-mcp            # core only
+pip install mamba-mcp[client]    # core + client
+pip install mamba-mcp[pg]        # core + pg server
+pip install mamba-mcp[fs]        # core + fs server
+pip install mamba-mcp[hana]      # core + hana server
+pip install mamba-mcp[gitlab]    # core + gitlab server
+pip install mamba-mcp[all]       # everything
+```
 
 ## Development Commands
 
 ```bash
-# Install all packages
-uv sync --group dev
+# Install all extras and dev tools
+uv sync --all-extras --group dev
 
 # Run CLI
-uv run --package mamba-mcp-client mamba-mcp --help
+uv run mamba-mcp --help
 
-# Run tests (per-package to avoid cross-package import conflicts)
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/
-uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
-uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
-uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
-uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
-uv run --package mamba-mcp-gitlab pytest packages/mamba-mcp-gitlab/
+# Run tests (all at once or per-module)
+uv run pytest tests/
+uv run pytest tests/core/
+uv run pytest tests/client/
+uv run pytest tests/pg/
+uv run pytest tests/fs/
+uv run pytest tests/hana/
+uv run pytest tests/gitlab/
 
 # Type check
-mypy packages/
+uv run mypy src/
 
 # Lint and format
-ruff check packages/
-ruff format packages/
+uv run ruff check src/
+uv run ruff format src/
 
-# Add dependencies
-uv add --package mamba-mcp-client some-library
+# Add dev dependencies
 uv add --group dev some-dev-tool
 ```
 
@@ -46,108 +58,98 @@ uv add --group dev some-dev-tool
 
 ```bash
 # Interactive TUI
-uv run --package mamba-mcp-client mamba-mcp tui --stdio "python server.py"
+uv run mamba-mcp tui --stdio "python server.py"
 
 # CLI commands
-uv run --package mamba-mcp-client mamba-mcp connect --stdio "python server.py"
-uv run --package mamba-mcp-client mamba-mcp tools --sse http://localhost:8000/sse
-uv run --package mamba-mcp-client mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
+uv run mamba-mcp connect --stdio "python server.py"
+uv run mamba-mcp tools --sse http://localhost:8000/sse
+uv run mamba-mcp call add --args '{"a": 5, "b": 3}' --stdio "python server.py"
 
 # UV transports
-uv run --package mamba-mcp-client mamba-mcp connect --uv @modelcontextprotocol/server-sqlite
-uv run --package mamba-mcp-client mamba-mcp connect --uv-local-path ./my-server --uv-local-name server
+uv run mamba-mcp connect --uv @modelcontextprotocol/server-sqlite
+uv run mamba-mcp connect --uv-local-path ./my-server --uv-local-name server
 
 # Extra server arguments (-- separator)
-uv run --package mamba-mcp-client mamba-mcp connect --stdio "python server.py" -- --verbose
-uv run --package mamba-mcp-client mamba-mcp tui --sse http://localhost:8000/sse -- env=prod
+uv run mamba-mcp connect --stdio "python server.py" -- --verbose
+uv run mamba-mcp tui --sse http://localhost:8000/sse -- env=prod
 ```
 
 ## Repository Structure
 
 ```
 mamba-mcp/
-├── pyproject.toml              # Workspace configuration
+├── pyproject.toml              # Single package config with extras
 ├── uv.lock                     # Shared lockfile
-├── packages/
-│   ├── mamba-mcp-core/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_core/
-│   │   │   ├── cli.py          # validate_env_file, resolve_default_env_file, setup_logging
-│   │   │   ├── config.py       # _env_file_path state management
-│   │   │   ├── errors.py       # ToolError model & create_tool_error factory
-│   │   │   ├── fuzzy.py        # Levenshtein distance & find_similar_names
-│   │   │   └── transport.py    # normalize_transport
-│   │   └── tests/
-│   ├── mamba-mcp-client/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_client/
-│   │   │   ├── cli.py          # Typer CLI entry point
-│   │   │   ├── client.py       # MCPTestClient async client
-│   │   │   ├── config.py       # Transport configs (Pydantic)
-│   │   │   ├── logging.py      # Protocol logging
-│   │   │   └── tui/app.py      # Textual TUI
-│   │   ├── tests/
-│   │   └── examples/
-│   ├── mamba-mcp-pg/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_pg/
-│   │   │   ├── __main__.py     # Typer CLI (test, serve)
-│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_PG_*)
-│   │   │   ├── errors.py       # Error codes & fuzzy matching
-│   │   │   ├── server.py       # FastMCP server & lifespan
-│   │   │   ├── database/       # SQLAlchemy async services
-│   │   │   ├── models/         # Pydantic I/O models
-│   │   │   └── tools/          # MCP tool definitions (8 tools)
-│   │   └── tests/
-│   ├── mamba-mcp-fs/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_fs/
-│   │   │   ├── __main__.py     # Typer CLI (test, serve)
-│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_FS_*)
-│   │   │   ├── content.py      # MIME detection & text/binary classification
-│   │   │   ├── errors.py       # Error codes & fuzzy matching
-│   │   │   ├── security.py     # Sandbox & path traversal enforcement
-│   │   │   ├── rate_limit.py   # Sliding window rate limiter
-│   │   │   ├── server.py       # FastMCP server & lifespan
-│   │   │   ├── backends/       # LocalBackend, S3Backend, BackendManager
-│   │   │   ├── models/         # Pydantic I/O models
-│   │   │   └── tools/          # MCP tool definitions (12 tools)
-│   │   └── tests/
-│   ├── mamba-mcp-hana/
-│   │   ├── pyproject.toml
-│   │   ├── src/mamba_mcp_hana/
-│   │   │   ├── __main__.py     # Typer CLI (test, serve)
-│   │   │   ├── config.py       # Pydantic settings (MAMBA_MCP_HANA_*)
-│   │   │   ├── errors.py       # Error codes & fuzzy matching
-│   │   │   ├── server.py       # FastMCP server & lifespan
-│   │   │   ├── database/       # hdbcli async services
-│   │   │   ├── models/         # Pydantic I/O models
-│   │   │   └── tools/          # MCP tool definitions (11 tools)
-│   │   └── tests/
-│   └── mamba-mcp-gitlab/
-│       ├── pyproject.toml
-│       ├── src/mamba_mcp_gitlab/
-│       │   ├── __main__.py     # Typer CLI (test, serve)
-│       │   ├── config.py       # Pydantic settings (MAMBA_MCP_GITLAB_*)
-│       │   ├── auth.py         # PAT & OAuth 2.0 auth strategies
-│       │   ├── errors.py       # Error codes & fuzzy matching
-│       │   ├── rate_limit.py   # Sliding window rate limiter
-│       │   ├── server.py       # FastMCP server & lifespan
-│       │   ├── services/       # GitLab API service classes
-│       │   ├── models/         # Pydantic I/O models
-│       │   └── tools/          # MCP tool definitions (18 tools)
-│       └── tests/
+├── src/
+│   ├── mamba_mcp_core/
+│   │   ├── cli.py              # validate_env_file, resolve_default_env_file, setup_logging
+│   │   ├── config.py           # _env_file_path state management
+│   │   ├── errors.py           # ToolError model & create_tool_error factory
+│   │   ├── fuzzy.py            # Levenshtein distance & find_similar_names
+│   │   └── transport.py        # normalize_transport
+│   ├── mamba_mcp_client/
+│   │   ├── cli.py              # Typer CLI entry point
+│   │   ├── client.py           # MCPTestClient async client
+│   │   ├── config.py           # Transport configs (Pydantic)
+│   │   ├── logging.py          # Protocol logging
+│   │   └── tui/app.py          # Textual TUI
+│   ├── mamba_mcp_pg/
+│   │   ├── __main__.py         # Typer CLI (test, serve)
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_PG_*)
+│   │   ├── errors.py           # Error codes & fuzzy matching
+│   │   ├── server.py           # FastMCP server & lifespan
+│   │   ├── database/           # SQLAlchemy async services
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # MCP tool definitions (8 tools)
+│   ├── mamba_mcp_fs/
+│   │   ├── __main__.py         # Typer CLI (test, serve)
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_FS_*)
+│   │   ├── content.py          # MIME detection & text/binary classification
+│   │   ├── errors.py           # Error codes & fuzzy matching
+│   │   ├── security.py         # Sandbox & path traversal enforcement
+│   │   ├── rate_limit.py       # Sliding window rate limiter
+│   │   ├── server.py           # FastMCP server & lifespan
+│   │   ├── backends/           # LocalBackend, S3Backend, BackendManager
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # MCP tool definitions (12 tools)
+│   ├── mamba_mcp_hana/
+│   │   ├── __main__.py         # Typer CLI (test, serve)
+│   │   ├── config.py           # Pydantic settings (MAMBA_MCP_HANA_*)
+│   │   ├── errors.py           # Error codes & fuzzy matching
+│   │   ├── server.py           # FastMCP server & lifespan
+│   │   ├── database/           # hdbcli async services
+│   │   ├── models/             # Pydantic I/O models
+│   │   └── tools/              # MCP tool definitions (11 tools)
+│   └── mamba_mcp_gitlab/
+│       ├── __main__.py         # Typer CLI (test, serve)
+│       ├── config.py           # Pydantic settings (MAMBA_MCP_GITLAB_*)
+│       ├── auth.py             # PAT & OAuth 2.0 auth strategies
+│       ├── errors.py           # Error codes & fuzzy matching
+│       ├── rate_limit.py       # Sliding window rate limiter
+│       ├── server.py           # FastMCP server & lifespan
+│       ├── services/           # GitLab API service classes
+│       ├── models/             # Pydantic I/O models
+│       └── tools/              # MCP tool definitions (18 tools)
+├── tests/
+│   ├── core/
+│   ├── client/
+│   ├── pg/
+│   ├── fs/                     # Includes test_backends/, test_tools/ subdirs
+│   ├── hana/
+│   └── gitlab/
+├── examples/                   # Client usage examples
+├── docs/                       # MkDocs documentation site
 └── internal/                   # Specs & images
 ```
 
-## Architecture (mamba-mcp-client)
+## Architecture (mamba_mcp_client)
 
 - `ClientConfig` factory methods: `for_stdio()`, `for_sse()`, `for_http()`, `for_uv_installed()`, `for_uv_local()`
 - `MCPTestClient` is an async context manager: `async with client.connect():`
 - Transport types: `STDIO`, `SSE`, `HTTP`, `UV_INSTALLED`, `UV_LOCAL`
 - Environment config prefix: `MAMBA_MCP_CLIENT_` (e.g., `MAMBA_MCP_CLIENT_STDIO__COMMAND`)
 
-## Architecture (mamba-mcp-pg)
+## Architecture (mamba_mcp_pg)
 
 - 3-layer MCP tool architecture:
   - **Layer 1 (Schema Discovery):** `list_schemas`, `list_tables`, `describe_table`, `get_sample_rows`
@@ -159,7 +161,7 @@ mamba-mcp/
 - CLI: `mamba-mcp-pg --env-file .env test` / `mamba-mcp-pg` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `sqlalchemy[asyncio]`, `asyncpg`
 
-## Architecture (mamba-mcp-fs)
+## Architecture (mamba_mcp_fs)
 
 - 3-layer MCP tool architecture:
   - **Layer 1 (Discovery):** `list_directory`, `get_file_info`, `read_file`, `search_files` (always registered)
@@ -172,7 +174,7 @@ mamba-mcp/
 - CLI: `mamba-mcp-fs --env-file mamba.env test` / `mamba-mcp-fs` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `fsspec`, `s3fs`, `pydantic-settings`
 
-## Architecture (mamba-mcp-hana)
+## Architecture (mamba_mcp_hana)
 
 - 4-layer MCP tool architecture:
   - **Layer 1 (Schema Discovery):** `list_schemas`, `list_tables`, `describe_table`, `get_sample_rows`
@@ -187,7 +189,7 @@ mamba-mcp/
 - CLI: `mamba-mcp-hana --env-file mamba.env test` / `mamba-mcp-hana` (serve)
 - Uses `mcp>=1.0.0` (FastMCP), `hdbcli`, `pydantic-settings`
 
-## Architecture (mamba-mcp-gitlab)
+## Architecture (mamba_mcp_gitlab)
 
 - 4-category MCP tool architecture:
   - **Merge Requests (7 tools):** `list_mrs`, `get_mr`, `get_mr_diffs`, `get_mr_commits`, `get_mr_pipelines`, `create_mr`, `update_mr`
@@ -205,51 +207,53 @@ mamba-mcp/
 ## Dependency Graph
 
 ```
-mamba-mcp-core (shared library, no CLI)
-  ↑ depended on by all 4 servers
-  ├── mamba-mcp-pg     (asyncpg, sqlalchemy[asyncio])
-  ├── mamba-mcp-fs     (fsspec, s3fs)
-  ├── mamba-mcp-hana   (hdbcli)
-  └── mamba-mcp-gitlab (httpx)
-
-mamba-mcp-client (fully independent — no dependency on core or any server)
-  └── fastmcp, textual, httpx
+mamba-mcp (single PyPI package)
+├── base deps: pydantic, typer
+├── [client] extra: fastmcp, textual, httpx, ...
+├── [pg] extra: mcp, sqlalchemy[asyncio], asyncpg, pydantic-settings
+├── [fs] extra: mcp, fsspec, s3fs, pydantic-settings
+├── [hana] extra: mcp, hdbcli, pydantic-settings
+├── [gitlab] extra: mcp, httpx, pydantic-settings
+└── [all] extra: all of the above
 ```
 
-- **Client is independent**: It does not import from `mamba-mcp-core` or any server package
-- **Servers all depend on core**: Shared CLI helpers, error model, fuzzy matching, transport normalization
-- **No cross-server dependencies**: PG, FS, HANA, and GitLab are completely independent of each other
+**Internal module relationships:**
+- **Core is always available**: All modules can import from `mamba_mcp_core`
+- **Client is independent**: It does not import from `mamba_mcp_core` or any server module
+- **No cross-server imports**: PG, FS, HANA, and GitLab do not import from each other
 - **Total MCP tools**: 49 across all servers (PG: 8, FS: 12, HANA: 11, GitLab: 18)
 
 ## Critical Files for Onboarding
 
 When getting familiar with this codebase, read these files in order:
 
-1. `packages/mamba-mcp-pg/src/mamba_mcp_pg/server.py` — The reference server implementation (HANA and FS were modeled from this)
-2. `packages/mamba-mcp-pg/src/mamba_mcp_pg/tools/schema_tools.py` — Canonical tool handler pattern used by all 49 tools
-3. `packages/mamba-mcp-core/src/mamba_mcp_core/errors.py` — Shared `ToolError` model with dependency-injected suggestions
-4. `packages/mamba-mcp-fs/src/mamba_mcp_fs/security.py` — Most security-critical file, defense-in-depth path validation
-5. `packages/mamba-mcp-fs/src/mamba_mcp_fs/backends/base.py` — `BackendProtocol` + `BackendManager` routing pattern
-6. `packages/mamba-mcp-client/src/mamba_mcp_client/client.py` — `MCPTestClient` async context manager
+1. `src/mamba_mcp_pg/server.py` — The reference server implementation (HANA and FS were modeled from this)
+2. `src/mamba_mcp_pg/tools/schema_tools.py` — Canonical tool handler pattern used by all 49 tools
+3. `src/mamba_mcp_core/errors.py` — Shared `ToolError` model with dependency-injected suggestions
+4. `src/mamba_mcp_fs/security.py` — Most security-critical file, defense-in-depth path validation
+5. `src/mamba_mcp_fs/backends/base.py` — `BackendProtocol` + `BackendManager` routing pattern
+6. `src/mamba_mcp_client/client.py` — `MCPTestClient` async context manager
 
-## Creating a New MCP Server Package
+## Creating a New MCP Server Module
 
-Use `mamba-mcp-pg` as the template. A new server package needs:
+Use `mamba_mcp_pg` as the template. A new server module needs:
 
-1. `__main__.py` — Copy PG's pattern: Typer app with `invoke_without_command=True`, bare command starts server, `test` subcommand validates connectivity
-2. `server.py` — `@dataclass AppContext` + `app_lifespan()` + `mcp = FastMCP(name, lifespan=...)`
-3. `config.py` — Nested Pydantic BaseSettings with `@model_validator(mode="before")` for env file bridging
-4. `errors.py` — `ErrorCode` class + `ERROR_SUGGESTIONS` dict + `create_tool_error()` wrapper
-5. `models/` — Input/Output model pairs with `Field(description="...")`
-6. `database/` or `backends/` — Service layer classes
-7. `tools/` — `@mcp.tool()` handlers following the 7-step skeleton
-8. `tests/` — Class-based tests, autouse fixtures for config state reset
+1. `src/mamba_mcp_<name>/` — New module directory under `src/`
+2. `__main__.py` — Copy PG's pattern: Typer app with `invoke_without_command=True`, bare command starts server, `test` subcommand validates connectivity
+3. `server.py` — `@dataclass AppContext` + `app_lifespan()` + `mcp = FastMCP(name, lifespan=...)`
+4. `config.py` — Nested Pydantic BaseSettings with `@model_validator(mode="before")` for env file bridging
+5. `errors.py` — `ErrorCode` class + `ERROR_SUGGESTIONS` dict + `create_tool_error()` wrapper
+6. `models/` — Input/Output model pairs with `Field(description="...")`
+7. `database/` or `backends/` — Service layer classes
+8. `tools/` — `@mcp.tool()` handlers following the 7-step skeleton
+9. `tests/<name>/` — Class-based tests, autouse fixtures for config state reset
+10. `pyproject.toml` — Add new extra in `[project.optional-dependencies]`, add entry point in `[project.scripts]`, add to `[tool.hatch.build.targets.wheel]` packages list
 
 ## Key Patterns to Follow
 
-### Server Package Pattern (pg, fs, hana)
+### Server Module Pattern (pg, fs, hana, gitlab)
 
-When creating or modifying MCP server packages, follow these established patterns:
+When creating or modifying MCP server modules, follow these established patterns:
 
 1. **AppContext via Lifespan** — All servers use `@dataclass class AppContext` yielded from an `app_lifespan()` async context manager. Tools access it via `ctx.request_context.lifespan_context`. Resources (engines, pools, backends) init at startup, cleanup on shutdown.
 
@@ -287,39 +291,43 @@ When creating or modifying MCP server packages, follow these established pattern
 - **Descriptive names:** `test_for_stdio()`, `test_unknown_extension_no_content()`
 - **One-line docstrings:** Every test has a docstring explaining what it tests
 - **File naming:** `test_<module>.py` mirrors source structure
+- **Test paths:** `tests/{core,client,pg,fs,hana,gitlab}/` — each module has its own test subdirectory
+- **Cross-file imports:** Use `from tests.<suite>.conftest import <helper>` (e.g., `from tests.pg.conftest import create_mock_result`)
 - **Parametrize:** Use `@pytest.mark.parametrize` for 3+ similar test cases
 - **Autouse fixtures:** Reset module-level state (`set_env_file_path(None)`) to prevent leakage
-- **Mock helpers:** `create_mock_result()` in conftest.py for SQLAlchemy row mocking
+- **Mock helpers:** `create_mock_result()` in per-suite conftest.py for SQLAlchemy row mocking
 - **Async tests:** `asyncio_mode = "auto"` in root pyproject.toml — no need for `@pytest.mark.asyncio`
 - **Coverage target:** Security-critical modules target 100% coverage
 
 ## Known Inconsistencies
 
-- **Error return types:** `mamba-mcp-pg` `create_tool_error()` returns `dict[str, Any]`, `mamba-mcp-hana` returns `ToolError` model instance, `mamba-mcp-fs` uses custom exception hierarchy (`FSError` base). All share the core `ToolError` model via `mamba-mcp-core`; the wrapper functions preserve each server's existing return type contract.
+- **Error return types:** `mamba_mcp_pg` `create_tool_error()` returns `dict[str, Any]`, `mamba_mcp_hana` returns `ToolError` model instance, `mamba_mcp_fs` uses custom exception hierarchy (`FSError` base). All share the core `ToolError` model via `mamba_mcp_core`; the wrapper functions preserve each server's existing return type contract.
 - **FS error architecture:** FS intentionally keeps its custom exception hierarchy (`FSError` base + 9 subclasses) for internal backend flow control — a pattern the DB servers don't need.
 
 ### Resolved Inconsistencies
 
 The following have been standardized:
-- ~~Module name~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other packages)
+- ~~Module name~~ — `mamba-mcp-hana` now maps to `mamba_mcp_hana` (1:1 like other modules)
 - ~~Tool return types~~ — All servers now return `OutputModel | dict[str, Any]` (HANA migrated from `str`)
-- ~~Fuzzy matching thresholds~~ — All servers use `mamba-mcp-core`'s scaled threshold: `max(2, min(len//2, 5))`
+- ~~Fuzzy matching thresholds~~ — All servers use `mamba_mcp_core`'s scaled threshold: `max(2, min(len//2, 5))`
 - ~~Transport naming~~ — All servers accept both `"http"` and `"streamable-http"`, normalized via core
-- ~~Code duplication~~ — CLI helpers, config state, errors, and fuzzy matching consolidated in `mamba-mcp-core`
+- ~~Code duplication~~ — CLI helpers, config state, errors, and fuzzy matching consolidated in `mamba_mcp_core`
+- ~~Package structure~~ — Consolidated from 6 separate PyPI packages into single `mamba-mcp` package with extras
 
 ## CI/CD Notes
 
 - **Pipeline**: `.github/workflows/ci.yml` runs lint, type-check, and test jobs in parallel
-- **Test matrix**: Per-package isolation via `uv run --package` (core, client, pg, fs, hana, gitlab)
+- **Test matrix**: Per-suite isolation via `uv run pytest tests/${{ matrix.suite }}/` (core, client, pg, fs, hana, gitlab)
 - **Client test coverage**: Minimal — only `test_client.py` exists; CLI commands and TUI lack tests
 
 ## Versioning & Release Process
 
-All 6 packages share a single version derived from git tags via **hatch-vcs**.
+Single version derived from git tags via **hatch-vcs**.
 
 - **Version source of truth**: Git tags (e.g., `v0.1.0`)
-- **Dynamic versioning**: Each package's `pyproject.toml` uses `dynamic = ["version"]` with `hatch-vcs`
-- **`_version.py` files**: Auto-generated at build time, gitignored — do not commit these
+- **Dynamic versioning**: `pyproject.toml` uses `dynamic = ["version"]` with `hatch-vcs`
+- **`_version.py` file**: Auto-generated at build time at `src/mamba_mcp_core/_version.py`, gitignored — do not commit
+- **Version sharing**: All 5 other modules import version from `mamba_mcp_core._version`
 - **Dev version fallback**: `__init__.py` files fall back to `"0.0.0.dev0"` when `_version.py` doesn't exist (editable installs)
 
 ### How to Release
@@ -332,7 +340,7 @@ All 6 packages share a single version derived from git tags via **hatch-vcs**.
 ### Release Pipeline (`.github/workflows/release.yml`)
 
 - Triggered by `v*` tags pushed to the repository
-- Builds all 6 packages with `uv build --package <name>`
+- Builds single package with `uv build`
 - Publishes to TestPyPI first (gate), then PyPI, then creates a GitHub Release
 - Uses OIDC trusted publishing (no API tokens needed — configured in PyPI/TestPyPI settings)
 
@@ -340,6 +348,6 @@ All 6 packages share a single version derived from git tags via **hatch-vcs**.
 
 - Python 3.11+
 - Line length: 100 (Ruff)
-- MyPy strict mode
+- MyPy strict mode with `mypy_path = "src"`
 - pytest asyncio auto mode
 - Ruff rules: E, F, I, N, W, UP

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** Consolidated 6 separate PyPI packages into single `mamba-mcp` package with optional extras
+  - Base install (`pip install mamba-mcp`) includes only core utilities
+  - Client available via `mamba-mcp[client]`
+  - Servers available via `mamba-mcp[pg]`, `mamba-mcp[fs]`, `mamba-mcp[hana]`, `mamba-mcp[gitlab]`
+  - `pip install mamba-mcp[all]` installs everything
+  - All Python module names unchanged (`mamba_mcp_core`, `mamba_mcp_pg`, etc.)
+  - Added `mamba-mcp` CLI alias for the client
+  - Source code moved from `packages/*/src/` to `src/`
+  - Tests moved from `packages/*/tests/` to `tests/{core,client,pg,fs,hana,gitlab}/`
+  - Single `pyproject.toml` replaces 7 (root + 6 per-package)
+  - CI/CD builds single wheel instead of 6 separate packages
+- Upgraded `str, Enum` classes to `StrEnum` in client package (Python 3.11+)
+
 ## [0.1.0] - 2026-02-10
 
 ### Added

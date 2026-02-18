@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide covers everything you need to set up a local development environment, run tests, and contribute to the Mamba MCP monorepo.
+This guide covers everything you need to set up a local development environment, run tests, and contribute to Mamba MCP.
 
 ## Prerequisites
 
@@ -8,8 +8,8 @@ Before getting started, make sure the following tools are installed on your mach
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| **Python** | 3.11+ | Runtime for all packages |
-| **UV** | Latest | Package manager and workspace orchestrator |
+| **Python** | 3.11+ | Runtime |
+| **UV** | Latest | Package manager |
 | **Git** | 2.x+ | Version control |
 
 !!! tip "Installing UV"
@@ -30,27 +30,27 @@ git clone https://github.com/sequenzia/mamba-mcp.git
 cd mamba-mcp
 ```
 
-### 2. Install All Packages
+### 2. Install with All Extras
 
-A single command installs every workspace package and all development dependencies:
+A single command installs the package with all optional extras and development dependencies:
 
 ```bash
-uv sync --group dev
+uv sync --all-extras --group dev
 ```
 
-This resolves the full dependency graph across all six packages (`mamba-mcp-core`, `mamba-mcp-client`, `mamba-mcp-pg`, `mamba-mcp-fs`, `mamba-mcp-hana`, `mamba-mcp-gitlab`) and pins everything in the shared `uv.lock` lockfile.
+This resolves the full dependency graph across all extras (`client`, `pg`, `fs`, `hana`, `gitlab`) and pins everything in the `uv.lock` lockfile.
 
 ### 3. Verify the Installation
 
 ```bash
-uv run --package mamba-mcp-client mamba-mcp --help
+uv run mamba-mcp --help
 ```
 
 You should see the CLI help output for the MCP test client.
 
 ### Dev Dependencies
 
-The workspace-level `[dependency-groups]` in the root `pyproject.toml` provides these shared development tools:
+The `[dependency-groups]` in `pyproject.toml` provides these shared development tools:
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -63,50 +63,51 @@ The workspace-level `[dependency-groups]` in the root `pyproject.toml` provides 
 
 ## Running Tests
 
-### Per-Package Isolation
+### Test Suites
 
-Tests must be run per-package to avoid cross-package import conflicts. Each package has its own test suite under its `tests/` directory.
+Each module has its own test suite under `tests/`. You can run all tests at once or target a specific suite:
 
 ```bash
-uv run --package mamba-mcp-core pytest packages/mamba-mcp-core/
-uv run --package mamba-mcp-client pytest packages/mamba-mcp-client/
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/
-uv run --package mamba-mcp-fs pytest packages/mamba-mcp-fs/
-uv run --package mamba-mcp-hana pytest packages/mamba-mcp-hana/
-uv run --package mamba-mcp-gitlab pytest packages/mamba-mcp-gitlab/
-```
+# Run all tests
+uv run pytest tests/
 
-!!! warning "Do Not Run Tests at the Root"
-    Running `pytest` from the workspace root without `--package` will cause import resolution issues between packages. Always use the `uv run --package` pattern shown above.
+# Run a specific suite
+uv run pytest tests/core/
+uv run pytest tests/client/
+uv run pytest tests/pg/
+uv run pytest tests/fs/
+uv run pytest tests/hana/
+uv run pytest tests/gitlab/
+```
 
 ### Running with Coverage
 
 ```bash
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/ --cov=mamba_mcp_pg --cov-report=term-missing
+uv run pytest tests/pg/ --cov=mamba_mcp_pg --cov-report=term-missing
 ```
 
 ### Running a Specific Test
 
 ```bash
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/tests/test_schema_tools.py::TestListSchemas -v
+uv run pytest tests/pg/test_schema_tools.py::TestListSchemas -v
 ```
 
 ### Verbose Output
 
 ```bash
-uv run --package mamba-mcp-pg pytest packages/mamba-mcp-pg/ --tb=short -q
+uv run pytest tests/pg/ --tb=short -q
 ```
 
 ## Type Checking
 
-The project uses MyPy in **strict mode** across all packages:
+The project uses MyPy in **strict mode** across all source modules:
 
 ```bash
-uv run mypy packages/
+uv run mypy src/
 ```
 
 !!! info "MyPy Configuration"
-    Strict mode is configured in the root `pyproject.toml` with targeted overrides:
+    Strict mode is configured in `pyproject.toml` with targeted overrides:
 
     - **Test and example directories** are excluded from type checking
     - **Third-party libraries** without stubs (e.g., `mcp`, `fastmcp`, `textual`, `hdbcli`) have `ignore_missing_imports = true`
@@ -120,30 +121,30 @@ The project uses [Ruff](https://docs.astral.sh/ruff/) for both linting and forma
 ### Check for Lint Errors
 
 ```bash
-uv run ruff check packages/
+uv run ruff check src/
 ```
 
 ### Auto-Fix Lint Errors
 
 ```bash
-uv run ruff check packages/ --fix
+uv run ruff check src/ --fix
 ```
 
 ### Format Code
 
 ```bash
-uv run ruff format packages/
+uv run ruff format src/
 ```
 
 ### Check Formatting Without Modifying Files
 
 ```bash
-uv run ruff format --check packages/
+uv run ruff format --check src/
 ```
 
 ### Ruff Configuration
 
-The Ruff rules are defined in the root `pyproject.toml`:
+The Ruff rules are defined in `pyproject.toml`:
 
 ```toml title="pyproject.toml"
 [tool.ruff]
@@ -165,11 +166,9 @@ select = ["E", "F", "I", "N", "W", "UP"]
 
 ## Adding Dependencies
 
-### To a Specific Package
+### To a Specific Extra
 
-```bash
-uv add --package mamba-mcp-client some-library
-```
+Add dependencies to the appropriate optional extra group in `pyproject.toml`. For example, to add a library needed by the PostgreSQL server, add it to the `pg` extra in the `[project.optional-dependencies]` section.
 
 ### To the Dev Dependency Group
 
@@ -177,8 +176,8 @@ uv add --package mamba-mcp-client some-library
 uv add --group dev some-dev-tool
 ```
 
-!!! note "Workspace Lockfile"
-    All dependency changes update the shared `uv.lock` file at the workspace root. Commit this file alongside your `pyproject.toml` changes.
+!!! note "Lockfile"
+    All dependency changes update the `uv.lock` file. Commit this file alongside your `pyproject.toml` changes.
 
 ## CI/CD
 
@@ -194,17 +193,17 @@ graph LR
     Push --> TypeCheck[Type Check]
     Push --> Test
 
-    Lint --> L1[ruff check packages/]
-    Lint --> L2[ruff format --check packages/]
+    Lint --> L1[ruff check src/]
+    Lint --> L2[ruff format --check src/]
 
-    TypeCheck --> T1[mypy packages/]
+    TypeCheck --> T1[mypy src/]
 
-    Test --> M1[mamba-mcp-core]
-    Test --> M2[mamba-mcp-client]
-    Test --> M3[mamba-mcp-pg]
-    Test --> M4[mamba-mcp-fs]
-    Test --> M5[mamba-mcp-hana]
-    Test --> M6[mamba-mcp-gitlab]
+    Test --> M1[core]
+    Test --> M2[client]
+    Test --> M3[pg]
+    Test --> M4[fs]
+    Test --> M5[hana]
+    Test --> M6[gitlab]
 ```
 
 ### Jobs
@@ -214,8 +213,8 @@ graph LR
     Checks code style and formatting:
 
     ```yaml
-    - run: uv run ruff check packages/
-    - run: uv run ruff format --check packages/
+    - run: uv run ruff check src/
+    - run: uv run ruff format --check src/
     ```
 
 === "Type Check"
@@ -223,39 +222,39 @@ graph LR
     Runs MyPy in strict mode:
 
     ```yaml
-    - run: uv run mypy packages/
+    - run: uv run mypy src/
     ```
 
 === "Test"
 
-    Uses a matrix strategy to run each package's tests in isolation with `fail-fast: false`:
+    Uses a matrix strategy to run each test suite with `fail-fast: false`:
 
     ```yaml
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - mamba-mcp-core
-          - mamba-mcp-client
-          - mamba-mcp-pg
-          - mamba-mcp-fs
-          - mamba-mcp-hana
-          - mamba-mcp-gitlab
+        suite:
+          - core
+          - client
+          - pg
+          - fs
+          - hana
+          - gitlab
     steps:
-      - run: uv run --package ${{ matrix.package }} pytest packages/${{ matrix.package }}/ --tb=short -q
+      - run: uv run pytest tests/${{ matrix.suite }}/ --tb=short -q
     ```
 
 All jobs use `astral-sh/setup-uv@v4` with caching enabled for fast installs.
 
 ## Testing Conventions
 
-Follow these conventions when writing tests for any package.
+Follow these conventions when writing tests for any module.
 
 ### Class-Based Organization
 
 Group related tests into classes. Each class focuses on a single function, feature, or component:
 
-```python title="tests/test_schema_tools.py"
+```python title="tests/pg/test_schema_tools.py"
 class TestListSchemas:
     """Tests for list_schemas functionality."""
 
@@ -291,7 +290,7 @@ class TestListTables:
 
 ### Async Test Mode
 
-The root `pyproject.toml` sets `asyncio_mode = "auto"`, which means you do **not** need `@pytest.mark.asyncio` on async test methods. Just define them as `async def`:
+The `pyproject.toml` sets `asyncio_mode = "auto"`, which means you do **not** need `@pytest.mark.asyncio` on async test methods. Just define them as `async def`:
 
 ```python
 async def test_some_async_operation(self) -> None:
@@ -322,7 +321,7 @@ async def test_table_exists(self, input_name: str, expected: bool) -> None:
 
 Module-level state (like `_env_file_path`) must be reset between tests using autouse fixtures:
 
-```python title="tests/conftest.py"
+```python title="tests/pg/conftest.py"
 @pytest.fixture(autouse=True)
 def reset_env_file_path() -> Generator[None, None, None]:
     """Reset env file path state before and after each test."""
@@ -333,9 +332,9 @@ def reset_env_file_path() -> Generator[None, None, None]:
 
 ### Mock Helpers
 
-Each server package provides `create_mock_result()` in its `conftest.py` for constructing mock database rows:
+Each server's test suite provides `create_mock_result()` in its `conftest.py` for constructing mock database rows:
 
-```python title="tests/conftest.py"
+```python title="tests/pg/conftest.py"
 def create_mock_result(rows: list[dict[str, Any]]) -> MagicMock:
     """Create a mock database result."""
     mock_result = MagicMock()
@@ -373,47 +372,41 @@ def create_mock_result(rows: list[dict[str, Any]]) -> MagicMock:
 - Validation via `Field(ge=1, le=100)`, `pattern=`, `min_length` / `max_length`
 - Centralized exports in `models/__init__.py` with `__all__`
 
-## Creating a New Server Package
+## Creating a New Server Module
 
-Use `mamba-mcp-pg` as the canonical template. A new server package requires the following files and directories.
+To add a new MCP server, create a new source module under `src/` and a corresponding test suite under `tests/`. Use `mamba_mcp_pg` as the canonical template.
 
 ### Required Structure
 
 ```
-packages/mamba-mcp-<name>/
-├── pyproject.toml
-├── src/mamba_mcp_<name>/
-│   ├── __init__.py
-│   ├── __main__.py        # Typer CLI entry point
-│   ├── server.py          # FastMCP server + lifespan
-│   ├── config.py          # Pydantic settings
-│   ├── errors.py          # Error codes + suggestions
-│   ├── models/            # Input/Output Pydantic models
-│   │   └── __init__.py
-│   ├── tools/             # @mcp.tool() handlers
-│   │   └── __init__.py
-│   └── database/          # Service layer (or backends/)
-│       └── __init__.py
-└── tests/
-    ├── __init__.py
-    └── conftest.py
+src/mamba_mcp_<name>/
+├── __init__.py
+├── __main__.py        # Typer CLI entry point
+├── server.py          # FastMCP server + lifespan
+├── config.py          # Pydantic settings
+├── errors.py          # Error codes + suggestions
+├── models/            # Input/Output Pydantic models
+│   └── __init__.py
+├── tools/             # @mcp.tool() handlers
+│   └── __init__.py
+└── database/          # Service layer (or backends/, services/)
+    └── __init__.py
+
+tests/<name>/
+├── __init__.py
+└── conftest.py
 ```
 
 ### Step-by-Step
 
-#### 1. `pyproject.toml`
+#### 1. Register the Extra in `pyproject.toml`
 
-Define the package with `mamba-mcp-core` as a dependency:
+Add a new optional extra for the server's dependencies:
 
-```toml title="packages/mamba-mcp-<name>/pyproject.toml"
-[project]
-name = "mamba-mcp-<name>"
-version = "0.1.0"
-description = "Description of your MCP server"
-requires-python = ">=3.11"
-
-dependencies = [
-    "mamba-mcp-core",
+```toml title="pyproject.toml"
+[project.optional-dependencies]
+# ... existing extras ...
+<name> = [
     "mcp>=1.0.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
@@ -422,15 +415,11 @@ dependencies = [
 ]
 
 [project.scripts]
+# ... existing scripts ...
 mamba-mcp-<name> = "mamba_mcp_<name>.__main__:app"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/mamba_mcp_<name>"]
 ```
+
+Also add the new extra to the `all` group so `pip install mamba-mcp[all]` includes it.
 
 #### 2. `server.py` -- AppContext and Lifespan
 
@@ -636,16 +625,9 @@ async def my_tool(
         return create_tool_error(ErrorCode.CONNECTION_ERROR, str(e), "my_tool", {"param": param})
 ```
 
-#### 7. Register the Package
+#### 7. Register in CI
 
-Add the new package to the workspace in the root `pyproject.toml`:
-
-```toml title="pyproject.toml"
-[tool.uv.sources]
-mamba-mcp-<name> = { workspace = true }
-```
-
-Then add it to the CI test matrix in `.github/workflows/ci.yml` and run `uv sync --group dev` to resolve the new package.
+Add the new test suite to the CI test matrix in `.github/workflows/ci.yml` and run `uv sync --all-extras --group dev` to resolve the new dependencies.
 
 ## Git Conventions
 
@@ -669,16 +651,16 @@ type(scope): description
 
 ### Scope
 
-The scope identifies the affected package or area:
+The scope identifies the affected module or area:
 
-| Scope | Package |
-|-------|---------|
-| `core` | mamba-mcp-core |
-| `client` | mamba-mcp-client |
-| `pg` | mamba-mcp-pg |
-| `fs` | mamba-mcp-fs |
-| `hana` | mamba-mcp-hana |
-| `gitlab` | mamba-mcp-gitlab |
+| Scope | Module |
+|-------|--------|
+| `core` | mamba_mcp_core |
+| `client` | mamba_mcp_client |
+| `pg` | mamba_mcp_pg |
+| `fs` | mamba_mcp_fs |
+| `hana` | mamba_mcp_hana |
+| `gitlab` | mamba_mcp_gitlab |
 | `ci` | CI/CD pipeline |
 | `spec` | Internal specifications |
 

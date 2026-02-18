@@ -23,11 +23,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build all packages
-        run: |
-          for pkg in mamba-mcp-core mamba-mcp-client mamba-mcp-pg mamba-mcp-fs mamba-mcp-hana mamba-mcp-gitlab; do
-            uv build --package "$pkg"
-          done
+      - name: Build package
+        run: uv build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
